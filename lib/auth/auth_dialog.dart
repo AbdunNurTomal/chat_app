@@ -25,6 +25,7 @@ class _AuthDialogState extends State<AuthDialog> {
   Users _users = new Users();
   FirebaseAuthService _authentication = new FirebaseAuthService();
   final _loginFormKey = GlobalKey<FormState>();
+  bool showPassword = true;
 
   late FocusNode textFocusNodeEmail;
   bool _isEditingEmail = false;
@@ -34,7 +35,7 @@ class _AuthDialogState extends State<AuthDialog> {
 
   bool _isRegistering = false;
 
-  String? loginStatus;
+  //String? loginStatus;
   Color loginStringColor = Colors.green;
 
   @override
@@ -68,6 +69,7 @@ class _AuthDialogState extends State<AuthDialog> {
 
     LoginSignupProvider loginSignupProvider =
         Provider.of<LoginSignupProvider>(context, listen: false);
+
     _authentication.login(_users, loginSignupProvider, context);
   }
 
@@ -148,6 +150,9 @@ class _AuthDialogState extends State<AuthDialog> {
                       child: TextFormField(
                         controller: GlobalMethod.emailController,
                         validator: GlobalMethod.validateEmail,
+                        onSaved: (newvalue) {
+                          _users.userEmail = newvalue!;
+                        },
                         style: GoogleFonts.openSans(color: Colors.white),
                         decoration: InputDecoration(
                             contentPadding:
@@ -158,6 +163,7 @@ class _AuthDialogState extends State<AuthDialog> {
                             icon:
                                 Icon(Icons.account_circle, color: Colors.white),
                             border: InputBorder.none),
+                        textInputAction: TextInputAction.next,
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -168,10 +174,26 @@ class _AuthDialogState extends State<AuthDialog> {
                           color: CustomColors.secondaryColor,
                           border: Border.all(color: Colors.blue)),
                       child: TextFormField(
+                        obscureText: showPassword,
                         controller: GlobalMethod.passwordController,
                         validator: GlobalMethod.validatePassword,
+                        onSaved: (newvalue) {
+                          _users.userPassword = newvalue!;
+                        },
                         style: GoogleFonts.openSans(color: Colors.white),
                         decoration: InputDecoration(
+                            suffixIcon: IconButton(
+                                icon: Icon(
+                                  (showPassword)
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                  color: Color.fromRGBO(255, 63, 111, 1),
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    showPassword = !showPassword;
+                                  });
+                                }),
                             contentPadding:
                                 EdgeInsets.symmetric(horizontal: 10),
                             labelText: 'Password',

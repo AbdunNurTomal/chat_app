@@ -1,7 +1,8 @@
-import 'package:chat_app/component/side_menu.dart';
-import 'package:chat_app/pages/message/chat_room_page.dart';
-import 'package:chat_app/utils/responsive_screen.dart';
 import 'package:flutter/material.dart';
+
+import '../../component/side_menu.dart';
+import '../../pages/message/chat_room_page.dart';
+import '../../utils/responsive_screen.dart';
 import 'list_user_in_message_screen.dart';
 
 class MessageHomePage extends StatefulWidget {
