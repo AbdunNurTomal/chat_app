@@ -22,14 +22,17 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
-  late final TextEditingController _firstNameController = TextEditingController(text: '');
-  late final TextEditingController _lastNameController = TextEditingController(text: '');
-  late final TextEditingController _emailTextController = TextEditingController(text: '');
-  late final TextEditingController _phoneNumberController = TextEditingController(text: '');
-  late final TextEditingController _passTextController = TextEditingController(text: '');
-  late final TextEditingController _positionCPTextController = TextEditingController(text: '');
+  late final TextEditingController _displayNameController =
+      TextEditingController(text: '');
+  late final TextEditingController _emailTextController =
+      TextEditingController(text: '');
+  late final TextEditingController _phoneNumberController =
+      TextEditingController(text: '');
+  late final TextEditingController _passTextController =
+      TextEditingController(text: '');
+  late final TextEditingController _positionCPTextController =
+      TextEditingController(text: '');
 
-  final FocusNode _lastNameFocusNode = FocusNode();
   final FocusNode _emailFocusNode = FocusNode();
   final FocusNode _phoneNumberFocusNode = FocusNode();
   final FocusNode _passFocusNode = FocusNode();
@@ -44,14 +47,12 @@ class _SignUpState extends State<SignUp> {
 
   @override
   void dispose() {
-    _firstNameController.dispose();
-    _lastNameController.dispose();
+    _displayNameController.dispose();
     _emailTextController.dispose();
     _phoneNumberController.dispose();
     _passTextController.dispose();
     _positionCPTextController.dispose();
 
-    _lastNameFocusNode.dispose();
     _emailFocusNode.dispose();
     _phoneNumberFocusNode.dispose();
     _passFocusNode.dispose();
@@ -88,8 +89,7 @@ class _SignUpState extends State<SignUp> {
           'createdAt': Timestamp.now(),
           'designation': _positionCPTextController.text,
           'email': _emailTextController.text,
-          'first_name': _firstNameController.text,
-          'last_name': _lastNameController.text,
+          'display_name': _displayNameController.text,
           'last_seen': Timestamp.now(),
           'password': _passTextController.text,
           'phone': _phoneNumberController.text,
@@ -282,70 +282,33 @@ class _SignUpState extends State<SignUp> {
             ],
           ),
           const SizedBox(height: 15),
-          // first name & last name
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                      color: CustomColors.secondaryColor,
-                      border: Border.all(color: Colors.blue)),
-                  child: TextFormField(
-                    textInputAction: TextInputAction.next,
-                    onEditingComplete: () =>
-                        FocusScope.of(context).requestFocus(_lastNameFocusNode),
-                    keyboardType: TextInputType.name,
-                    controller: _firstNameController,
-                    validator: (value) {
-                      if (value!.isEmpty) {
-                        return "This Field is missing";
-                      } else {
-                        return null;
-                      }
-                    },
-                    style: GoogleFonts.openSans(color: Colors.white),
-                    decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-                        labelText: 'First name',
-                        labelStyle: GoogleFonts.openSans(color: Colors.white),
-                        icon: const Icon(Icons.account_circle, color: Colors.white),
-                        border: InputBorder.none),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                      color: CustomColors.secondaryColor,
-                      border: Border.all(color: Colors.blue)),
-                  child: TextFormField(
-                    textInputAction: TextInputAction.next,
-                    onEditingComplete: () => FocusScope.of(context) .requestFocus(_emailFocusNode),
-                    keyboardType: TextInputType.name,
-                    controller: _lastNameController,
-                    validator: (value) {
-                      if (value!.isEmpty) {
-                        return "This Field is missing";
-                      } else {
-                        return null;
-                      }
-                    },
-                    style: GoogleFonts.openSans(color: Colors.white),
-                    decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-                        labelText: 'Last name',
-                        labelStyle: GoogleFonts.openSans(color: Colors.white),
-                        icon: const Icon(Icons.account_circle, color: Colors.white),
-                        border: InputBorder.none),
-                  ),
-                ),
-              ),
-            ],
+          // display name
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+                color: CustomColors.secondaryColor,
+                border: Border.all(color: Colors.blue)),
+            child: TextFormField(
+              textInputAction: TextInputAction.next,
+              onEditingComplete: () =>
+                  FocusScope.of(context).requestFocus(_emailFocusNode),
+              keyboardType: TextInputType.name,
+              controller: _displayNameController,
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return "This Field is missing";
+                } else {
+                  return null;
+                }
+              },
+              style: GoogleFonts.openSans(color: Colors.white),
+              decoration: InputDecoration(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                  labelText: 'Display name',
+                  labelStyle: GoogleFonts.openSans(color: Colors.white),
+                  icon: const Icon(Icons.account_circle, color: Colors.white),
+                  border: InputBorder.none),
+            ),
           ),
           const SizedBox(height: 20),
           //Email
@@ -479,12 +442,12 @@ class _SignUpState extends State<SignUp> {
                 },
                 style: GoogleFonts.openSans(color: Colors.white),
                 decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-                  labelText: 'Position in the company',
-                  labelStyle: GoogleFonts.openSans(color: Colors.white),
-                  icon: const Icon(Icons.cases_sharp, color: Colors.white),
-                  border: InputBorder.none),
-            ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                    labelText: 'Position in the company',
+                    labelStyle: GoogleFonts.openSans(color: Colors.white),
+                    icon: const Icon(Icons.cases_sharp, color: Colors.white),
+                    border: InputBorder.none),
+              ),
             ),
           ),
         ],
@@ -612,9 +575,13 @@ class _SignUpState extends State<SignUp> {
                         children: [
                           Icon(
                             Icons.check_circle_rounded,
-                            color: (jobItem)?Colors.green.shade200:Colors.red.shade200,
+                            color: (jobItem)
+                                ? Colors.green.shade200
+                                : Colors.red.shade200,
                           ),
-                          const SizedBox(width: 10,),
+                          const SizedBox(
+                            width: 10,
+                          ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text(

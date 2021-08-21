@@ -110,28 +110,14 @@ class FirebaseAuthService {
   }
 
   // initialize current user
-  Future<void> initializeCurrentUser(
-      LoginSignupProvider loginSignupProvider,BuildContext context) async {
-    User? user = _auth.currentUser;
+  Future<User?> initializeCurrentUser(
+      LoginSignupProvider loginSignupProvider) async {
+    return _auth.currentUser;
 
     //if (user != null) {
     //  loginSignupProvider.setUser(user);
     //  await getUserDetails(loginSignupProvider);
     //}
-
-    if (loginSignupProvider.user == null) {
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (_) => AuthDialog()));
-    } else if (loginSignupProvider.userDetails == null) {
-      print('wait');
-    } else if (loginSignupProvider.userDetails!.userRole == 'admin') {
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (_) => AdminHomePage()));
-    } else {
-      Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (_) => CustomerHomePage()));
-    }
-
   }
 
   // signout
@@ -220,12 +206,19 @@ class FirebaseAuthService {
           user = userCredential.user;
         } on FirebaseException catch (error) {
           if (error.code == 'account-exists-with-different-credential') {
-            GlobalMethod.showErrorDialog(error: 'The account already exists with a different credential.', ctx: context);
+            GlobalMethod.showErrorDialog(
+                error:
+                    'The account already exists with a different credential.',
+                ctx: context);
           } else if (error.code == 'invalid-credential') {
-            GlobalMethod.showErrorDialog(error: 'Error occurred while accessing credentials. Try again.', ctx: context);
+            GlobalMethod.showErrorDialog(
+                error: 'Error occurred while accessing credentials. Try again.',
+                ctx: context);
           }
         } catch (error) {
-          GlobalMethod.showErrorDialog(error: 'Error occurred using Google Sign-In. Try again.', ctx: context);
+          GlobalMethod.showErrorDialog(
+              error: 'Error occurred using Google Sign-In. Try again.',
+              ctx: context);
           //ScaffoldMessenger.of(context).showSnackBar(
           //  customSnackBar(
           //      content: 'Error occurred using Google Sign-In. Try again.'),
@@ -235,5 +228,4 @@ class FirebaseAuthService {
     }
     return user;
   }
-
 }

@@ -1,7 +1,6 @@
 import 'package:chat_app/models/user.dart';
 import 'package:chat_app/utils/constants.dart';
 import 'package:chat_app/utils/global_methods.dart';
-import 'package:chat_app/utils/responsive_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -52,7 +51,7 @@ class _AuthDialogState extends State<AuthDialog> {
     LoginSignupProvider loginSignupProvider =
         Provider.of<LoginSignupProvider>(context, listen: false);
     // initialize current user
-    _authentication.initializeCurrentUser(loginSignupProvider,context);
+    _authentication.initializeCurrentUser(loginSignupProvider);
     GlobalMethod.emailController = TextEditingController();
     GlobalMethod.emailController.text = '';
     GlobalMethod.passwordController = TextEditingController();
@@ -171,8 +170,8 @@ class _AuthDialogState extends State<AuthDialog> {
                               labelText: 'Email Address',
                               labelStyle:
                                   GoogleFonts.openSans(color: Colors.white),
-                              icon:
-                              const Icon(Icons.account_circle, color: Colors.white),
+                              icon: const Icon(Icons.account_circle,
+                                  color: Colors.white),
                               border: InputBorder.none),
                           textInputAction: TextInputAction.next,
                         ),
@@ -198,7 +197,8 @@ class _AuthDialogState extends State<AuthDialog> {
                                     (showPassword)
                                         ? Icons.visibility_off
                                         : Icons.visibility,
-                                    color: const Color.fromRGBO(255, 63, 111, 1),
+                                    color:
+                                        const Color.fromRGBO(255, 63, 111, 1),
                                   ),
                                   onPressed: () {
                                     setState(() {
@@ -206,7 +206,7 @@ class _AuthDialogState extends State<AuthDialog> {
                                     });
                                   }),
                               contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 10),
+                                  const EdgeInsets.symmetric(horizontal: 10),
                               labelText: 'Password',
                               labelStyle:
                                   GoogleFonts.openSans(color: Colors.white),
@@ -224,7 +224,8 @@ class _AuthDialogState extends State<AuthDialog> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => ForgetPasswordScreen(),
+                                    builder: (context) =>
+                                        ForgetPasswordScreen(),
                                   ),
                                 );
                               },

@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
+
+import 'auth/user_profile.dart';
+import 'auth/wait_room.dart';
 import 'pages/admin/admin_home_page.dart';
 import 'pages/customer/customer_home_page.dart';
 import 'pages/manager/manager_home_page.dart';
 import 'pages/supervisor/supervisor_home_page.dart';
 import 'provider/login_signup_provider.dart';
-
 import 'launcher_page.dart';
-
 import 'auth/auth_dialog.dart';
 
 void main() async {
@@ -30,13 +31,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Flutter Demo',
+        title: 'PQC',
         theme: ThemeData(
           primarySwatch: Colors.indigo,
         ),
         home: LauncherPage(),
         routes: {
           LauncherPage.routeName: (context) => LauncherPage(),
+          WaitingRoom.routeName: (context) => WaitingRoom(),
           AuthDialog.routeName: (context) => AuthDialog(),
           AdminHomePage.routeName: (context) => AdminHomePage(),
           CustomerHomePage.routeName: (context) => CustomerHomePage(),

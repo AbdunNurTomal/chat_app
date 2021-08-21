@@ -1,15 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import 'firebase_auth_service.dart';
 import 'login_page.dart';
 import '../utils/custom_color.dart';
 
 class UserProfilePage extends StatefulWidget {
+  final User _user;
   const UserProfilePage({Key? key, required User user})
       : _user = user,
         super(key: key);
-  final User _user;
 
   @override
   _UserProfilePageState createState() => _UserProfilePageState();

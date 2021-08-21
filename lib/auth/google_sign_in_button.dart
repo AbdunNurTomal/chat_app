@@ -1,9 +1,9 @@
 //import 'package:chat_app/pages/users/user_profile_page.dart';
-import 'package:chat_app/auth/user_profile_page.dart';
+import 'package:chat_app/auth/user_profile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../welcome_page.dart';
 import 'firebase_auth_service.dart';
+import 'user_profile.dart';
 
 class GoogleSignInButton extends StatefulWidget {
   @override
@@ -43,7 +43,7 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
                   //Navigator.pushReplacementNamed(context, WelcomePage.routeName);
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
-                      builder: (context) => UserProfilePage(user: user),
+                      builder: (context) => UserProfile(user: user),
                     ),
                   );
                 }
