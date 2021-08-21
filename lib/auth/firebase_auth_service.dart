@@ -99,25 +99,25 @@ class FirebaseAuthService {
 
   // to get user details
   Future<void> getUserDetails(LoginSignupProvider loginSignupProvider) async {
-    FirebaseFirestore.instance
+     FirebaseFirestore.instance
         .collection('users')
         .doc(loginSignupProvider.user!.uid)
         .get()
-        .then((value) {
-      print(value);
-      //loginSignupProvider.setUserDetails(Users.fromMap(value.data()));
-    });
+        .catchError((e) => print(e))
+        .then((value) => (value != null)
+            ? loginSignupProvider.setUserDetails(Users.fromMap(value.data()))
+            : print(value));
   }
 
   // initialize current user
   Future<User?> initializeCurrentUser(
       LoginSignupProvider loginSignupProvider) async {
-    return _auth.currentUser;
-
-    //if (user != null) {
-    //  loginSignupProvider.setUser(user);
-    //  await getUserDetails(loginSignupProvider);
-    //}
+    //return _auth.currentUser;
+    User? user = _auth.currentUser;
+    if (user != null) {
+      loginSignupProvider.setUser(user);
+      await getUserDetails(loginSignupProvider);
+    }
   }
 
   // signout
