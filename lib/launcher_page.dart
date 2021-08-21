@@ -21,7 +21,7 @@ class LauncherPage extends StatefulWidget {
 
 class _LauncherPageState extends State<LauncherPage> {
   FirebaseAuthService _firebaseAuthService = new FirebaseAuthService();
-  User? _user;
+  //User? _user;
 
   @override
   void initState() {
@@ -29,10 +29,9 @@ class _LauncherPageState extends State<LauncherPage> {
         Provider.of<LoginSignupProvider>(context, listen: false);
     Future.delayed(Duration(seconds: 3), () async {
       // initialize current user
-      _user =
-          await _firebaseAuthService.initializeCurrentUser(loginSignupProvider);
+      await _firebaseAuthService.initializeCurrentUser(loginSignupProvider);
 
-      if (_user == null) {
+      if (loginSignupProvider.user == null) {
         Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (_) => AuthDialog()));
       } else if (loginSignupProvider.userDetails == null) {
@@ -40,7 +39,7 @@ class _LauncherPageState extends State<LauncherPage> {
         //print(_user);
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => UserProfile(user: _user!),
+            builder: (context) => UserProfile(user: loginSignupProvider.user!),
           ),
         );
       } else if (loginSignupProvider.userDetails!.userRole != '') {
