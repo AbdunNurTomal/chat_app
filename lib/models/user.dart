@@ -1,17 +1,17 @@
 import 'package:intl/intl.dart';
 
 class Users {
-  late String firstName;
-  late String lastName;
-  late String userEmail;
-  late num userPhone;
-  late String userPassword;
-  late String userRole;
-  late String userLastSeen;
-  late String userPresence;
-  late String userProfilePicUrl;
-  late String userUid;
-  late String createdDateTime;
+  String firstName = '';
+  String lastName = '';
+  String userEmail = '';
+  num userPhone = 0;
+  String userPassword = '';
+  String userRole = '';
+  String userLastSeen = '';
+  String userPresence = '';
+  String userProfilePicUrl = '';
+  String userUid = '';
+  String createdDateTime = '';
 
   Users({
     firstName,

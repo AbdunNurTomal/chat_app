@@ -1,4 +1,5 @@
 //import 'package:chat_app/pages/users/user_profile_page.dart';
+import 'package:chat_app/auth/user_profile_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../welcome_page.dart';
@@ -39,19 +40,16 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
                 });
 
                 if (user != null) {
-                  Navigator.pushReplacementNamed(
-                      context, WelcomePage.routeName);
-                  //Navigator.of(context).pushReplacement(
-                  //  MaterialPageRoute(
-                  //    builder: (context) => UserProfilePage(
-                  //      user: user,
-                  //    ),
-                  //  ),
-                  //);
+                  //Navigator.pushReplacementNamed(context, WelcomePage.routeName);
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                      builder: (context) => UserProfilePage(user: user),
+                    ),
+                  );
                 }
               },
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+              child: const Padding(
+                padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
                 child: Image(
                   image: AssetImage("images/google_logo.png"),
                   height: 35.0,

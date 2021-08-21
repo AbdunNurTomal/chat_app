@@ -1,8 +1,8 @@
-import 'pages/admin/admin_home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'auth/auth_dialog.dart';
 import 'auth/firebase_auth_service.dart';
+import 'pages/admin/admin_home_page.dart';
 import 'pages/customer/customer_home_page.dart';
 import 'provider/login_signup_provider.dart';
 
@@ -21,7 +21,7 @@ class _LauncherPageState extends State<LauncherPage> {
     LoginSignupProvider loginSignupProvider =
         Provider.of<LoginSignupProvider>(context, listen: false);
     // initialize current user
-    _firebaseAuthService.initializeCurrentUser(loginSignupProvider);
+    _firebaseAuthService.initializeCurrentUser(loginSignupProvider,context);
 
     super.initState();
   }
@@ -52,28 +52,14 @@ class _LauncherPageState extends State<LauncherPage> {
         ),
         const SizedBox(height: 30),
         GestureDetector(
-          onTap: () {
-            // check user null
-            if (loginSignupProvider.user == null) {
-              Navigator.pushReplacement(
-                  context, MaterialPageRoute(builder: (_) => AuthDialog()));
-            } else if (loginSignupProvider.userDetails == null) {
-              print('wait');
-            } else if (loginSignupProvider.userDetails.userRole == 'admin') {
-              Navigator.pushReplacement(
-                  context, MaterialPageRoute(builder: (_) => AdminHomePage()));
-            } else {
-              Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (_) => CustomerHomePage()));
-            }
-          },
+          onTap: () { },
           child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 80, vertical: 15),
+            padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 15),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(30),
             ),
-            child: Text(
+            child: const Text(
               "Explore",
               style: TextStyle(
                 fontSize: 20,

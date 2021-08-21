@@ -4,8 +4,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'custom_color.dart';
 
 class GlobalMethod {
-  static String errorMsg = '';
-
+  //static String errorMsg = '';
+  static dynamic screenSize({required context,required String sizeWidthHeight}){
+    Size size = MediaQuery.of(context).size;
+    return (sizeWidthHeight == 'width') ? size.width : size.height;
+  }
   static void showErrorDialog(
       {required String error, required BuildContext ctx}) {
     showDialog(
@@ -33,9 +36,10 @@ class GlobalMethod {
             content: Text(
               '$error',
               style: TextStyle(
-                  color: CustomColors.darkBlue,
-                  fontSize: 20,
-                  fontStyle: FontStyle.italic),
+                color: CustomColors.darkBlue,
+                fontSize: 20,
+                //fontStyle: FontStyle.italic
+              ),
             ),
             actions: [
               TextButton(
@@ -52,6 +56,17 @@ class GlobalMethod {
         });
   }
 
+  static SnackBar customSnackBar({required String content}) {
+    return SnackBar(
+      backgroundColor: Colors.black,
+      content: Text(
+        content,
+        style: const TextStyle(color: Colors.redAccent, letterSpacing: 0.5),
+      ),
+    );
+  }
+
+  static late TextEditingController forgetPassTextController;
   static late TextEditingController emailController;
   static String? validateEmail(String? value) {
     value = value!.trim();
@@ -73,9 +88,9 @@ class GlobalMethod {
   static late TextEditingController passwordController;
   static String? validatePassword(String? value) {
     value = value!.trim();
-    RegExp regex = new RegExp(
-        r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$');
-    //print(value);
+    String pattern =
+        r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~.]).{8,}$';
+    RegExp regex = new RegExp(pattern);
     if (passwordController.text.isNotEmpty) {
       if (value.isEmpty) {
         return 'Password can\'t be empty';
@@ -104,4 +119,5 @@ class GlobalMethod {
       ],
     );
   }
+
 }

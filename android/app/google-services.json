@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "883152792673",
+    "firebase_url": "https://pqcbd-f585c-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "pqcbd-f585c",
+    "storage_bucket": "pqcbd-f585c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:883152792673:android:b5b34459c94c483dad4e20",
+        "android_client_info": {
+          "package_name": "com.pqcbd.chat.chat_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "883152792673-vhb6q8d1l5qlgufv4t25e87tacjlunpf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.pqcbd.chat.chat_app",
+            "certificate_hash": "3f2bb4bf582e44a8f7ce4d70fa6c26d58e25d18b"
+          }
+        },
+        {
+          "client_id": "883152792673-otaljk04pr6nhma1l7i4u7c150u58bb2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDTIFxLRvsbmrxLwtsIGPDDfzPxoWvF3mU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "883152792673-otaljk04pr6nhma1l7i4u7c150u58bb2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

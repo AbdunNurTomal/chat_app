@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
+import 'auth_dialog.dart';
 import 'login_page.dart';
 
 class FirebaseAuthService {
@@ -22,66 +23,74 @@ class FirebaseAuthService {
 
   Future<void> login(Users users, LoginSignupProvider loginSignupProvider,
       BuildContext context) async {
-    UserCredential result;
+    UserCredential? result;
+
+    String email = users.userEmail.toString().trim();
+    String password = users.userPassword.toString().trim();
 
     try {
+      print("$email password $password");
       result = await _auth.signInWithEmailAndPassword(
-          email: users.userEmail, password: users.userPassword);
+          email: email, password: password);
+      print(result);
     } on FirebaseException catch (error) {
       GlobalMethod.showErrorDialog(error: error.message!, ctx: context);
     }
 
     // check email verification
     try {
-      User? user = _auth.currentUser;
-      if (!user!.emailVerified) {
-        _auth.signOut();
-        GlobalMethod.showErrorDialog(
-            error: 'Email ID not Verified', ctx: context);
-      } else {
-        print('Logged In: $user');
-        loginSignupProvider.setUser(user);
-        await getUserDetails(loginSignupProvider);
-        print('done');
-
-        // admin or user navigation
-        if (Responsive.isDesktop(context) || Responsive.isTablet(context)) {
-          Navigator.pushReplacementNamed(context, MessageHomePage.routeName);
+      if (result != null) {
+        User? user = _auth.currentUser;
+        if (!user!.emailVerified) {
+          _auth.signOut();
+          GlobalMethod.showErrorDialog(
+              error: 'Email ID not Verified', ctx: context);
         } else {
-          switch (loginSignupProvider.userDetails.userRole) {
-            case 'admin':
-              Navigator.pushReplacementNamed(context, AdminHomePage.routeName);
-              //Navigator.push(context, MaterialPageRoute(builder: (_) => AdminHomePage()));
-              break;
-            case 'manager':
-              Navigator.pushReplacementNamed(
-                  context, ManagerHomePage.routeName);
-              //Navigator.push(context, MaterialPageRoute(builder: (_) => ManagerHomePage()));
-              break;
-            case 'supervisor':
-              Navigator.pushReplacementNamed(
-                  context, SupervisorHomePage.routeName);
-              //Navigator.push(context,MaterialPageRoute(builder: (_) => SupervisorHomePage()));
-              break;
-            default:
-              Navigator.pushReplacementNamed(
-                  context, CustomerHomePage.routeName);
-              //Navigator.push(context, MaterialPageRoute(builder: (_) => CustomerHomePage()));
-              break;
-          }
-        }
+          print('Logged In: $user');
+          loginSignupProvider.setUser(user);
+          await getUserDetails(loginSignupProvider);
+          print('done');
 
-        //if (loginSignupProvider.userDetails.userRole == 'admin') {
-        //  Navigator.push(
-        //      context, MaterialPageRoute(builder: (_) => AdminHomeScreen()));
-        //} else {
-        //  Navigator.push(
-        //      context,
-        //      MaterialPageRoute(
-        //          builder: (_) => NavigationBar(
-        //                selectedIndex: 0,
-        //              )));
-        //}
+          // admin or user navigation
+          if (Responsive.isDesktop(context) || Responsive.isTablet(context)) {
+            switch (loginSignupProvider.userDetails!.userRole) {
+              case 'admin':
+                Navigator.pushReplacementNamed(
+                    context, AdminHomePage.routeName);
+                //Navigator.push(context, MaterialPageRoute(builder: (_) => AdminHomePage()));
+                break;
+              case 'manager':
+                Navigator.pushReplacementNamed(
+                    context, ManagerHomePage.routeName);
+                //Navigator.push(context, MaterialPageRoute(builder: (_) => ManagerHomePage()));
+                break;
+              case 'supervisor':
+                Navigator.pushReplacementNamed(
+                    context, SupervisorHomePage.routeName);
+                //Navigator.push(context,MaterialPageRoute(builder: (_) => SupervisorHomePage()));
+                break;
+              default:
+                Navigator.pushReplacementNamed(
+                    context, CustomerHomePage.routeName);
+                //Navigator.push(context, MaterialPageRoute(builder: (_) => CustomerHomePage()));
+                break;
+            }
+          } else {
+            Navigator.pushReplacementNamed(context, MessageHomePage.routeName);
+          }
+
+          //if (loginSignupProvider.userDetails.userRole == 'admin') {
+          //  Navigator.push(
+          //      context, MaterialPageRoute(builder: (_) => AdminHomeScreen()));
+          //} else {
+          //  Navigator.push(
+          //      context,
+          //      MaterialPageRoute(
+          //          builder: (_) => NavigationBar(
+          //                selectedIndex: 0,
+          //              )));
+          //}
+        }
       }
     } on FirebaseException catch (error) {
       GlobalMethod.showErrorDialog(error: error.message!, ctx: context);
@@ -92,7 +101,7 @@ class FirebaseAuthService {
   Future<void> getUserDetails(LoginSignupProvider loginSignupProvider) async {
     FirebaseFirestore.instance
         .collection('users')
-        .doc(loginSignupProvider.user.uid)
+        .doc(loginSignupProvider.user!.uid)
         .get()
         .then((value) {
       print(value);
@@ -102,13 +111,27 @@ class FirebaseAuthService {
 
   // initialize current user
   Future<void> initializeCurrentUser(
-      LoginSignupProvider loginSignupProvider) async {
+      LoginSignupProvider loginSignupProvider,BuildContext context) async {
     User? user = _auth.currentUser;
 
-    if (user != null) {
-      loginSignupProvider.setUser(user);
-      await getUserDetails(loginSignupProvider);
+    //if (user != null) {
+    //  loginSignupProvider.setUser(user);
+    //  await getUserDetails(loginSignupProvider);
+    //}
+
+    if (loginSignupProvider.user == null) {
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (_) => AuthDialog()));
+    } else if (loginSignupProvider.userDetails == null) {
+      print('wait');
+    } else if (loginSignupProvider.userDetails!.userRole == 'admin') {
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (_) => AdminHomePage()));
+    } else {
+      Navigator.pushReplacement(context,
+          MaterialPageRoute(builder: (_) => CustomerHomePage()));
     }
+
   }
 
   // signout
@@ -174,8 +197,8 @@ class FirebaseAuthService {
         final UserCredential userCredential =
             await _auth.signInWithPopup(authProvider);
         user = userCredential.user;
-      } catch (e) {
-        print(e);
+      } on FirebaseException catch (error) {
+        GlobalMethod.showErrorDialog(error: error.message!, ctx: context);
       }
     } else {
       final GoogleSignIn googleSignIn = GoogleSignIn();
@@ -195,38 +218,22 @@ class FirebaseAuthService {
           final UserCredential userCredential =
               await _auth.signInWithCredential(credential);
           user = userCredential.user;
-        } on FirebaseAuthException catch (e) {
-          if (e.code == 'account-exists-with-different-credential') {
-            ScaffoldMessenger.of(context).showSnackBar(
-              customSnackBar(
-                  content:
-                      'The account already exists with a different credential.'),
-            );
-          } else if (e.code == 'invalid-credential') {
-            ScaffoldMessenger.of(context).showSnackBar(
-              customSnackBar(
-                  content:
-                      'Error occurred while accessing credentials. Try again.'),
-            );
+        } on FirebaseException catch (error) {
+          if (error.code == 'account-exists-with-different-credential') {
+            GlobalMethod.showErrorDialog(error: 'The account already exists with a different credential.', ctx: context);
+          } else if (error.code == 'invalid-credential') {
+            GlobalMethod.showErrorDialog(error: 'Error occurred while accessing credentials. Try again.', ctx: context);
           }
-        } catch (e) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            customSnackBar(
-                content: 'Error occurred using Google Sign-In. Try again.'),
-          );
+        } catch (error) {
+          GlobalMethod.showErrorDialog(error: 'Error occurred using Google Sign-In. Try again.', ctx: context);
+          //ScaffoldMessenger.of(context).showSnackBar(
+          //  customSnackBar(
+          //      content: 'Error occurred using Google Sign-In. Try again.'),
+          //);
         }
       }
     }
     return user;
   }
 
-  static SnackBar customSnackBar({required String content}) {
-    return SnackBar(
-      backgroundColor: Colors.black,
-      content: Text(
-        content,
-        style: TextStyle(color: Colors.redAccent, letterSpacing: 0.5),
-      ),
-    );
-  }
 }
