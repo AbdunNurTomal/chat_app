@@ -110,7 +110,7 @@ class FirebaseAuthService {
   }
 
   // initialize current user
-  Future<User?> initializeCurrentUser(
+  Future<void> initializeCurrentUser(
       LoginSignupProvider loginSignupProvider) async {
     //return _auth.currentUser;
     User? user = _auth.currentUser;
