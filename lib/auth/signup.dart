@@ -22,6 +22,17 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
+  final TextEditingController _displayNameController =
+      TextEditingController(text: '');
+  final TextEditingController _emailTextController =
+      TextEditingController(text: '');
+  final TextEditingController _phoneNumberController =
+      TextEditingController(text: '');
+  final TextEditingController _passTextController =
+      TextEditingController(text: '');
+  final TextEditingController _positionCPTextController =
+      TextEditingController(text: '');
+
   final FocusNode _emailFocusNode = FocusNode();
   final FocusNode _phoneNumberFocusNode = FocusNode();
   final FocusNode _passFocusNode = FocusNode();
@@ -36,11 +47,11 @@ class _SignUpState extends State<SignUp> {
 
   @override
   void dispose() {
-    GlobalMethod.displayNameController.dispose();
-    GlobalMethod.emailTextController.dispose();
-    GlobalMethod.phoneNumberController.dispose();
-    GlobalMethod.passTextController.dispose();
-    GlobalMethod.positionCPTextController.dispose();
+    _displayNameController.dispose();
+    _emailTextController.dispose();
+    _phoneNumberController.dispose();
+    _passTextController.dispose();
+    _positionCPTextController.dispose();
 
     _emailFocusNode.dispose();
     _phoneNumberFocusNode.dispose();
@@ -64,8 +75,8 @@ class _SignUpState extends State<SignUp> {
 
       try {
         await _auth.createUserWithEmailAndPassword(
-            email: GlobalMethod.emailTextController.text.trim().toLowerCase(),
-            password: GlobalMethod.passTextController.text.trim());
+            email: _emailTextController.text.trim().toLowerCase(),
+            password: _passTextController.text.trim());
         final User? user = _auth.currentUser;
         final _uid = user!.uid;
         //final ref = FirebaseStorage.instance
@@ -76,12 +87,12 @@ class _SignUpState extends State<SignUp> {
         //imageUrl = await ref.getDownloadURL();
         FirebaseFirestore.instance.collection('users').doc(_uid).set({
           'createdAt': Timestamp.now(),
-          'designation': GlobalMethod.positionCPTextController.text,
-          'email': GlobalMethod.emailTextController.text,
-          'display_name': GlobalMethod.displayNameController.text,
+          'designation': _positionCPTextController.text,
+          'email': _emailTextController.text,
+          'display_name': _displayNameController.text,
           'last_seen': Timestamp.now(),
-          'password': GlobalMethod.passTextController.text,
-          'phone': GlobalMethod.phoneNumberController.text,
+          'password': _passTextController.text,
+          'phone': _phoneNumberController.text,
           'presence': true,
           'profile_pic': 'imageUrl',
           'role': '',
@@ -282,7 +293,7 @@ class _SignUpState extends State<SignUp> {
               onEditingComplete: () =>
                   FocusScope.of(context).requestFocus(_emailFocusNode),
               keyboardType: TextInputType.name,
-              controller: GlobalMethod.displayNameController,
+              controller: _displayNameController,
               validator: (value) {
                 if (value!.isEmpty) {
                   return "This Field is missing";
@@ -312,8 +323,8 @@ class _SignUpState extends State<SignUp> {
                   FocusScope.of(context).requestFocus(_phoneNumberFocusNode),
               focusNode: _emailFocusNode,
               keyboardType: TextInputType.emailAddress,
-              controller: GlobalMethod.emailTextController,
-              validator: GlobalMethod.validateEmail,
+              controller: _emailTextController,
+              validator: (value) => GlobalMethod.validateEmail(value!),
               style: GoogleFonts.openSans(color: Colors.white),
               decoration: InputDecoration(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 10),
@@ -336,8 +347,8 @@ class _SignUpState extends State<SignUp> {
               onEditingComplete: () =>
                   FocusScope.of(context).requestFocus(_passFocusNode),
               keyboardType: TextInputType.phone,
-              controller: GlobalMethod.phoneNumberController,
-              validator: GlobalMethod.validatePhone,
+              controller: _phoneNumberController,
+              validator: (value) => GlobalMethod.validatePhone(value!),
               //onChanged: (v) {
               //  print(' Phone number ${GlobalMethod.phoneNumberController.text}');
               //},
@@ -364,14 +375,8 @@ class _SignUpState extends State<SignUp> {
               focusNode: _passFocusNode,
               obscureText: _obscureText,
               keyboardType: TextInputType.visiblePassword,
-              controller: GlobalMethod.passTextController,
-              validator: (value) {
-                if (value!.isEmpty || value.length < 7) {
-                  return "Please enter a valid password";
-                } else {
-                  return null;
-                }
-              },
+              controller: _passTextController,
+              validator: (value) => GlobalMethod.validatePassword(value!),
               style: GoogleFonts.openSans(color: Colors.white),
               decoration: InputDecoration(
                   suffixIcon: GestureDetector(
@@ -409,7 +414,7 @@ class _SignUpState extends State<SignUp> {
                 onEditingComplete: () => _submitFormOnSignUp,
                 focusNode: _positionCPFocusNode,
                 keyboardType: TextInputType.name,
-                controller: GlobalMethod.positionCPTextController,
+                controller: _positionCPTextController,
                 validator: (value) {
                   if (value!.isEmpty) {
                     return "This field is missing";
@@ -542,7 +547,7 @@ class _SignUpState extends State<SignUp> {
                     return InkWell(
                       onTap: () {
                         setState(() {
-                          GlobalMethod.positionCPTextController.text =
+                          _positionCPTextController.text =
                               Constants.jobsList[index];
                           jobItem = true;
                         });

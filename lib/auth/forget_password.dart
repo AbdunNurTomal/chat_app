@@ -18,6 +18,7 @@ class ForgetPasswordScreen extends StatefulWidget {
 class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final _forgetPasswordFormKey = GlobalKey<FormState>();
+
   final TextEditingController _forgetPassTextController =
       TextEditingController(text: '');
 
@@ -74,8 +75,9 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                                 color: CustomColors.secondaryColor,
                                 border: Border.all(color: Colors.blue)),
                             child: TextFormField(
-                              controller: GlobalMethod.forgetPassTextController,
-                              validator: GlobalMethod.validateEmail,
+                              controller: _forgetPassTextController,
+                              validator: (value) =>
+                                  GlobalMethod.validateEmail(value!),
                               style: GoogleFonts.openSans(color: Colors.white),
                               decoration: InputDecoration(
                                   contentPadding: const EdgeInsets.symmetric(

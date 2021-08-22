@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 
 class LoginSignupProvider with ChangeNotifier {
   User? _user;
-  User? get user => _user;
+  //User get user => _user;
+  get user => _user;
 
   void setUser(User user) {
     _user = user;
@@ -12,7 +13,8 @@ class LoginSignupProvider with ChangeNotifier {
   }
 
   Users? _userDetails;
-  Users? get userDetails => _userDetails;
+  //Users get userDetails => _userDetails!;
+  get userDetails => _userDetails;
 
   void setUserDetails(Users users) {
     _userDetails = users;

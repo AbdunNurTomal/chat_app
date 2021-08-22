@@ -28,6 +28,11 @@ class _AuthDialogState extends State<AuthDialog> {
   final _loginFormKey = GlobalKey<FormState>();
   bool showPassword = true;
 
+  final TextEditingController _emailTextController =
+      TextEditingController(text: '');
+  final TextEditingController _passTextController =
+      TextEditingController(text: '');
+
   late FocusNode textFocusNodeEmail;
   late FocusNode textFocusNodePassword;
   //bool _isEditingEmail = false;
@@ -38,8 +43,8 @@ class _AuthDialogState extends State<AuthDialog> {
 
   @override
   void dispose() {
-    GlobalMethod.emailTextController.dispose();
-    GlobalMethod.passTextController.dispose();
+    _emailTextController.dispose();
+    _passTextController.dispose();
     super.dispose();
   }
 
@@ -152,8 +157,9 @@ class _AuthDialogState extends State<AuthDialog> {
                             color: CustomColors.secondaryColor,
                             border: Border.all(color: Colors.blue)),
                         child: TextFormField(
-                          controller: GlobalMethod.emailTextController,
-                          validator: GlobalMethod.validateEmail,
+                          controller: _emailTextController,
+                          validator: (value) =>
+                              GlobalMethod.validateEmail(value!),
                           onSaved: (value) {
                             _users.userEmail = value!;
                           },
@@ -179,8 +185,9 @@ class _AuthDialogState extends State<AuthDialog> {
                             border: Border.all(color: Colors.blue)),
                         child: TextFormField(
                           obscureText: showPassword,
-                          controller: GlobalMethod.passTextController,
-                          validator: GlobalMethod.validatePassword,
+                          controller: _passTextController,
+                          validator: (value) =>
+                              GlobalMethod.validatePassword(value!),
                           onSaved: (value) {
                             _users.userPassword = value!;
                           },

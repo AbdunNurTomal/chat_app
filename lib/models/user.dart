@@ -10,6 +10,7 @@ class Users {
   String? userPresence;
   String? userProfilePicUrl;
   String? userUid;
+  String? userDesignation;
   String? createdDateTime;
 
   Users();
@@ -23,6 +24,7 @@ class Users {
     userLastSeen = data["last_seen"];
     userPresence = data["presence"];
     userProfilePicUrl = data["profile_pic"];
+    userDesignation = data["designation"];
     userUid = data["uid"];
     createdDateTime = data["created_date_time"];
   }
@@ -37,6 +39,7 @@ class Users {
       'last_seen': userLastSeen,
       'presence': userPresence,
       'profile_pic': userProfilePicUrl,
+      'designation': userDesignation,
       'uid': userUid,
       'created_date_time': createdDateTime
     };

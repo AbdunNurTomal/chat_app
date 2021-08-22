@@ -30,17 +30,18 @@ class _LauncherPageState extends State<LauncherPage> {
       // initialize current user
       await _firebaseAuthService.initializeCurrentUser(loginSignupProvider);
 
+      //print(loginSignupProvider.user);
       if (loginSignupProvider.user == null) {
         Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (_) => AuthDialog()));
       } else if (loginSignupProvider.userDetails == null) {
         print('wait');
-        //print(_user);
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => UserProfile(user: loginSignupProvider.user!),
-          ),
-        );
+        print(loginSignupProvider.user);
+        //Navigator.of(context).pushReplacement(
+        //  MaterialPageRoute(
+        //    builder: (context) => UserProfile(user: loginSignupProvider.user),
+        //  ),
+        //);
       } else if (loginSignupProvider.userDetails!.userRole != '') {
         String? userRole = loginSignupProvider.userDetails!.userRole;
         // admin or user navigation

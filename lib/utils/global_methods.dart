@@ -68,22 +68,9 @@ class GlobalMethod {
     );
   }
 
-  static late TextEditingController displayNameController =
-      TextEditingController(text: '');
-  static late TextEditingController emailTextController =
-      TextEditingController(text: '');
-  static late TextEditingController phoneNumberController =
-      TextEditingController(text: '');
-  static late TextEditingController passTextController =
-      TextEditingController(text: '');
-  static late TextEditingController forgetPassTextController =
-      TextEditingController(text: '');
-  static late TextEditingController positionCPTextController =
-      TextEditingController(text: '');
-
-  static String? validateEmail(String? value) {
-    value = value!.trim();
-    if (emailTextController.text.isNotEmpty) {
+  static String? validateEmail(String value) {
+    value = value.trim();
+    if (value.isNotEmpty) {
       if (value.isEmpty) {
         return 'Email can\'t be empty';
       } else {
@@ -101,9 +88,9 @@ class GlobalMethod {
   }
 
   //^(?:\+?88|0088)?01[15-9]\d{8}$
-  static String? validatePhone(String? value) {
-    value = value!.trim();
-    if (phoneNumberController.text.isNotEmpty) {
+  static String? validatePhone(String value) {
+    value = value.trim();
+    if (value.isNotEmpty) {
       if (value.isEmpty) {
         return 'Phone can\'t be empty';
       } else if (value.length < 11) {
@@ -119,9 +106,9 @@ class GlobalMethod {
     return null;
   }
 
-  static String? validatePassword(String? value) {
-    value = value!.trim();
-    if (passTextController.text.isNotEmpty) {
+  static String? validatePassword(String value) {
+    value = value.trim();
+    if (value.isNotEmpty) {
       if (value.isEmpty) {
         return 'Password can\'t be empty';
       } else if (value.length < 6) {
