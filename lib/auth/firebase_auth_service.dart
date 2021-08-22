@@ -99,7 +99,7 @@ class FirebaseAuthService {
 
   // to get user details
   Future<void> getUserDetails(LoginSignupProvider loginSignupProvider) async {
-     FirebaseFirestore.instance
+    FirebaseFirestore.instance
         .collection('users')
         .doc(loginSignupProvider.user!.uid)
         .get()

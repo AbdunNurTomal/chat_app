@@ -22,17 +22,6 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
-  late final TextEditingController _displayNameController =
-      TextEditingController(text: '');
-  late final TextEditingController _emailTextController =
-      TextEditingController(text: '');
-  late final TextEditingController _phoneNumberController =
-      TextEditingController(text: '');
-  late final TextEditingController _passTextController =
-      TextEditingController(text: '');
-  late final TextEditingController _positionCPTextController =
-      TextEditingController(text: '');
-
   final FocusNode _emailFocusNode = FocusNode();
   final FocusNode _phoneNumberFocusNode = FocusNode();
   final FocusNode _passFocusNode = FocusNode();
@@ -47,11 +36,11 @@ class _SignUpState extends State<SignUp> {
 
   @override
   void dispose() {
-    _displayNameController.dispose();
-    _emailTextController.dispose();
-    _phoneNumberController.dispose();
-    _passTextController.dispose();
-    _positionCPTextController.dispose();
+    GlobalMethod.displayNameController.dispose();
+    GlobalMethod.emailTextController.dispose();
+    GlobalMethod.phoneNumberController.dispose();
+    GlobalMethod.passTextController.dispose();
+    GlobalMethod.positionCPTextController.dispose();
 
     _emailFocusNode.dispose();
     _phoneNumberFocusNode.dispose();
@@ -75,8 +64,8 @@ class _SignUpState extends State<SignUp> {
 
       try {
         await _auth.createUserWithEmailAndPassword(
-            email: _emailTextController.text.trim().toLowerCase(),
-            password: _passTextController.text.trim());
+            email: GlobalMethod.emailTextController.text.trim().toLowerCase(),
+            password: GlobalMethod.passTextController.text.trim());
         final User? user = _auth.currentUser;
         final _uid = user!.uid;
         //final ref = FirebaseStorage.instance
@@ -87,12 +76,12 @@ class _SignUpState extends State<SignUp> {
         //imageUrl = await ref.getDownloadURL();
         FirebaseFirestore.instance.collection('users').doc(_uid).set({
           'createdAt': Timestamp.now(),
-          'designation': _positionCPTextController.text,
-          'email': _emailTextController.text,
-          'display_name': _displayNameController.text,
+          'designation': GlobalMethod.positionCPTextController.text,
+          'email': GlobalMethod.emailTextController.text,
+          'display_name': GlobalMethod.displayNameController.text,
           'last_seen': Timestamp.now(),
-          'password': _passTextController.text,
-          'phone': _phoneNumberController.text,
+          'password': GlobalMethod.passTextController.text,
+          'phone': GlobalMethod.phoneNumberController.text,
           'presence': true,
           'profile_pic': 'imageUrl',
           'role': '',
@@ -293,7 +282,7 @@ class _SignUpState extends State<SignUp> {
               onEditingComplete: () =>
                   FocusScope.of(context).requestFocus(_emailFocusNode),
               keyboardType: TextInputType.name,
-              controller: _displayNameController,
+              controller: GlobalMethod.displayNameController,
               validator: (value) {
                 if (value!.isEmpty) {
                   return "This Field is missing";
@@ -323,20 +312,14 @@ class _SignUpState extends State<SignUp> {
                   FocusScope.of(context).requestFocus(_phoneNumberFocusNode),
               focusNode: _emailFocusNode,
               keyboardType: TextInputType.emailAddress,
-              controller: _emailTextController,
-              validator: (value) {
-                if (value!.isEmpty || !value.contains("@")) {
-                  return "Please enter a valid Email adress";
-                } else {
-                  return null;
-                }
-              },
+              controller: GlobalMethod.emailTextController,
+              validator: GlobalMethod.validateEmail,
               style: GoogleFonts.openSans(color: Colors.white),
               decoration: InputDecoration(
-                  contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 10),
                   labelText: 'Email Address',
                   labelStyle: GoogleFonts.openSans(color: Colors.white),
-                  icon: Icon(Icons.email, color: Colors.white),
+                  icon: const Icon(Icons.email, color: Colors.white),
                   border: InputBorder.none),
             ),
           ),
@@ -353,17 +336,11 @@ class _SignUpState extends State<SignUp> {
               onEditingComplete: () =>
                   FocusScope.of(context).requestFocus(_passFocusNode),
               keyboardType: TextInputType.phone,
-              controller: _phoneNumberController,
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return "This Field is missing";
-                } else {
-                  return null;
-                }
-              },
-              onChanged: (v) {
-                print(' Phone number ${_phoneNumberController.text}');
-              },
+              controller: GlobalMethod.phoneNumberController,
+              validator: GlobalMethod.validatePhone,
+              //onChanged: (v) {
+              //  print(' Phone number ${GlobalMethod.phoneNumberController.text}');
+              //},
               style: GoogleFonts.openSans(color: Colors.white),
               decoration: InputDecoration(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 10),
@@ -387,7 +364,7 @@ class _SignUpState extends State<SignUp> {
               focusNode: _passFocusNode,
               obscureText: _obscureText,
               keyboardType: TextInputType.visiblePassword,
-              controller: _passTextController,
+              controller: GlobalMethod.passTextController,
               validator: (value) {
                 if (value!.isEmpty || value.length < 7) {
                   return "Please enter a valid password";
@@ -432,7 +409,7 @@ class _SignUpState extends State<SignUp> {
                 onEditingComplete: () => _submitFormOnSignUp,
                 focusNode: _positionCPFocusNode,
                 keyboardType: TextInputType.name,
-                controller: _positionCPTextController,
+                controller: GlobalMethod.positionCPTextController,
                 validator: (value) {
                   if (value!.isEmpty) {
                     return "This field is missing";
@@ -460,7 +437,7 @@ class _SignUpState extends State<SignUp> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text('Please choose an option'),
+            title: const Text('Please choose an option'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -565,7 +542,7 @@ class _SignUpState extends State<SignUp> {
                     return InkWell(
                       onTap: () {
                         setState(() {
-                          _positionCPTextController.text =
+                          GlobalMethod.positionCPTextController.text =
                               Constants.jobsList[index];
                           jobItem = true;
                         });

@@ -24,25 +24,22 @@ class AuthDialog extends StatefulWidget {
 
 class _AuthDialogState extends State<AuthDialog> {
   final Users _users = Users();
-  final FirebaseAuthService _authentication = new FirebaseAuthService();
+  final FirebaseAuthService _authentication = FirebaseAuthService();
   final _loginFormKey = GlobalKey<FormState>();
   bool showPassword = true;
 
   late FocusNode textFocusNodeEmail;
-  //bool _isEditingEmail = false;
-
   late FocusNode textFocusNodePassword;
+  //bool _isEditingEmail = false;
   //bool _isEditingPassword = false;
-
   //bool _isRegistering = false;
-
   //String? loginStatus;
-  Color loginStringColor = Colors.green;
+  //Color loginStringColor = Colors.green;
 
   @override
   void dispose() {
-    GlobalMethod.emailController.dispose();
-    GlobalMethod.passwordController.dispose();
+    GlobalMethod.emailTextController.dispose();
+    GlobalMethod.passTextController.dispose();
     super.dispose();
   }
 
@@ -52,10 +49,7 @@ class _AuthDialogState extends State<AuthDialog> {
         Provider.of<LoginSignupProvider>(context, listen: false);
     // initialize current user
     _authentication.initializeCurrentUser(loginSignupProvider);
-    GlobalMethod.emailController = TextEditingController();
-    GlobalMethod.emailController.text = '';
-    GlobalMethod.passwordController = TextEditingController();
-    GlobalMethod.passwordController.text = '';
+
     textFocusNodeEmail = FocusNode();
     textFocusNodePassword = FocusNode();
     super.initState();
@@ -158,7 +152,7 @@ class _AuthDialogState extends State<AuthDialog> {
                             color: CustomColors.secondaryColor,
                             border: Border.all(color: Colors.blue)),
                         child: TextFormField(
-                          controller: GlobalMethod.emailController,
+                          controller: GlobalMethod.emailTextController,
                           validator: GlobalMethod.validateEmail,
                           onSaved: (value) {
                             _users.userEmail = value!;
@@ -185,7 +179,7 @@ class _AuthDialogState extends State<AuthDialog> {
                             border: Border.all(color: Colors.blue)),
                         child: TextFormField(
                           obscureText: showPassword,
-                          controller: GlobalMethod.passwordController,
+                          controller: GlobalMethod.passTextController,
                           validator: GlobalMethod.validatePassword,
                           onSaved: (value) {
                             _users.userPassword = value!;

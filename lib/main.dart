@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 
-import 'auth/user_profile.dart';
 import 'auth/wait_room.dart';
 import 'pages/admin/admin_home_page.dart';
 import 'pages/customer/customer_home_page.dart';

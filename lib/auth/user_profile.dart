@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:chat_app/auth/wait_room.dart';
+import 'package:chat_app/provider/login_signup_provider.dart';
 import 'package:chat_app/utils/constants.dart';
 import 'package:chat_app/utils/responsive_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -11,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:websafe_svg/websafe_svg.dart';
 
 import '../utils/custom_color.dart';
@@ -20,9 +22,9 @@ class UserProfile extends StatefulWidget {
   //const UserProfile({ Key? key }) : super(key: key);
   //static const String routeName = "\profile";
 
-  final User _user;
+  final User user;
   const UserProfile({Key? key, required User user})
-      : _user = user,
+      : user = user,
         super(key: key);
 
   @override
@@ -30,18 +32,7 @@ class UserProfile extends StatefulWidget {
 }
 
 class _UserProfileState extends State<UserProfile> {
-  late User _user;
-
-  late final TextEditingController _displayNameController =
-      TextEditingController(text: '');
-  late final TextEditingController _emailTextController =
-      TextEditingController(text: '');
-  late final TextEditingController _phoneNumberController =
-      TextEditingController(text: '');
-  late final TextEditingController _passTextController =
-      TextEditingController(text: '');
-  late final TextEditingController _positionCPTextController =
-      TextEditingController(text: '');
+  User? _user;
 
   final FocusNode _emailFocusNode = FocusNode();
   final FocusNode _phoneNumberFocusNode = FocusNode();
@@ -57,8 +48,16 @@ class _UserProfileState extends State<UserProfile> {
 
   @override
   void initState() {
-    _user = widget._user;
-    //print(_user);
+    LoginSignupProvider loginSignupProvider =
+    Provider.of<LoginSignupProvider>(context, listen: false);
+    _user = widget.user;
+    //print("Use : $_user");
+
+    if (_user != null) {
+      GlobalMethod.displayNameController.text = _user!.displayName!;
+      GlobalMethod.emailTextController.text = _user!.email!;
+      GlobalMethod.phoneNumberController.text = _user!.phoneNumber!;
+    }
     super.initState();
   }
 
@@ -81,11 +80,11 @@ class _UserProfileState extends State<UserProfile> {
 
   @override
   void dispose() {
-    _displayNameController.dispose();
-    _emailTextController.dispose();
-    _phoneNumberController.dispose();
-    _passTextController.dispose();
-    _positionCPTextController.dispose();
+    GlobalMethod.displayNameController.dispose();
+    GlobalMethod.emailTextController.dispose();
+    GlobalMethod.phoneNumberController.dispose();
+    GlobalMethod.passTextController.dispose();
+    GlobalMethod.positionCPTextController.dispose();
 
     _emailFocusNode.dispose();
     _phoneNumberFocusNode.dispose();
@@ -112,7 +111,7 @@ class _UserProfileState extends State<UserProfile> {
         //    email: _emailTextController.text.trim().toLowerCase(),
         //    password: _passTextController.text.trim());
         //final User? user = _auth.currentUser;
-        final _uid = _user.uid;
+        final _uid = _user!.uid;
         //final ref = FirebaseStorage.instance
         //    .ref()
         //    .child('userImages')
@@ -121,12 +120,12 @@ class _UserProfileState extends State<UserProfile> {
         //imageUrl = await ref.getDownloadURL();
         FirebaseFirestore.instance.collection('users').doc(_uid).set({
           'createdAt': Timestamp.now(),
-          'designation': _positionCPTextController.text,
-          'email': _emailTextController.text,
-          'display_name': _displayNameController.text,
+          'designation': GlobalMethod.positionCPTextController.text,
+          'email': GlobalMethod.emailTextController.text,
+          'display_name': GlobalMethod.displayNameController.text,
           'last_seen': Timestamp.now(),
-          'password': _passTextController.text,
-          'phone': _phoneNumberController.text,
+          'password': GlobalMethod.passTextController.text,
+          'phone': GlobalMethod.phoneNumberController.text,
           'presence': true,
           'profile_pic': 'imageUrl',
           'role': '',
@@ -325,28 +324,28 @@ class _UserProfileState extends State<UserProfile> {
             decoration: BoxDecoration(
                 color: CustomColors.secondaryColor,
                 border: Border.all(color: Colors.blue)),
-            child: TextFormField(
-              //readOnly: (_user.displayName!.isNotEmpty) ? true : false,
+            child: TextField(
+              readOnly: (_user!.displayName!.isNotEmpty) ? true : false,
               textInputAction: TextInputAction.next,
               onEditingComplete: () =>
                   FocusScope.of(context).requestFocus(_emailFocusNode),
               keyboardType: TextInputType.name,
-              //controller: _displayNameController,
-              initialValue: _user.displayName,
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return "This Field is missing";
-                } else {
-                  return null;
-                }
-              },
+              controller: GlobalMethod.displayNameController,
+              //initialValue: _user!.displayName,
+              //validator: (value) {
+              //  if (value!.isEmpty) {
+              //    return "This Field is missing";
+              //  } else {
+              //    return null;
+              //  }
+              //},
               style: GoogleFonts.openSans(color: Colors.white),
               decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-                  labelText: 'Display name',
-                  labelStyle: GoogleFonts.openSans(color: Colors.white),
-                  icon: const Icon(Icons.account_circle, color: Colors.white),
-                  border: InputBorder.none),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                labelText: 'Display name',
+                labelStyle: GoogleFonts.openSans(color: Colors.white),
+                icon: const Icon(Icons.account_circle, color: Colors.white),
+                border: InputBorder.none),
             ),
           ),
           const SizedBox(height: 20),
@@ -356,29 +355,30 @@ class _UserProfileState extends State<UserProfile> {
             decoration: BoxDecoration(
                 color: CustomColors.secondaryColor,
                 border: Border.all(color: Colors.blue)),
-            child: TextFormField(
-              //readOnly: (_user.email!.isNotEmpty) ? true : false,
+            child: TextField(
+              readOnly: (_user!.email!.isNotEmpty) ? true : false,
               textInputAction: TextInputAction.next,
               onEditingComplete: () =>
                   FocusScope.of(context).requestFocus(_phoneNumberFocusNode),
               focusNode: _emailFocusNode,
               keyboardType: TextInputType.emailAddress,
-              //controller: _emailTextController,
-              initialValue: _user.email,
-              validator: (value) {
-                if (value!.isEmpty || !value.contains("@")) {
-                  return "Please enter a valid Email adress";
-                } else {
-                  return null;
-                }
-              },
+              controller: GlobalMethod.emailTextController,
+              //initialValue: _user!.email,
+              //validator: (value) {
+              //  if (value!.isEmpty || !value.contains("@")) {
+              //    return "Please enter a valid Email adress";
+              //  } else {
+              //    return null;
+              //  }
+              //},
               style: GoogleFonts.openSans(color: Colors.white),
               decoration: InputDecoration(
-                  contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                  labelText: 'Email Address',
-                  labelStyle: GoogleFonts.openSans(color: Colors.white),
-                  icon: Icon(Icons.email, color: Colors.white),
-                  border: InputBorder.none),
+                errorText: GlobalMethod.validateEmail(GlobalMethod.emailTextController.text),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                labelText: 'Email Address',
+                labelStyle: GoogleFonts.openSans(color: Colors.white),
+                icon: const Icon(Icons.email, color: Colors.white),
+                border: InputBorder.none),
             ),
           ),
           const SizedBox(height: 20),
@@ -388,27 +388,28 @@ class _UserProfileState extends State<UserProfile> {
             decoration: BoxDecoration(
                 color: CustomColors.secondaryColor,
                 border: Border.all(color: Colors.blue)),
-            child: TextFormField(
-              //readOnly: (_user.phoneNumber!.isNotEmpty) ? true : false,
+            child: TextField(
+              readOnly: (_user!.phoneNumber!.isNotEmpty) ? true : false,
               focusNode: _phoneNumberFocusNode,
               textInputAction: TextInputAction.next,
               onEditingComplete: () =>
                   FocusScope.of(context).requestFocus(_passFocusNode),
               keyboardType: TextInputType.phone,
-              //controller: _phoneNumberController,
-              initialValue: _user.phoneNumber,
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return "This Field is missing";
-                } else {
-                  return null;
-                }
-              },
-              onChanged: (v) {
-                print(' Phone number ${_phoneNumberController.text}');
-              },
+              controller: GlobalMethod.phoneNumberController,
+              //initialValue: _user!.phoneNumber,
+              //validator: (value) {
+              //  if (value!.isEmpty) {
+              //    return "This Field is missing";
+              //  } else {
+              //    return null;
+              //  }
+              //},
+              //onChanged: (v) {
+              //  print(' Phone number ${_phoneNumberController.text}');
+              //},
               style: GoogleFonts.openSans(color: Colors.white),
               decoration: InputDecoration(
+                  errorText: GlobalMethod.validatePhone(GlobalMethod.phoneNumberController.text),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 10),
                   labelText: 'Phone Number',
                   labelStyle: GoogleFonts.openSans(color: Colors.white),
@@ -423,23 +424,24 @@ class _UserProfileState extends State<UserProfile> {
             decoration: BoxDecoration(
                 color: CustomColors.secondaryColor,
                 border: Border.all(color: Colors.blue)),
-            child: TextFormField(
+            child: TextField(
               textInputAction: TextInputAction.next,
               onEditingComplete: () =>
                   FocusScope.of(context).requestFocus(_positionCPFocusNode),
               focusNode: _passFocusNode,
               obscureText: _obscureText,
               keyboardType: TextInputType.visiblePassword,
-              controller: _passTextController,
-              validator: (value) {
-                if (value!.isEmpty || value.length < 7) {
-                  return "Please enter a valid password";
-                } else {
-                  return null;
-                }
-              },
+              controller: GlobalMethod.passTextController,
+              //validator: (value) {
+              //  if (value!.isEmpty || value.length < 7) {
+              //    return "Please enter a valid password";
+              //  } else {
+              //    return null;
+              //  }
+              //},
               style: GoogleFonts.openSans(color: Colors.white),
               decoration: InputDecoration(
+                  errorText: GlobalMethod.validatePassword(GlobalMethod.passTextController.text),
                   suffixIcon: GestureDetector(
                     onTap: () {
                       setState(() {
@@ -475,7 +477,7 @@ class _UserProfileState extends State<UserProfile> {
                 onEditingComplete: () {},
                 focusNode: _positionCPFocusNode,
                 keyboardType: TextInputType.name,
-                controller: _positionCPTextController,
+                controller: GlobalMethod.positionCPTextController,
                 validator: (value) {
                   if (value!.isEmpty) {
                     return "This field is missing";
@@ -503,7 +505,7 @@ class _UserProfileState extends State<UserProfile> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text('Please choose an option'),
+            title: const Text('Please choose an option'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -608,7 +610,7 @@ class _UserProfileState extends State<UserProfile> {
                     return InkWell(
                       onTap: () {
                         setState(() {
-                          _positionCPTextController.text =
+                          GlobalMethod.positionCPTextController.text =
                               Constants.jobsList[index];
                           jobItem = true;
                         });

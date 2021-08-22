@@ -5,10 +5,12 @@ import 'custom_color.dart';
 
 class GlobalMethod {
   //static String errorMsg = '';
-  static dynamic screenSize({required context,required String sizeWidthHeight}){
+  static dynamic screenSize(
+      {required context, required String sizeWidthHeight}) {
     Size size = MediaQuery.of(context).size;
     return (sizeWidthHeight == 'width') ? size.width : size.height;
   }
+
   static void showErrorDialog(
       {required String error, required BuildContext ctx}) {
     showDialog(
@@ -66,41 +68,71 @@ class GlobalMethod {
     );
   }
 
-  static late TextEditingController forgetPassTextController;
-  static late TextEditingController emailController;
+  static late TextEditingController displayNameController =
+      TextEditingController(text: '');
+  static late TextEditingController emailTextController =
+      TextEditingController(text: '');
+  static late TextEditingController phoneNumberController =
+      TextEditingController(text: '');
+  static late TextEditingController passTextController =
+      TextEditingController(text: '');
+  static late TextEditingController forgetPassTextController =
+      TextEditingController(text: '');
+  static late TextEditingController positionCPTextController =
+      TextEditingController(text: '');
+
   static String? validateEmail(String? value) {
     value = value!.trim();
-
-    if (emailController.text.isNotEmpty) {
+    if (emailTextController.text.isNotEmpty) {
       if (value.isEmpty) {
         return 'Email can\'t be empty';
-      } else if (!value.contains(
-          RegExp(r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]"
-              r"{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]"
-              r"{0,253}[a-zA-Z0-9])?)*$"))) {
-        return 'Enter a correct email address';
+      } else {
+        if (!value.contains(RegExp(
+            r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]"
+            r"{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]"
+            r"{0,253}[a-zA-Z0-9])?)*$"))) {
+          return 'Enter a correct email address';
+        } else {
+          return null;
+        }
       }
     }
-
     return null;
   }
 
-  static late TextEditingController passwordController;
+  //^(?:\+?88|0088)?01[15-9]\d{8}$
+  static String? validatePhone(String? value) {
+    value = value!.trim();
+    if (phoneNumberController.text.isNotEmpty) {
+      if (value.isEmpty) {
+        return 'Phone can\'t be empty';
+      } else if (value.length < 11) {
+        return 'Length of phone should be 11';
+      } else {
+        if (!value.contains(RegExp(r"^(?:\+?88|0088)?01[15-9]\d{8}$"))) {
+          return 'Enter a correct phone number';
+        } else {
+          return null;
+        }
+      }
+    }
+    return null;
+  }
+
   static String? validatePassword(String? value) {
     value = value!.trim();
-    String pattern =
-        r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~.]).{8,}$';
-    RegExp regex = new RegExp(pattern);
-    if (passwordController.text.isNotEmpty) {
+    if (passTextController.text.isNotEmpty) {
       if (value.isEmpty) {
         return 'Password can\'t be empty';
       } else if (value.length < 6) {
         return 'Length of password should be greater than 6';
       } else {
-        if (!regex.hasMatch(value))
+        if (!value.contains(RegExp(
+            r"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~.]).{8,}$"))) {
           return 'Enter valid password';
-        else
+        } else {
           return null;
+        }
       }
     }
   }
@@ -119,5 +151,4 @@ class GlobalMethod {
       ],
     );
   }
-
 }
