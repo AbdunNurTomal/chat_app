@@ -4,20 +4,20 @@ import 'package:flutter/material.dart';
 
 class LoginSignupProvider with ChangeNotifier {
   User? _user;
-  //User get user => _user;
-  get user => _user;
+  User get user => _user!;
 
-  void setUser(User user) {
-    _user = user;
+  void setUser(User? user) {
+    _user = user!;
+    //print(_user);
     notifyListeners();
   }
 
   Users? _userDetails;
-  //Users get userDetails => _userDetails!;
-  get userDetails => _userDetails;
+  Users get userDetails => _userDetails!;
 
-  void setUserDetails(Users users) {
-    _userDetails = users;
+  void setUserDetails(Users? users) {
+    _userDetails = users!;
+    //print(_userDetails);
     notifyListeners();
   }
 

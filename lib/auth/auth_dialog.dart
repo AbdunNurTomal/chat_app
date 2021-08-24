@@ -1,6 +1,7 @@
 import 'package:chat_app/models/user.dart';
 import 'package:chat_app/utils/constants.dart';
 import 'package:chat_app/utils/global_methods.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +25,8 @@ class AuthDialog extends StatefulWidget {
 
 class _AuthDialogState extends State<AuthDialog> {
   final Users _users = Users();
-  final FirebaseAuthService _authentication = FirebaseAuthService();
+
+  FirebaseAuthService _authentication = FirebaseAuthService();
   final _loginFormKey = GlobalKey<FormState>();
   bool showPassword = true;
 
@@ -53,7 +55,7 @@ class _AuthDialogState extends State<AuthDialog> {
     LoginSignupProvider loginSignupProvider =
         Provider.of<LoginSignupProvider>(context, listen: false);
     // initialize current user
-    _authentication.initializeCurrentUser(loginSignupProvider);
+    _authentication.initializeCurrentUser(context, loginSignupProvider);
 
     textFocusNodeEmail = FocusNode();
     textFocusNodePassword = FocusNode();

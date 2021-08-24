@@ -1,3 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '/models/user.dart';
 import '/pages/admin/admin_home_page.dart';
 import '/pages/customer/customer_home_page.dart';
@@ -7,8 +10,7 @@ import '/pages/supervisor/supervisor_home_page.dart';
 import '/provider/login_signup_provider.dart';
 import '/utils/global_methods.dart';
 import '/utils/responsive_screen.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -18,19 +20,26 @@ import 'auth_dialog.dart';
 import 'login_page.dart';
 
 class FirebaseAuthService {
-  static final FirebaseAuth _auth = FirebaseAuth.instance;
-  //static User? get currentUser => _auth.currentUser;
+  //final FirebaseAuth _firebaseAuth;
+  //FirebaseAuthService(this._firebaseAuth);
+
+  FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+
+  Users user = Users();
+  final userRef = FirebaseFirestore.instance.collection("users");
+
+  UserCredential? result;
+
+  Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
 
   Future<void> login(Users users, LoginSignupProvider loginSignupProvider,
       BuildContext context) async {
-    UserCredential? result;
-
     String email = users.userEmail.toString().trim();
     String password = users.userPassword.toString().trim();
 
     try {
       print("$email password $password");
-      result = await _auth.signInWithEmailAndPassword(
+      result = await _firebaseAuth.signInWithEmailAndPassword(
           email: email, password: password);
       print(result);
     } on FirebaseException catch (error) {
@@ -40,44 +49,45 @@ class FirebaseAuthService {
     // check email verification
     try {
       if (result != null) {
-        User? user = _auth.currentUser;
+        User? user = _firebaseAuth.currentUser;
         if (!user!.emailVerified) {
-          _auth.signOut();
+          _firebaseAuth.signOut();
           GlobalMethod.showErrorDialog(
               error: 'Email ID not Verified', ctx: context);
+          await result!.user!.sendEmailVerification();
         } else {
           print('Logged In: $user');
           loginSignupProvider.setUser(user);
-          await getUserDetails(loginSignupProvider);
+          await getUserDetails(context, loginSignupProvider);
           print('done');
 
           // admin or user navigation
-          if (Responsive.isDesktop(context) || Responsive.isTablet(context)) {
-            switch (loginSignupProvider.userDetails!.userRole) {
-              case 'admin':
-                Navigator.pushReplacementNamed(
-                    context, AdminHomePage.routeName);
-                //Navigator.push(context, MaterialPageRoute(builder: (_) => AdminHomePage()));
-                break;
-              case 'manager':
-                Navigator.pushReplacementNamed(
-                    context, ManagerHomePage.routeName);
-                //Navigator.push(context, MaterialPageRoute(builder: (_) => ManagerHomePage()));
-                break;
-              case 'supervisor':
-                Navigator.pushReplacementNamed(
-                    context, SupervisorHomePage.routeName);
-                //Navigator.push(context,MaterialPageRoute(builder: (_) => SupervisorHomePage()));
-                break;
-              default:
-                Navigator.pushReplacementNamed(
-                    context, CustomerHomePage.routeName);
-                //Navigator.push(context, MaterialPageRoute(builder: (_) => CustomerHomePage()));
-                break;
-            }
-          } else {
-            Navigator.pushReplacementNamed(context, MessageHomePage.routeName);
-          }
+          //if (Responsive.isDesktop(context) || Responsive.isTablet(context)) {
+          //  switch (loginSignupProvider.userDetails.first) {
+          //    case 'admin':
+          //      Navigator.pushReplacementNamed(
+          //          context, AdminHomePage.routeName);
+          //      //Navigator.push(context, MaterialPageRoute(builder: (_) => AdminHomePage()));
+          //      break;
+          //    case 'manager':
+          //      Navigator.pushReplacementNamed(
+          //          context, ManagerHomePage.routeName);
+          //      //Navigator.push(context, MaterialPageRoute(builder: (_) => ManagerHomePage()));
+          //      break;
+          //    case 'supervisor':
+          //      Navigator.pushReplacementNamed(
+          //          context, SupervisorHomePage.routeName);
+          //      //Navigator.push(context,MaterialPageRoute(builder: (_) => SupervisorHomePage()));
+          //      break;
+          //    default:
+          //      Navigator.pushReplacementNamed(
+          //          context, CustomerHomePage.routeName);
+          //      //Navigator.push(context, MaterialPageRoute(builder: (_) => CustomerHomePage()));
+          //      break;
+          //  }
+          //} else {
+          //  Navigator.pushReplacementNamed(context, MessageHomePage.routeName);
+          //}
 
           //if (loginSignupProvider.userDetails.userRole == 'admin') {
           //  Navigator.push(
@@ -98,25 +108,33 @@ class FirebaseAuthService {
   }
 
   // to get user details
-  Future<void> getUserDetails(LoginSignupProvider loginSignupProvider) async {
-    FirebaseFirestore.instance
-        .collection('users')
-        .doc(loginSignupProvider.user!.uid)
-        .get()
-        .catchError((e) => print(e))
-        .then((value) => (value != null)
-            ? loginSignupProvider.setUserDetails(Users.fromMap(value.data()))
-            : print(value));
+  Future<void> getUserDetails(
+      BuildContext context, LoginSignupProvider loginSignupProvider) async {
+    print(loginSignupProvider.user.email);
+    try {
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(loginSignupProvider.user.uid)
+          .get()
+          .then((value) => {
+                //print(value.data().toString()),
+                loginSignupProvider.setUserDetails(value)
+              });
+    } on FirebaseException catch (error) {
+      GlobalMethod.showErrorDialog(error: error.message!, ctx: context);
+    }
   }
 
   // initialize current user
   Future<void> initializeCurrentUser(
-      LoginSignupProvider loginSignupProvider) async {
-    //return _auth.currentUser;
-    User? user = _auth.currentUser;
+      BuildContext context, LoginSignupProvider loginSignupProvider) async {
+    User? user = _firebaseAuth.currentUser;
     if (user != null) {
+      print(user);
       loginSignupProvider.setUser(user);
-      await getUserDetails(loginSignupProvider);
+      await getUserDetails(context, loginSignupProvider);
+    } else {
+      Navigator.pushReplacementNamed(context, AuthDialog.routeName);
     }
   }
 
@@ -128,7 +146,7 @@ class FirebaseAuthService {
       if (!kIsWeb) {
         await googleSignIn.signOut();
       }
-      await _auth.signOut();
+      await _firebaseAuth.signOut();
       print('Log out');
       Navigator.pushReplacementNamed(context, LoginPage.routeName);
     } on FirebaseException catch (error) {
@@ -173,16 +191,21 @@ class FirebaseAuthService {
     return firebaseApp;
   }
 */
-  static Future<User?> signInWithGoogle({required BuildContext context}) async {
-    User? user;
+  Future<void> signInWithGoogle(
+      {required LoginSignupProvider loginSignupProvider,
+      required BuildContext context}) async {
+    final UserCredential userCredential;
 
     if (kIsWeb) {
       GoogleAuthProvider authProvider = GoogleAuthProvider();
 
       try {
-        final UserCredential userCredential =
-            await _auth.signInWithPopup(authProvider);
-        user = userCredential.user;
+        userCredential = await _firebaseAuth.signInWithPopup(authProvider);
+        if (userCredential.user != null) {
+          loginSignupProvider.setUser(userCredential.user!);
+          //Navigator.pushReplacement(
+          //    context, MaterialPageRoute(builder: (context) => HomePage()));
+        }
       } on FirebaseException catch (error) {
         GlobalMethod.showErrorDialog(error: error.message!, ctx: context);
       }
@@ -201,9 +224,12 @@ class FirebaseAuthService {
         );
 
         try {
-          final UserCredential userCredential =
-              await _auth.signInWithCredential(credential);
-          user = userCredential.user;
+          userCredential = await _firebaseAuth.signInWithCredential(credential);
+          if (userCredential.user != null) {
+            loginSignupProvider.setUser(userCredential.user!);
+            //Navigator.pushReplacement(
+            //    context, MaterialPageRoute(builder: (context) => HomePage()));
+          }
         } on FirebaseException catch (error) {
           if (error.code == 'account-exists-with-different-credential') {
             GlobalMethod.showErrorDialog(
@@ -226,6 +252,6 @@ class FirebaseAuthService {
         }
       }
     }
-    return user;
+    //return user;
   }
 }

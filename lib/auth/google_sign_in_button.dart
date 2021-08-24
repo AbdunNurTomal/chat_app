@@ -1,7 +1,9 @@
 //import 'package:chat_app/pages/users/user_profile_page.dart';
 import 'package:chat_app/auth/user_profile.dart';
+import 'package:chat_app/provider/login_signup_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'firebase_auth_service.dart';
 import 'user_profile.dart';
 
@@ -11,8 +13,11 @@ class GoogleSignInButton extends StatefulWidget {
 }
 
 class _GoogleSignInButtonState extends State<GoogleSignInButton> {
+  FirebaseAuthService _authentication = FirebaseAuthService();
+
   bool _isGoogleSigningIn = false;
   String errorMsg = '';
+  final FirebaseAuth auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -32,21 +37,15 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
                   _isGoogleSigningIn = true;
                 });
 
-                User? user = await FirebaseAuthService.signInWithGoogle(
-                    context: context);
+                LoginSignupProvider loginSignupProvider =
+                    Provider.of<LoginSignupProvider>(context, listen: false);
+
+                _authentication.signInWithGoogle(
+                    loginSignupProvider: loginSignupProvider, context: context);
 
                 setState(() {
                   _isGoogleSigningIn = false;
                 });
-
-                if (user != null) {
-                  //Navigator.pushReplacementNamed(context, WelcomePage.routeName);
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(
-                      builder: (context) => UserProfile(user: user),
-                    ),
-                  );
-                }
               },
               child: const Padding(
                 padding: EdgeInsets.fromLTRB(0, 10, 0, 10),

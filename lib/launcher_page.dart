@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'auth/auth_dialog.dart';
@@ -19,8 +20,8 @@ class LauncherPage extends StatefulWidget {
 }
 
 class _LauncherPageState extends State<LauncherPage> {
-  FirebaseAuthService _firebaseAuthService = new FirebaseAuthService();
   //User? _user;
+  FirebaseAuthService _authentication = FirebaseAuthService();
 
   @override
   void initState() {
@@ -28,22 +29,23 @@ class _LauncherPageState extends State<LauncherPage> {
         Provider.of<LoginSignupProvider>(context, listen: false);
     Future.delayed(Duration(seconds: 3), () async {
       // initialize current user
-      await _firebaseAuthService.initializeCurrentUser(loginSignupProvider);
+      //final firebaseUser = context.watch<User>();
+      _authentication.initializeCurrentUser(context, loginSignupProvider);
 
       //print(loginSignupProvider.user);
-      if (loginSignupProvider.user == null) {
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (_) => AuthDialog()));
-      } else if (loginSignupProvider.userDetails == null) {
+      if (loginSignupProvider.userDetails == null) {
         print('wait');
         print(loginSignupProvider.user);
+
+        //Navigator.pushNamed(context, UserProfile.routeName, arguments: [loginSignupProvider.user]);
+
         //Navigator.of(context).pushReplacement(
         //  MaterialPageRoute(
         //    builder: (context) => UserProfile(user: loginSignupProvider.user),
         //  ),
         //);
-      } else if (loginSignupProvider.userDetails!.userRole != '') {
-        String? userRole = loginSignupProvider.userDetails!.userRole;
+      } else if (loginSignupProvider.userDetails.userRole != '') {
+        String? userRole = loginSignupProvider.userDetails.userRole;
         // admin or user navigation
         if (Responsive.isDesktop(context) || Responsive.isTablet(context)) {
           switch (userRole) {

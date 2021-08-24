@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:chat_app/auth/firebase_auth_service.dart';
 import 'package:chat_app/auth/wait_room.dart';
 import 'package:chat_app/provider/login_signup_provider.dart';
 import 'package:chat_app/utils/constants.dart';
@@ -20,7 +21,7 @@ import '../utils/global_methods.dart';
 
 class UserProfile extends StatefulWidget {
   //const UserProfile({ Key? key }) : super(key: key);
-  //static const String routeName = "\profile";
+  static const String routeName = "\profile";
 
   final User user;
   const UserProfile({Key? key, required User user})
@@ -39,12 +40,12 @@ class _UserProfileState extends State<UserProfile> {
   String password = '';
   String designation = '';
 
-  //final TextEditingController _displayNameController = TextEditingController();
-  //final TextEditingController _emailTextController = TextEditingController();
-  //final TextEditingController _phoneNumberController = TextEditingController();
-  //final TextEditingController _passTextController = TextEditingController();
-  //final TextEditingController _positionCPTextController =
-  //    TextEditingController();
+  final TextEditingController _displayNameController = TextEditingController();
+  final TextEditingController _emailTextController = TextEditingController();
+  final TextEditingController _phoneNumberController = TextEditingController();
+  final TextEditingController _passTextController = TextEditingController();
+  final TextEditingController _positionCPTextController =
+      TextEditingController();
 
   final FocusNode _emailFocusNode = FocusNode();
   final FocusNode _phoneNumberFocusNode = FocusNode();
@@ -57,6 +58,32 @@ class _UserProfileState extends State<UserProfile> {
   //final FirebaseAuth _auth = FirebaseAuth.instance;
   bool _isLoading = false;
   String? imageUrl;
+
+  //FirebaseAuth auth = FirebaseAuth.instance;
+  //final userRef = FirebaseFirestore.instance.collection("users");
+  //late User _currentUser;
+//
+  //String _uid;
+  //String _username;
+  //String _email;
+  //
+  //getCurrentUser() async {
+  //  User currentUser = await context
+  //      .read<FirebaseAuthService>()
+  //      .getUserFromDB(uid: auth.currentUser!.uid);
+  //
+  //  _currentUser = currentUser;
+  //
+  //  print("${_currentUser.username}");
+  //
+  //  setState(() {
+  //    _uid = _currentUser.uid;
+  //    displayName = _currentUser.username;
+  //    _displayNameController.text = displayName;
+//
+  //    _email = _currentUser.email;
+  //  });
+  //}
 
   @override
   void initState() {
@@ -71,6 +98,7 @@ class _UserProfileState extends State<UserProfile> {
     //  _phoneNumberController.text = _user!.phoneNumber!;
     //}
     super.initState();
+    //getCurrentUser();
   }
 
   @override
