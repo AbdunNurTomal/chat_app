@@ -8,16 +8,14 @@ class LoginSignupProvider with ChangeNotifier {
 
   void setUser(User? user) {
     _user = user!;
-    //print(_user);
     notifyListeners();
   }
 
   Users? _userDetails;
   Users get userDetails => _userDetails!;
 
-  void setUserDetails(Users? users) {
-    _userDetails = users!;
-    //print(_userDetails);
+  void setUserDetails(Users users) {
+    _userDetails = users;
     notifyListeners();
   }
 

@@ -52,10 +52,11 @@ class _AuthDialogState extends State<AuthDialog> {
 
   @override
   void initState() {
-    LoginSignupProvider loginSignupProvider =
-        Provider.of<LoginSignupProvider>(context, listen: false);
+    //LoginSignupProvider loginSignupProvider =
+    //    Provider.of<LoginSignupProvider>(context, listen: false);
     // initialize current user
-    _authentication.initializeCurrentUser(context, loginSignupProvider);
+    //_authentication.initializeCurrentUser(context, loginSignupProvider);
+    //_authentication.initializeCurrentUser(loginSignupProvider);
 
     textFocusNodeEmail = FocusNode();
     textFocusNodePassword = FocusNode();

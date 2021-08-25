@@ -25,58 +25,47 @@ class _LauncherPageState extends State<LauncherPage> {
 
   @override
   void initState() {
+    super.initState();
     LoginSignupProvider loginSignupProvider =
         Provider.of<LoginSignupProvider>(context, listen: false);
+
     Future.delayed(Duration(seconds: 3), () async {
+      print("delay 3 seconds");
       // initialize current user
       //final firebaseUser = context.watch<User>();
-      _authentication.initializeCurrentUser(context, loginSignupProvider);
+      //print(firebaseUser);
 
+      await _authentication.initializeCurrentUser(context, loginSignupProvider);
       //print(loginSignupProvider.user);
-      if (loginSignupProvider.userDetails == null) {
-        print('wait');
-        print(loginSignupProvider.user);
+      //print("User details - ");
+      //print(loginSignupProvider.userDetails.userRole);
 
-        //Navigator.pushNamed(context, UserProfile.routeName, arguments: [loginSignupProvider.user]);
-
-        //Navigator.of(context).pushReplacement(
-        //  MaterialPageRoute(
-        //    builder: (context) => UserProfile(user: loginSignupProvider.user),
-        //  ),
-        //);
-      } else if (loginSignupProvider.userDetails.userRole != '') {
+      // admin or user navigation
+      if (Responsive.isDesktop(context) || Responsive.isTablet(context)) {
         String? userRole = loginSignupProvider.userDetails.userRole;
-        // admin or user navigation
-        if (Responsive.isDesktop(context) || Responsive.isTablet(context)) {
-          switch (userRole) {
-            case 'admin':
-              Navigator.pushReplacementNamed(context, AdminHomePage.routeName);
-              //Navigator.push(context, MaterialPageRoute(builder: (_) => AdminHomePage()));
-              break;
-            case 'manager':
-              Navigator.pushReplacementNamed(
-                  context, ManagerHomePage.routeName);
-              //Navigator.push(context, MaterialPageRoute(builder: (_) => ManagerHomePage()));
-              break;
-            case 'supervisor':
-              Navigator.pushReplacementNamed(
-                  context, SupervisorHomePage.routeName);
-              //Navigator.push(context,MaterialPageRoute(builder: (_) => SupervisorHomePage()));
-              break;
-            default:
-              Navigator.pushReplacementNamed(
-                  context, CustomerHomePage.routeName);
-              //Navigator.push(context, MaterialPageRoute(builder: (_) => CustomerHomePage()));
-              break;
-          }
-        } else {
-          Navigator.pushReplacementNamed(context, MessageHomePage.routeName);
+        switch (userRole) {
+          case 'admin':
+            Navigator.pushReplacementNamed(context, AdminHomePage.routeName);
+            //Navigator.push(context, MaterialPageRoute(builder: (_) => AdminHomePage()));
+            break;
+          case 'manager':
+            Navigator.pushReplacementNamed(context, ManagerHomePage.routeName);
+            //Navigator.push(context, MaterialPageRoute(builder: (_) => ManagerHomePage()));
+            break;
+          case 'supervisor':
+            Navigator.pushReplacementNamed(
+                context, SupervisorHomePage.routeName);
+            //Navigator.push(context,MaterialPageRoute(builder: (_) => SupervisorHomePage()));
+            break;
+          default:
+            Navigator.pushReplacementNamed(context, CustomerHomePage.routeName);
+            //Navigator.push(context, MaterialPageRoute(builder: (_) => CustomerHomePage()));
+            break;
         }
       } else {
-        Navigator.pushReplacementNamed(context, CustomerHomePage.routeName);
+        Navigator.pushReplacementNamed(context, MessageHomePage.routeName);
       }
     });
-    super.initState();
   }
 
   @override
@@ -86,7 +75,7 @@ class _LauncherPageState extends State<LauncherPage> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         Image.asset(
-          'images/launcher_icon.png',
+          'images/pqc.png',
           height: 250,
         ),
         const SizedBox(height: 20),

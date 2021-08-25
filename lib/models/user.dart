@@ -15,8 +15,8 @@ class Users {
   String? createdDateTime;
 
   //Users({
-  //  this.displayName = '',
-  //  this.userEmail = '',
+  //  required this.displayName,
+  //  required this.userEmail,
   //  this.userPhone = '',
   //  this.userPassword = '',
   //  this.userRole = '',
@@ -27,7 +27,15 @@ class Users {
   //  this.userDesignation = '',
   //  this.createdDateTime = '',
   //});
-  Users({userPassword, displayName, userEmail, userUid});
+  Users({
+    this.displayName,
+    this.userEmail,
+    this.userPassword,
+    this.userUid,
+    this.userRole
+  });
+
+  //Users({userPassword, displayName, userEmail, userUid});
 
   //Users.fromMap(Map<String, dynamic> data) {
   //  this.displayName = data["display_name"];
@@ -61,7 +69,18 @@ class Users {
         userEmail: data["email"],
         userPassword: data["password"],
         userUid: data["uid"],
+        userRole: data["role"],
       );
+
+  //factory Users.fromMap(Map<String, dynamic> data) {
+  //  print(data["displayName"]);
+  //  return Users(
+  //    displayName: data["displayName"],
+  //    userEmail: data["email"],
+  //    userPassword: data["password"],
+  //    userUid: data["uid"],
+  //  );
+  //}
 
   Map<String, dynamic> toMap() {
     return {

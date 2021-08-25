@@ -18,6 +18,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'auth_dialog.dart';
 import 'login_page.dart';
+import 'user_profile.dart';
 
 class FirebaseAuthService {
   //final FirebaseAuth _firebaseAuth;
@@ -41,7 +42,7 @@ class FirebaseAuthService {
       print("$email password $password");
       result = await _firebaseAuth.signInWithEmailAndPassword(
           email: email, password: password);
-      print(result);
+      //print(result);
     } on FirebaseException catch (error) {
       GlobalMethod.showErrorDialog(error: error.message!, ctx: context);
     }
@@ -112,28 +113,41 @@ class FirebaseAuthService {
       BuildContext context, LoginSignupProvider loginSignupProvider) async {
     print(loginSignupProvider.user.email);
     try {
-      FirebaseFirestore.instance
+      await FirebaseFirestore.instance
           .collection('users')
           .doc(loginSignupProvider.user.uid)
           .get()
           .then((value) => {
-                //print(value.data().toString()),
-                loginSignupProvider.setUserDetails(value)
+                print(value.data().toString()),
+                if (value.data() == null)
+                  {
+                    Navigator.pushReplacementNamed(
+                        context, UserProfile.routeName,
+                        arguments: [loginSignupProvider.user])
+                  }
+                else
+                  {
+                    user = Users.fromMap(value.data()!),
+                    print(user.displayName),
+                    loginSignupProvider.setUserDetails(user),
+                  }
               });
     } on FirebaseException catch (error) {
       GlobalMethod.showErrorDialog(error: error.message!, ctx: context);
+      //print(error.message!);
     }
   }
 
   // initialize current user
   Future<void> initializeCurrentUser(
       BuildContext context, LoginSignupProvider loginSignupProvider) async {
-    User? user = _firebaseAuth.currentUser;
-    if (user != null) {
-      print(user);
-      loginSignupProvider.setUser(user);
+    //print(_firebaseAuth.currentUser);
+    if (_firebaseAuth.currentUser != null) {
+      //print("initialize Current User if");
+      loginSignupProvider.setUser(_firebaseAuth.currentUser);
       await getUserDetails(context, loginSignupProvider);
     } else {
+      //print("initializ Current User else");
       Navigator.pushReplacementNamed(context, AuthDialog.routeName);
     }
   }
