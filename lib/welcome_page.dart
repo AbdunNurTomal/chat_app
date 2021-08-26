@@ -1,3 +1,12 @@
+import 'package:provider/provider.dart';
+
+import 'auth/firebase_auth_service.dart';
+import 'pages/admin/admin_home_page.dart';
+import 'pages/customer/customer_home_page.dart';
+import 'pages/manager/manager_home_page.dart';
+import 'pages/message/message_home_page.dart';
+import 'pages/supervisor/supervisor_home_page.dart';
+import 'provider/login_signup_provider.dart';
 import 'utils/constants.dart';
 import 'utils/custom_color.dart';
 import 'package:flutter/foundation.dart';
@@ -5,11 +14,62 @@ import 'package:flutter/material.dart';
 import 'component/side_menu.dart';
 import 'utils/responsive_screen.dart';
 
-class WelcomePage extends StatelessWidget {
+class WelcomePage extends StatefulWidget {
   //const WelcomePage({Key? key}) : super(key: key);
   static const String routeName = "\welcome_page";
 
+  @override
+  _WelcomePageState createState() => _WelcomePageState();
+}
+
+class _WelcomePageState extends State<WelcomePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  //User? _user;
+  //FirebaseAuthService _authentication = FirebaseAuthService();
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
+  @override
+  void initState() async {
+    super.initState();
+    //LoginSignupProvider loginSignupProvider =
+    //    Provider.of<LoginSignupProvider>(context);
+
+    //Future.delayed(Duration(seconds: 3), () async {
+    //  print("delay 3 seconds");
+
+    //await _authentication.initializeCurrentUser(context, loginSignupProvider);
+    //print(loginSignupProvider.user);
+    //print("User details - ");
+    //print(loginSignupProvider.userDetails.userRole);
+    //await _authentication.userRoleOperation(loginSignupProvider);
+    //switch (loginSignupProvider.userDetails.userRole) {
+    //  case 'admin':
+    //    //Navigator.pushReplacementNamed(context, AdminHomePage.routeName);
+    //    Navigator.push(
+    //        context, MaterialPageRoute(builder: (_) => AdminHomePage()));
+    //    break;
+    //  case 'manager':
+    //    //Navigator.pushReplacementNamed(context, ManagerHomePage.routeName);
+    //    Navigator.push(
+    //        context, MaterialPageRoute(builder: (_) => ManagerHomePage()));
+    //    break;
+    //  case 'supervisor':
+    //    //Navigator.pushReplacementNamed(context, SupervisorHomePage.routeName);
+    //    Navigator.push(
+    //        context, MaterialPageRoute(builder: (_) => SupervisorHomePage()));
+    //    break;
+    //  default:
+    //    //Navigator.pushReplacementNamed(context, CustomerHomePage.routeName);
+    //    Navigator.push(
+    //        context, MaterialPageRoute(builder: (_) => CustomerHomePage()));
+    //    break;
+    //}
+    //});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +79,9 @@ class WelcomePage extends StatelessWidget {
           constraints: BoxConstraints(maxWidth: 250),
           child: SideMenu(),
         ),
-        body: Container(
+        body: Text("Welcome")
+        /*
+        Container(
           padding: EdgeInsets.only(top: kIsWeb ? Constants.kDefaultPadding : 0),
           color: CustomColors.kBgDarkColor,
           child: SafeArea(
@@ -53,6 +115,8 @@ class WelcomePage extends StatelessWidget {
               ],
             ),
           ),
-        ));
+        )
+        */
+        );
   }
 }

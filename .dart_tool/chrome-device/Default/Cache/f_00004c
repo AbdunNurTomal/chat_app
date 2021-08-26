@@ -1,0 +1,3747 @@
+define(['dart_sdk', 'packages/flutter/src/widgets/widget_span.dart', 'packages/flutter/src/widgets/form.dart', 'packages/firebase_auth/firebase_auth.dart', 'packages/cloud_firestore/cloud_firestore.dart', 'packages/cloud_firestore_platform_interface/src/timestamp.dart', 'packages/chat_app/utils/global_methods.dart', 'packages/firebase_core_platform_interface/firebase_core_platform_interface.dart', 'packages/flutter/src/widgets/safe_area.dart', 'packages/flutter/src/material/button_bar.dart', 'packages/flutter/src/painting/edge_insets.dart', 'packages/chat_app/utils/custom_color.dart', 'packages/flutter/src/painting/rounded_rectangle_border.dart', 'packages/flutter/src/painting/border_radius.dart', 'packages/flutter/src/widgets/single_child_scroll_view.dart', 'packages/flutter/src/rendering/flex.dart', 'packages/google_fonts/src/google_fonts_base.dart', 'packages/flutter/src/material/colors.dart', 'packages/flutter/src/painting/placeholder_span.dart', 'packages/flutter/src/services/mouse_cursor.dart', 'packages/flutter/src/gestures/tap.dart', 'packages/flutter/src/material/progress_indicator.dart', 'packages/flutter/src/painting/alignment.dart', 'packages/flutter/src/material/icon_button.dart', 'packages/flutter/src/painting/box_decoration.dart', 'packages/flutter/src/painting/box_border.dart', 'packages/websafe_svg/src/websafe_svg.dart', 'packages/flutter/src/painting/box_fit.dart', 'packages/flutter/src/widgets/icon.dart', 'packages/flutter/src/material/icons.dart', 'packages/flutter/src/material/text_form_field.dart', 'packages/flutter/src/services/text_input.dart', 'packages/flutter/src/widgets/icon_data.dart', 'packages/flutter/src/material/input_border.dart', 'packages/flutter/src/painting/colors.dart', 'packages/image_picker/image_picker.dart', 'packages/image_picker_platform_interface/src/types/image_source.dart', 'packages/image_cropper/src/cropper.dart', 'packages/flutter/src/painting/strut_style.dart', 'packages/flutter/src/widgets/scroll_view.dart', 'packages/chat_app/utils/constants.dart'], (function load__packages__chat_app__auth__signup_dart(dart_sdk, packages__flutter__src__widgets__widget_span$46dart, packages__flutter__src__widgets__form$46dart, packages__firebase_auth__firebase_auth$46dart, packages__cloud_firestore__cloud_firestore$46dart, packages__cloud_firestore_platform_interface__src__timestamp$46dart, packages__chat_app__utils__global_methods$46dart, packages__firebase_core_platform_interface__firebase_core_platform_interface$46dart, packages__flutter__src__widgets__safe_area$46dart, packages__flutter__src__material__button_bar$46dart, packages__flutter__src__painting__edge_insets$46dart, packages__chat_app__utils__custom_color$46dart, packages__flutter__src__painting__rounded_rectangle_border$46dart, packages__flutter__src__painting__border_radius$46dart, packages__flutter__src__widgets__single_child_scroll_view$46dart, packages__flutter__src__rendering__flex$46dart, packages__google_fonts__src__google_fonts_base$46dart, packages__flutter__src__material__colors$46dart, packages__flutter__src__painting__placeholder_span$46dart, packages__flutter__src__services__mouse_cursor$46dart, packages__flutter__src__gestures__tap$46dart, packages__flutter__src__material__progress_indicator$46dart, packages__flutter__src__painting__alignment$46dart, packages__flutter__src__material__icon_button$46dart, packages__flutter__src__painting__box_decoration$46dart, packages__flutter__src__painting__box_border$46dart, packages__websafe_svg__src__websafe_svg$46dart, packages__flutter__src__painting__box_fit$46dart, packages__flutter__src__widgets__icon$46dart, packages__flutter__src__material__icons$46dart, packages__flutter__src__material__text_form_field$46dart, packages__flutter__src__services__text_input$46dart, packages__flutter__src__widgets__icon_data$46dart, packages__flutter__src__material__input_border$46dart, packages__flutter__src__painting__colors$46dart, packages__image_picker__image_picker$46dart, packages__image_picker_platform_interface__src__types__image_source$46dart, packages__image_cropper__src__cropper$46dart, packages__flutter__src__painting__strut_style$46dart, packages__flutter__src__widgets__scroll_view$46dart, packages__chat_app__utils__constants$46dart) {
+  'use strict';
+  const core = dart_sdk.core;
+  const _js_helper = dart_sdk._js_helper;
+  const async = dart_sdk.async;
+  const ui = dart_sdk.ui;
+  const _interceptors = dart_sdk._interceptors;
+  const io = dart_sdk.io;
+  const dart = dart_sdk.dart;
+  const dartx = dart_sdk.dartx;
+  const framework = packages__flutter__src__widgets__widget_span$46dart.src__widgets__framework;
+  const editable_text = packages__flutter__src__widgets__widget_span$46dart.src__widgets__editable_text;
+  const focus_manager = packages__flutter__src__widgets__widget_span$46dart.src__widgets__focus_manager;
+  const navigator = packages__flutter__src__widgets__widget_span$46dart.src__widgets__navigator;
+  const basic = packages__flutter__src__widgets__widget_span$46dart.src__widgets__basic;
+  const container = packages__flutter__src__widgets__widget_span$46dart.src__widgets__container;
+  const text = packages__flutter__src__widgets__widget_span$46dart.src__widgets__text;
+  const widget_inspector = packages__flutter__src__widgets__widget_span$46dart.src__widgets__widget_inspector;
+  const image = packages__flutter__src__widgets__widget_span$46dart.src__widgets__image;
+  const focus_scope = packages__flutter__src__widgets__widget_span$46dart.src__widgets__focus_scope;
+  const gesture_detector = packages__flutter__src__widgets__widget_span$46dart.src__widgets__gesture_detector;
+  const form = packages__flutter__src__widgets__form$46dart.src__widgets__form;
+  const firebase_auth = packages__firebase_auth__firebase_auth$46dart.firebase_auth;
+  const cloud_firestore = packages__cloud_firestore__cloud_firestore$46dart.cloud_firestore;
+  const timestamp = packages__cloud_firestore_platform_interface__src__timestamp$46dart.src__timestamp;
+  const global_methods = packages__chat_app__utils__global_methods$46dart.utils__global_methods;
+  const firebase_core_platform_interface = packages__firebase_core_platform_interface__firebase_core_platform_interface$46dart.firebase_core_platform_interface;
+  const safe_area = packages__flutter__src__widgets__safe_area$46dart.src__widgets__safe_area;
+  const dialog = packages__flutter__src__material__button_bar$46dart.src__material__dialog;
+  const edge_insets = packages__flutter__src__painting__edge_insets$46dart.src__painting__edge_insets;
+  const custom_color = packages__chat_app__utils__custom_color$46dart.utils__custom_color;
+  const rounded_rectangle_border = packages__flutter__src__painting__rounded_rectangle_border$46dart.src__painting__rounded_rectangle_border;
+  const border_radius = packages__flutter__src__painting__border_radius$46dart.src__painting__border_radius;
+  const single_child_scroll_view = packages__flutter__src__widgets__single_child_scroll_view$46dart.src__widgets__single_child_scroll_view;
+  const flex = packages__flutter__src__rendering__flex$46dart.src__rendering__flex;
+  const google_fonts = packages__google_fonts__src__google_fonts_base$46dart.google_fonts;
+  const colors = packages__flutter__src__material__colors$46dart.src__material__colors;
+  const text_span = packages__flutter__src__painting__placeholder_span$46dart.src__painting__text_span;
+  const inline_span = packages__flutter__src__painting__placeholder_span$46dart.src__painting__inline_span;
+  const mouse_cursor = packages__flutter__src__services__mouse_cursor$46dart.src__services__mouse_cursor;
+  const tap = packages__flutter__src__gestures__tap$46dart.src__gestures__tap;
+  const progress_indicator = packages__flutter__src__material__progress_indicator$46dart.src__material__progress_indicator;
+  const alignment = packages__flutter__src__painting__alignment$46dart.src__painting__alignment;
+  const material_button = packages__flutter__src__material__icon_button$46dart.src__material__material_button;
+  const ink_well = packages__flutter__src__material__icon_button$46dart.src__material__ink_well;
+  const input_decorator = packages__flutter__src__material__icon_button$46dart.src__material__input_decorator;
+  const text_button = packages__flutter__src__material__icon_button$46dart.src__material__text_button;
+  const box_decoration = packages__flutter__src__painting__box_decoration$46dart.src__painting__box_decoration;
+  const box_border = packages__flutter__src__painting__box_border$46dart.src__painting__box_border;
+  const websafe_svg = packages__websafe_svg__src__websafe_svg$46dart.src__websafe_svg;
+  const box_fit = packages__flutter__src__painting__box_fit$46dart.src__painting__box_fit;
+  const icon = packages__flutter__src__widgets__icon$46dart.src__widgets__icon;
+  const icons = packages__flutter__src__material__icons$46dart.src__material__icons;
+  const text_form_field = packages__flutter__src__material__text_form_field$46dart.src__material__text_form_field;
+  const text_input = packages__flutter__src__services__text_input$46dart.src__services__text_input;
+  const icon_data = packages__flutter__src__widgets__icon_data$46dart.src__widgets__icon_data;
+  const input_border = packages__flutter__src__material__input_border$46dart.src__material__input_border;
+  const colors$ = packages__flutter__src__painting__colors$46dart.src__painting__colors;
+  const image_picker = packages__image_picker__image_picker$46dart.image_picker;
+  const image_source = packages__image_picker_platform_interface__src__types__image_source$46dart.src__types__image_source;
+  const cropper = packages__image_cropper__src__cropper$46dart.src__cropper;
+  const text_style = packages__flutter__src__painting__strut_style$46dart.src__painting__text_style;
+  const scroll_view = packages__flutter__src__widgets__scroll_view$46dart.src__widgets__scroll_view;
+  const constants = packages__chat_app__utils__constants$46dart.utils__constants;
+  var signup = Object.create(dart.library);
+  var $trim = dartx.trim;
+  var $toLowerCase = dartx.toLowerCase;
+  var $isEmpty = dartx.isEmpty;
+  var $length = dartx.length;
+  var $_get = dartx._get;
+  dart._checkModuleNullSafetyMode(true);
+  var T = {
+    GlobalKeyOfFormState: () => (T.GlobalKeyOfFormState = dart.constFn(framework.GlobalKey$(form.FormState)))(),
+    VoidTovoid: () => (T.VoidTovoid = dart.constFn(dart.fnType(dart.void, [])))(),
+    IdentityMapOfString$dynamic: () => (T.IdentityMapOfString$dynamic = dart.constFn(_js_helper.IdentityMap$(core.String, dart.dynamic)))(),
+    ObjectN: () => (T.ObjectN = dart.constFn(dart.nullable(core.Object)))(),
+    JSArrayOfInlineSpan: () => (T.JSArrayOfInlineSpan = dart.constFn(_interceptors.JSArray$(inline_span.InlineSpan)))(),
+    JSArrayOfWidget: () => (T.JSArrayOfWidget = dart.constFn(_interceptors.JSArray$(framework.Widget)))(),
+    StringN: () => (T.StringN = dart.constFn(dart.nullable(core.String)))(),
+    StringNToStringN: () => (T.StringNToStringN = dart.constFn(dart.fnType(T.StringN(), [T.StringN()])))(),
+    BuildContextToAlertDialog: () => (T.BuildContextToAlertDialog = dart.constFn(dart.fnType(dialog.AlertDialog, [framework.BuildContext])))(),
+    BuildContextAndintToInkWell: () => (T.BuildContextAndintToInkWell = dart.constFn(dart.fnType(ink_well.InkWell, [framework.BuildContext, core.int])))()
+  };
+  const CT = Object.create({
+    _: () => (C, CT)
+  });
+  dart.defineLazy(CT, {
+    get C0() {
+      return C[0] = dart.const({
+        __proto__: edge_insets.EdgeInsets.prototype,
+        [EdgeInsets_bottom]: 0,
+        [EdgeInsets_right]: 0,
+        [EdgeInsets_top]: 0,
+        [EdgeInsets_left]: 0
+      });
+    },
+    get C1() {
+      return C[1] = dart.const({
+        __proto__: edge_insets.EdgeInsets.prototype,
+        [EdgeInsets_bottom]: 16,
+        [EdgeInsets_right]: 16,
+        [EdgeInsets_top]: 16,
+        [EdgeInsets_left]: 16
+      });
+    },
+    get C4() {
+      return C[4] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "data",
+        [_Location_column]: 31,
+        [_Location_line]: 134,
+        [_Location_file]: null
+      });
+    },
+    get C5() {
+      return C[5] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "textAlign",
+        [_Location_column]: 31,
+        [_Location_line]: 135,
+        [_Location_file]: null
+      });
+    },
+    get C6() {
+      return C[6] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "style",
+        [_Location_column]: 31,
+        [_Location_line]: 136,
+        [_Location_file]: null
+      });
+    },
+    get C3() {
+      return C[3] = dart.constList([C[4] || CT.C4, C[5] || CT.C5, C[6] || CT.C6], widget_inspector._Location);
+    },
+    get C2() {
+      return C[2] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[3] || CT.C3,
+        [_Location_name]: null,
+        [_Location_column]: 29,
+        [_Location_line]: 133,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C10() {
+      return C[10] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "height",
+        [_Location_column]: 44,
+        [_Location_line]: 139,
+        [_Location_file]: null
+      });
+    },
+    get C9() {
+      return C[9] = dart.constList([C[10] || CT.C10], widget_inspector._Location);
+    },
+    get C8() {
+      return C[8] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[9] || CT.C9,
+        [_Location_name]: null,
+        [_Location_column]: 35,
+        [_Location_line]: 139,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C7() {
+      return C[7] = dart.const({
+        __proto__: basic.SizedBox.prototype,
+        [Widget__location]: C[8] || CT.C8,
+        [Widget_key]: null,
+        [SingleChildRenderObjectWidget_child]: null,
+        [SizedBox_height]: 10,
+        [SizedBox_width]: null
+      });
+    },
+    get C12() {
+      return C[12] = dart.const({
+        __proto__: mouse_cursor._DeferringMouseCursor.prototype
+      });
+    },
+    get C11() {
+      return C[11] = dart.const({
+        __proto__: text_span.TextSpan.prototype,
+        [InlineSpan_style]: null,
+        [TextSpan_semanticsLabel]: null,
+        [TextSpan_onExit]: null,
+        [TextSpan_onEnter]: null,
+        [TextSpan_mouseCursor]: C[12] || CT.C12,
+        [TextSpan_recognizer]: null,
+        [TextSpan_children]: null,
+        [TextSpan_text]: "    "
+      });
+    },
+    get C15() {
+      return C[15] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "text",
+        [_Location_column]: 31,
+        [_Location_line]: 141,
+        [_Location_file]: null
+      });
+    },
+    get C14() {
+      return C[14] = dart.constList([C[15] || CT.C15], widget_inspector._Location);
+    },
+    get C13() {
+      return C[13] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[14] || CT.C14,
+        [_Location_name]: null,
+        [_Location_column]: 29,
+        [_Location_line]: 140,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C19() {
+      return C[19] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "height",
+        [_Location_column]: 44,
+        [_Location_line]: 164,
+        [_Location_file]: null
+      });
+    },
+    get C18() {
+      return C[18] = dart.constList([C[19] || CT.C19], widget_inspector._Location);
+    },
+    get C17() {
+      return C[17] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[18] || CT.C18,
+        [_Location_name]: null,
+        [_Location_column]: 35,
+        [_Location_line]: 164,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C16() {
+      return C[16] = dart.const({
+        __proto__: basic.SizedBox.prototype,
+        [Widget__location]: C[17] || CT.C17,
+        [Widget_key]: null,
+        [SingleChildRenderObjectWidget_child]: null,
+        [SizedBox_height]: 20,
+        [SizedBox_width]: null
+      });
+    },
+    get C23() {
+      return C[23] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "height",
+        [_Location_column]: 44,
+        [_Location_line]: 166,
+        [_Location_file]: null
+      });
+    },
+    get C22() {
+      return C[22] = dart.constList([C[23] || CT.C23], widget_inspector._Location);
+    },
+    get C21() {
+      return C[21] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[22] || CT.C22,
+        [_Location_name]: null,
+        [_Location_column]: 35,
+        [_Location_line]: 166,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C20() {
+      return C[20] = dart.const({
+        __proto__: basic.SizedBox.prototype,
+        [Widget__location]: C[21] || CT.C21,
+        [Widget_key]: null,
+        [SingleChildRenderObjectWidget_child]: null,
+        [SizedBox_height]: 40,
+        [SizedBox_width]: null
+      });
+    },
+    get C27() {
+      return C[27] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "child",
+        [_Location_column]: 37,
+        [_Location_line]: 169,
+        [_Location_file]: null
+      });
+    },
+    get C26() {
+      return C[26] = dart.constList([C[27] || CT.C27], widget_inspector._Location);
+    },
+    get C25() {
+      return C[25] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[26] || CT.C26,
+        [_Location_name]: null,
+        [_Location_column]: 41,
+        [_Location_line]: 168,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C31() {
+      return C[31] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "width",
+        [_Location_column]: 39,
+        [_Location_line]: 170,
+        [_Location_file]: null
+      });
+    },
+    get C32() {
+      return C[32] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "height",
+        [_Location_column]: 39,
+        [_Location_line]: 171,
+        [_Location_file]: null
+      });
+    },
+    get C33() {
+      return C[33] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "child",
+        [_Location_column]: 39,
+        [_Location_line]: 172,
+        [_Location_file]: null
+      });
+    },
+    get C30() {
+      return C[30] = dart.constList([C[31] || CT.C31, C[32] || CT.C32, C[33] || CT.C33], widget_inspector._Location);
+    },
+    get C29() {
+      return C[29] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[30] || CT.C30,
+        [_Location_name]: null,
+        [_Location_column]: 44,
+        [_Location_line]: 169,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C36() {
+      return C[36] = dart.constList([], widget_inspector._Location);
+    },
+    get C35() {
+      return C[35] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[36] || CT.C36,
+        [_Location_name]: null,
+        [_Location_column]: 46,
+        [_Location_line]: 172,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C37() {
+      return C[37] = dart.const({
+        __proto__: progress_indicator._ActivityIndicatorType.prototype,
+        [_name]: "_ActivityIndicatorType.material",
+        index: 0
+      });
+    },
+    get C34() {
+      return C[34] = dart.const({
+        __proto__: progress_indicator.CircularProgressIndicator.prototype,
+        [Widget__location]: C[35] || CT.C35,
+        [Widget_key]: null,
+        [ProgressIndicator_semanticsValue]: null,
+        [ProgressIndicator_semanticsLabel]: null,
+        [ProgressIndicator_valueColor]: null,
+        [ProgressIndicator_color]: null,
+        [ProgressIndicator_backgroundColor]: null,
+        [ProgressIndicator_value]: null,
+        [CircularProgressIndicator_strokeWidth]: 4,
+        [CircularProgressIndicator__indicatorType]: C[37] || CT.C37
+      });
+    },
+    get C28() {
+      return C[28] = dart.const({
+        __proto__: basic.SizedBox.prototype,
+        [Widget__location]: C[29] || CT.C29,
+        [Widget_key]: null,
+        [SingleChildRenderObjectWidget_child]: C[34] || CT.C34,
+        [SizedBox_height]: 70,
+        [SizedBox_width]: 70
+      });
+    },
+    get C38() {
+      return C[38] = dart.const({
+        __proto__: alignment.Alignment.prototype,
+        [Alignment_y]: 0,
+        [Alignment_x]: 0
+      });
+    },
+    get C24() {
+      return C[24] = dart.const({
+        __proto__: basic.Center.prototype,
+        [Widget__location]: C[25] || CT.C25,
+        [Widget_key]: null,
+        [SingleChildRenderObjectWidget_child]: C[28] || CT.C28,
+        [Align_heightFactor]: null,
+        [Align_widthFactor]: null,
+        [Align_alignment]: C[38] || CT.C38
+      });
+    },
+    get C41() {
+      return C[41] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "data",
+        [_Location_column]: 49,
+        [_Location_line]: 181,
+        [_Location_file]: null
+      });
+    },
+    get C42() {
+      return C[42] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "style",
+        [_Location_column]: 41,
+        [_Location_line]: 182,
+        [_Location_file]: null
+      });
+    },
+    get C40() {
+      return C[40] = dart.constList([C[41] || CT.C41, C[42] || CT.C42], widget_inspector._Location);
+    },
+    get C39() {
+      return C[39] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[40] || CT.C40,
+        [_Location_name]: null,
+        [_Location_column]: 44,
+        [_Location_line]: 181,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C45() {
+      return C[45] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "elevation",
+        [_Location_column]: 37,
+        [_Location_line]: 176,
+        [_Location_file]: null
+      });
+    },
+    get C46() {
+      return C[46] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "minWidth",
+        [_Location_column]: 37,
+        [_Location_line]: 177,
+        [_Location_file]: null
+      });
+    },
+    get C47() {
+      return C[47] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "height",
+        [_Location_column]: 37,
+        [_Location_line]: 178,
+        [_Location_file]: null
+      });
+    },
+    get C48() {
+      return C[48] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "onPressed",
+        [_Location_column]: 37,
+        [_Location_line]: 179,
+        [_Location_file]: null
+      });
+    },
+    get C49() {
+      return C[49] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "color",
+        [_Location_column]: 37,
+        [_Location_line]: 180,
+        [_Location_file]: null
+      });
+    },
+    get C50() {
+      return C[50] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "child",
+        [_Location_column]: 37,
+        [_Location_line]: 181,
+        [_Location_file]: null
+      });
+    },
+    get C51() {
+      return C[51] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "textColor",
+        [_Location_column]: 37,
+        [_Location_line]: 184,
+        [_Location_file]: null
+      });
+    },
+    get C44() {
+      return C[44] = dart.constList([C[45] || CT.C45, C[46] || CT.C46, C[47] || CT.C47, C[48] || CT.C48, C[49] || CT.C49, C[50] || CT.C50, C[51] || CT.C51], widget_inspector._Location);
+    },
+    get C43() {
+      return C[43] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[44] || CT.C44,
+        [_Location_name]: null,
+        [_Location_column]: 35,
+        [_Location_line]: 175,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C54() {
+      return C[54] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "mainAxisAlignment",
+        [_Location_column]: 27,
+        [_Location_line]: 130,
+        [_Location_file]: null
+      });
+    },
+    get C55() {
+      return C[55] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "crossAxisAlignment",
+        [_Location_column]: 27,
+        [_Location_line]: 131,
+        [_Location_file]: null
+      });
+    },
+    get C56() {
+      return C[56] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "children",
+        [_Location_column]: 27,
+        [_Location_line]: 132,
+        [_Location_file]: null
+      });
+    },
+    get C53() {
+      return C[53] = dart.constList([C[54] || CT.C54, C[55] || CT.C55, C[56] || CT.C56], widget_inspector._Location);
+    },
+    get C52() {
+      return C[52] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[53] || CT.C53,
+        [_Location_name]: null,
+        [_Location_column]: 30,
+        [_Location_line]: 129,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C59() {
+      return C[59] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "width",
+        [_Location_column]: 23,
+        [_Location_line]: 127,
+        [_Location_file]: null
+      });
+    },
+    get C60() {
+      return C[60] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "color",
+        [_Location_column]: 23,
+        [_Location_line]: 128,
+        [_Location_file]: null
+      });
+    },
+    get C61() {
+      return C[61] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "child",
+        [_Location_column]: 23,
+        [_Location_line]: 129,
+        [_Location_file]: null
+      });
+    },
+    get C58() {
+      return C[58] = dart.constList([C[59] || CT.C59, C[60] || CT.C60, C[61] || CT.C61], widget_inspector._Location);
+    },
+    get C57() {
+      return C[57] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[58] || CT.C58,
+        [_Location_name]: null,
+        [_Location_column]: 26,
+        [_Location_line]: 126,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C64() {
+      return C[64] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "padding",
+        [_Location_column]: 19,
+        [_Location_line]: 125,
+        [_Location_file]: null
+      });
+    },
+    get C65() {
+      return C[65] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "child",
+        [_Location_column]: 19,
+        [_Location_line]: 126,
+        [_Location_file]: null
+      });
+    },
+    get C63() {
+      return C[63] = dart.constList([C[64] || CT.C64, C[65] || CT.C65], widget_inspector._Location);
+    },
+    get C62() {
+      return C[62] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[63] || CT.C63,
+        [_Location_name]: null,
+        [_Location_column]: 22,
+        [_Location_line]: 124,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C68() {
+      return C[68] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "child",
+        [_Location_column]: 15,
+        [_Location_line]: 124,
+        [_Location_file]: null
+      });
+    },
+    get C67() {
+      return C[67] = dart.constList([C[68] || CT.C68], widget_inspector._Location);
+    },
+    get C66() {
+      return C[66] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[67] || CT.C67,
+        [_Location_name]: null,
+        [_Location_column]: 18,
+        [_Location_line]: 123,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C71() {
+      return C[71] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "insetPadding",
+        [_Location_column]: 11,
+        [_Location_line]: 118,
+        [_Location_file]: null
+      });
+    },
+    get C72() {
+      return C[72] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "backgroundColor",
+        [_Location_column]: 11,
+        [_Location_line]: 119,
+        [_Location_file]: null
+      });
+    },
+    get C73() {
+      return C[73] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "shape",
+        [_Location_column]: 11,
+        [_Location_line]: 120,
+        [_Location_file]: null
+      });
+    },
+    get C74() {
+      return C[74] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "child",
+        [_Location_column]: 11,
+        [_Location_line]: 123,
+        [_Location_file]: null
+      });
+    },
+    get C70() {
+      return C[70] = dart.constList([C[71] || CT.C71, C[72] || CT.C72, C[73] || CT.C73, C[74] || CT.C74], widget_inspector._Location);
+    },
+    get C69() {
+      return C[69] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[70] || CT.C70,
+        [_Location_name]: null,
+        [_Location_column]: 14,
+        [_Location_line]: 117,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C77() {
+      return C[77] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "child",
+        [_Location_column]: 7,
+        [_Location_line]: 117,
+        [_Location_file]: null
+      });
+    },
+    get C76() {
+      return C[76] = dart.constList([C[77] || CT.C77], widget_inspector._Location);
+    },
+    get C75() {
+      return C[75] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[76] || CT.C76,
+        [_Location_name]: null,
+        [_Location_column]: 12,
+        [_Location_line]: 116,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C78() {
+      return C[78] = dart.const({
+        __proto__: edge_insets.EdgeInsets.prototype,
+        [EdgeInsets_bottom]: 8,
+        [EdgeInsets_right]: 8,
+        [EdgeInsets_top]: 8,
+        [EdgeInsets_left]: 8
+      });
+    },
+    get C81() {
+      return C[81] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "file",
+        [_Location_column]: 38,
+        [_Location_line]: 250,
+        [_Location_file]: null
+      });
+    },
+    get C82() {
+      return C[82] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "fit",
+        [_Location_column]: 29,
+        [_Location_line]: 251,
+        [_Location_file]: null
+      });
+    },
+    get C80() {
+      return C[80] = dart.constList([C[81] || CT.C81, C[82] || CT.C82], widget_inspector._Location);
+    },
+    get C79() {
+      return C[79] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[80] || CT.C80,
+        [_Location_name]: null,
+        [_Location_column]: 33,
+        [_Location_line]: 249,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C85() {
+      return C[85] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "borderRadius",
+        [_Location_column]: 21,
+        [_Location_line]: 239,
+        [_Location_file]: null
+      });
+    },
+    get C86() {
+      return C[86] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "child",
+        [_Location_column]: 21,
+        [_Location_line]: 240,
+        [_Location_file]: null
+      });
+    },
+    get C84() {
+      return C[84] = dart.constList([C[85] || CT.C85, C[86] || CT.C86], widget_inspector._Location);
+    },
+    get C83() {
+      return C[83] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[84] || CT.C84,
+        [_Location_name]: null,
+        [_Location_column]: 26,
+        [_Location_line]: 238,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C89() {
+      return C[89] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "width",
+        [_Location_column]: 19,
+        [_Location_line]: 232,
+        [_Location_file]: null
+      });
+    },
+    get C90() {
+      return C[90] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "height",
+        [_Location_column]: 19,
+        [_Location_line]: 233,
+        [_Location_file]: null
+      });
+    },
+    get C91() {
+      return C[91] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "decoration",
+        [_Location_column]: 19,
+        [_Location_line]: 234,
+        [_Location_file]: null
+      });
+    },
+    get C92() {
+      return C[92] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "child",
+        [_Location_column]: 19,
+        [_Location_line]: 238,
+        [_Location_file]: null
+      });
+    },
+    get C88() {
+      return C[88] = dart.constList([C[89] || CT.C89, C[90] || CT.C90, C[91] || CT.C91, C[92] || CT.C92], widget_inspector._Location);
+    },
+    get C87() {
+      return C[87] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[88] || CT.C88,
+        [_Location_name]: null,
+        [_Location_column]: 24,
+        [_Location_line]: 231,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C95() {
+      return C[95] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "padding",
+        [_Location_column]: 17,
+        [_Location_line]: 230,
+        [_Location_file]: null
+      });
+    },
+    get C96() {
+      return C[96] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "child",
+        [_Location_column]: 17,
+        [_Location_line]: 231,
+        [_Location_file]: null
+      });
+    },
+    get C94() {
+      return C[94] = dart.constList([C[95] || CT.C95, C[96] || CT.C96], widget_inspector._Location);
+    },
+    get C93() {
+      return C[93] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[94] || CT.C94,
+        [_Location_name]: null,
+        [_Location_column]: 15,
+        [_Location_line]: 229,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C99() {
+      return C[99] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "icon",
+        [_Location_column]: 29,
+        [_Location_line]: 273,
+        [_Location_file]: null
+      });
+    },
+    get C100() {
+      return C[100] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "color",
+        [_Location_column]: 25,
+        [_Location_line]: 275,
+        [_Location_file]: null
+      });
+    },
+    get C101() {
+      return C[101] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "size",
+        [_Location_column]: 25,
+        [_Location_line]: 276,
+        [_Location_file]: null
+      });
+    },
+    get C98() {
+      return C[98] = dart.constList([C[99] || CT.C99, C[100] || CT.C100, C[101] || CT.C101], widget_inspector._Location);
+    },
+    get C97() {
+      return C[97] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[98] || CT.C98,
+        [_Location_name]: null,
+        [_Location_column]: 30,
+        [_Location_line]: 271,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C104() {
+      return C[104] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "padding",
+        [_Location_column]: 23,
+        [_Location_line]: 270,
+        [_Location_file]: null
+      });
+    },
+    get C105() {
+      return C[105] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "child",
+        [_Location_column]: 23,
+        [_Location_line]: 271,
+        [_Location_file]: null
+      });
+    },
+    get C103() {
+      return C[103] = dart.constList([C[104] || CT.C104, C[105] || CT.C105], widget_inspector._Location);
+    },
+    get C102() {
+      return C[102] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[103] || CT.C103,
+        [_Location_name]: null,
+        [_Location_column]: 28,
+        [_Location_line]: 269,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C108() {
+      return C[108] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "decoration",
+        [_Location_column]: 21,
+        [_Location_line]: 264,
+        [_Location_file]: null
+      });
+    },
+    get C109() {
+      return C[109] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "child",
+        [_Location_column]: 21,
+        [_Location_line]: 269,
+        [_Location_file]: null
+      });
+    },
+    get C107() {
+      return C[107] = dart.constList([C[108] || CT.C108, C[109] || CT.C109], widget_inspector._Location);
+    },
+    get C106() {
+      return C[106] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[107] || CT.C107,
+        [_Location_name]: null,
+        [_Location_column]: 26,
+        [_Location_line]: 263,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C112() {
+      return C[112] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "onTap",
+        [_Location_column]: 19,
+        [_Location_line]: 260,
+        [_Location_file]: null
+      });
+    },
+    get C113() {
+      return C[113] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "child",
+        [_Location_column]: 19,
+        [_Location_line]: 263,
+        [_Location_file]: null
+      });
+    },
+    get C111() {
+      return C[111] = dart.constList([C[112] || CT.C112, C[113] || CT.C113], widget_inspector._Location);
+    },
+    get C110() {
+      return C[110] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[111] || CT.C111,
+        [_Location_name]: null,
+        [_Location_column]: 24,
+        [_Location_line]: 259,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C116() {
+      return C[116] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "top",
+        [_Location_column]: 17,
+        [_Location_line]: 257,
+        [_Location_file]: null
+      });
+    },
+    get C117() {
+      return C[117] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "right",
+        [_Location_column]: 17,
+        [_Location_line]: 258,
+        [_Location_file]: null
+      });
+    },
+    get C118() {
+      return C[118] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "child",
+        [_Location_column]: 17,
+        [_Location_line]: 259,
+        [_Location_file]: null
+      });
+    },
+    get C115() {
+      return C[115] = dart.constList([C[116] || CT.C116, C[117] || CT.C117, C[118] || CT.C118], widget_inspector._Location);
+    },
+    get C114() {
+      return C[114] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[115] || CT.C115,
+        [_Location_name]: null,
+        [_Location_column]: 15,
+        [_Location_line]: 256,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C121() {
+      return C[121] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "children",
+        [_Location_column]: 13,
+        [_Location_line]: 228,
+        [_Location_file]: null
+      });
+    },
+    get C120() {
+      return C[120] = dart.constList([C[121] || CT.C121], widget_inspector._Location);
+    },
+    get C119() {
+      return C[119] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[120] || CT.C120,
+        [_Location_name]: null,
+        [_Location_column]: 11,
+        [_Location_line]: 227,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C125() {
+      return C[125] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "height",
+        [_Location_column]: 26,
+        [_Location_line]: 284,
+        [_Location_file]: null
+      });
+    },
+    get C124() {
+      return C[124] = dart.constList([C[125] || CT.C125], widget_inspector._Location);
+    },
+    get C123() {
+      return C[123] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[124] || CT.C124,
+        [_Location_name]: null,
+        [_Location_column]: 17,
+        [_Location_line]: 284,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C122() {
+      return C[122] = dart.const({
+        __proto__: basic.SizedBox.prototype,
+        [Widget__location]: C[123] || CT.C123,
+        [Widget_key]: null,
+        [SingleChildRenderObjectWidget_child]: null,
+        [SizedBox_height]: 15,
+        [SizedBox_width]: null
+      });
+    },
+    get C126() {
+      return C[126] = dart.const({
+        __proto__: edge_insets.EdgeInsets.prototype,
+        [EdgeInsets_bottom]: 5,
+        [EdgeInsets_right]: 10,
+        [EdgeInsets_top]: 5,
+        [EdgeInsets_left]: 10
+      });
+    },
+    get C127() {
+      return C[127] = dart.const({
+        __proto__: edge_insets.EdgeInsets.prototype,
+        [EdgeInsets_bottom]: 0,
+        [EdgeInsets_right]: 10,
+        [EdgeInsets_top]: 0,
+        [EdgeInsets_left]: 10
+      });
+    },
+    get C131() {
+      return C[131] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "icon",
+        [_Location_column]: 42,
+        [_Location_line]: 309,
+        [_Location_file]: null
+      });
+    },
+    get C132() {
+      return C[132] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "color",
+        [_Location_column]: 58,
+        [_Location_line]: 309,
+        [_Location_file]: null
+      });
+    },
+    get C130() {
+      return C[130] = dart.constList([C[131] || CT.C131, C[132] || CT.C132], widget_inspector._Location);
+    },
+    get C129() {
+      return C[129] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[130] || CT.C130,
+        [_Location_name]: null,
+        [_Location_column]: 31,
+        [_Location_line]: 309,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C133() {
+      return C[133] = dart.const({
+        __proto__: ui.Color.prototype,
+        [Color_value]: 4294967295.0
+      });
+    },
+    get C134() {
+      return C[134] = dart.const({
+        __proto__: icon_data.IconData.prototype,
+        [IconData_matchTextDirection]: false,
+        [IconData_fontPackage]: null,
+        [IconData_fontFamily]: "MaterialIcons",
+        [IconData_codePoint]: 57411
+      });
+    },
+    get C128() {
+      return C[128] = dart.const({
+        __proto__: icon.Icon.prototype,
+        [Widget__location]: C[129] || CT.C129,
+        [Widget_key]: null,
+        [Icon_textDirection]: null,
+        [Icon_semanticLabel]: null,
+        [Icon_color]: C[133] || CT.C133,
+        [Icon_size]: null,
+        [Icon_icon]: C[134] || CT.C134
+      });
+    },
+    get C137() {
+      return C[137] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "textInputAction",
+        [_Location_column]: 15,
+        [_Location_line]: 292,
+        [_Location_file]: null
+      });
+    },
+    get C138() {
+      return C[138] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "onEditingComplete",
+        [_Location_column]: 15,
+        [_Location_line]: 293,
+        [_Location_file]: null
+      });
+    },
+    get C139() {
+      return C[139] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "keyboardType",
+        [_Location_column]: 15,
+        [_Location_line]: 295,
+        [_Location_file]: null
+      });
+    },
+    get C140() {
+      return C[140] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "controller",
+        [_Location_column]: 15,
+        [_Location_line]: 296,
+        [_Location_file]: null
+      });
+    },
+    get C141() {
+      return C[141] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "validator",
+        [_Location_column]: 15,
+        [_Location_line]: 297,
+        [_Location_file]: null
+      });
+    },
+    get C142() {
+      return C[142] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "style",
+        [_Location_column]: 15,
+        [_Location_line]: 304,
+        [_Location_file]: null
+      });
+    },
+    get C143() {
+      return C[143] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "decoration",
+        [_Location_column]: 15,
+        [_Location_line]: 305,
+        [_Location_file]: null
+      });
+    },
+    get C136() {
+      return C[136] = dart.constList([C[137] || CT.C137, C[138] || CT.C138, C[139] || CT.C139, C[140] || CT.C140, C[141] || CT.C141, C[142] || CT.C142, C[143] || CT.C143], widget_inspector._Location);
+    },
+    get C135() {
+      return C[135] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[136] || CT.C136,
+        [_Location_name]: null,
+        [_Location_column]: 20,
+        [_Location_line]: 291,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C146() {
+      return C[146] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "padding",
+        [_Location_column]: 13,
+        [_Location_line]: 287,
+        [_Location_file]: null
+      });
+    },
+    get C147() {
+      return C[147] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "decoration",
+        [_Location_column]: 13,
+        [_Location_line]: 288,
+        [_Location_file]: null
+      });
+    },
+    get C148() {
+      return C[148] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "child",
+        [_Location_column]: 13,
+        [_Location_line]: 291,
+        [_Location_file]: null
+      });
+    },
+    get C145() {
+      return C[145] = dart.constList([C[146] || CT.C146, C[147] || CT.C147, C[148] || CT.C148], widget_inspector._Location);
+    },
+    get C144() {
+      return C[144] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[145] || CT.C145,
+        [_Location_name]: null,
+        [_Location_column]: 11,
+        [_Location_line]: 286,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C152() {
+      return C[152] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "height",
+        [_Location_column]: 26,
+        [_Location_line]: 313,
+        [_Location_file]: null
+      });
+    },
+    get C151() {
+      return C[151] = dart.constList([C[152] || CT.C152], widget_inspector._Location);
+    },
+    get C150() {
+      return C[150] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[151] || CT.C151,
+        [_Location_name]: null,
+        [_Location_column]: 17,
+        [_Location_line]: 313,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C149() {
+      return C[149] = dart.const({
+        __proto__: basic.SizedBox.prototype,
+        [Widget__location]: C[150] || CT.C150,
+        [Widget_key]: null,
+        [SingleChildRenderObjectWidget_child]: null,
+        [SizedBox_height]: 20,
+        [SizedBox_width]: null
+      });
+    },
+    get C156() {
+      return C[156] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "icon",
+        [_Location_column]: 42,
+        [_Location_line]: 333,
+        [_Location_file]: null
+      });
+    },
+    get C157() {
+      return C[157] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "color",
+        [_Location_column]: 49,
+        [_Location_line]: 333,
+        [_Location_file]: null
+      });
+    },
+    get C155() {
+      return C[155] = dart.constList([C[156] || CT.C156, C[157] || CT.C157], widget_inspector._Location);
+    },
+    get C154() {
+      return C[154] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[155] || CT.C155,
+        [_Location_name]: null,
+        [_Location_column]: 31,
+        [_Location_line]: 333,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C158() {
+      return C[158] = dart.const({
+        __proto__: icon_data.IconData.prototype,
+        [IconData_matchTextDirection]: false,
+        [IconData_fontPackage]: null,
+        [IconData_fontFamily]: "MaterialIcons",
+        [IconData_codePoint]: 57898
+      });
+    },
+    get C153() {
+      return C[153] = dart.const({
+        __proto__: icon.Icon.prototype,
+        [Widget__location]: C[154] || CT.C154,
+        [Widget_key]: null,
+        [Icon_textDirection]: null,
+        [Icon_semanticLabel]: null,
+        [Icon_color]: C[133] || CT.C133,
+        [Icon_size]: null,
+        [Icon_icon]: C[158] || CT.C158
+      });
+    },
+    get C161() {
+      return C[161] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "textInputAction",
+        [_Location_column]: 15,
+        [_Location_line]: 321,
+        [_Location_file]: null
+      });
+    },
+    get C162() {
+      return C[162] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "onEditingComplete",
+        [_Location_column]: 15,
+        [_Location_line]: 322,
+        [_Location_file]: null
+      });
+    },
+    get C163() {
+      return C[163] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "focusNode",
+        [_Location_column]: 15,
+        [_Location_line]: 324,
+        [_Location_file]: null
+      });
+    },
+    get C164() {
+      return C[164] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "keyboardType",
+        [_Location_column]: 15,
+        [_Location_line]: 325,
+        [_Location_file]: null
+      });
+    },
+    get C165() {
+      return C[165] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "controller",
+        [_Location_column]: 15,
+        [_Location_line]: 326,
+        [_Location_file]: null
+      });
+    },
+    get C166() {
+      return C[166] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "validator",
+        [_Location_column]: 15,
+        [_Location_line]: 327,
+        [_Location_file]: null
+      });
+    },
+    get C167() {
+      return C[167] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "style",
+        [_Location_column]: 15,
+        [_Location_line]: 328,
+        [_Location_file]: null
+      });
+    },
+    get C168() {
+      return C[168] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "decoration",
+        [_Location_column]: 15,
+        [_Location_line]: 329,
+        [_Location_file]: null
+      });
+    },
+    get C160() {
+      return C[160] = dart.constList([C[161] || CT.C161, C[162] || CT.C162, C[163] || CT.C163, C[164] || CT.C164, C[165] || CT.C165, C[166] || CT.C166, C[167] || CT.C167, C[168] || CT.C168], widget_inspector._Location);
+    },
+    get C159() {
+      return C[159] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[160] || CT.C160,
+        [_Location_name]: null,
+        [_Location_column]: 20,
+        [_Location_line]: 320,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C171() {
+      return C[171] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "padding",
+        [_Location_column]: 13,
+        [_Location_line]: 316,
+        [_Location_file]: null
+      });
+    },
+    get C172() {
+      return C[172] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "decoration",
+        [_Location_column]: 13,
+        [_Location_line]: 317,
+        [_Location_file]: null
+      });
+    },
+    get C173() {
+      return C[173] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "child",
+        [_Location_column]: 13,
+        [_Location_line]: 320,
+        [_Location_file]: null
+      });
+    },
+    get C170() {
+      return C[170] = dart.constList([C[171] || CT.C171, C[172] || CT.C172, C[173] || CT.C173], widget_inspector._Location);
+    },
+    get C169() {
+      return C[169] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[170] || CT.C170,
+        [_Location_name]: null,
+        [_Location_column]: 11,
+        [_Location_line]: 315,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C177() {
+      return C[177] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "height",
+        [_Location_column]: 26,
+        [_Location_line]: 337,
+        [_Location_file]: null
+      });
+    },
+    get C176() {
+      return C[176] = dart.constList([C[177] || CT.C177], widget_inspector._Location);
+    },
+    get C175() {
+      return C[175] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[176] || CT.C176,
+        [_Location_name]: null,
+        [_Location_column]: 17,
+        [_Location_line]: 337,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C174() {
+      return C[174] = dart.const({
+        __proto__: basic.SizedBox.prototype,
+        [Widget__location]: C[175] || CT.C175,
+        [Widget_key]: null,
+        [SingleChildRenderObjectWidget_child]: null,
+        [SizedBox_height]: 20,
+        [SizedBox_width]: null
+      });
+    },
+    get C181() {
+      return C[181] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "icon",
+        [_Location_column]: 42,
+        [_Location_line]: 360,
+        [_Location_file]: null
+      });
+    },
+    get C182() {
+      return C[182] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "color",
+        [_Location_column]: 49,
+        [_Location_line]: 360,
+        [_Location_file]: null
+      });
+    },
+    get C180() {
+      return C[180] = dart.constList([C[181] || CT.C181, C[182] || CT.C182], widget_inspector._Location);
+    },
+    get C179() {
+      return C[179] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[180] || CT.C180,
+        [_Location_name]: null,
+        [_Location_column]: 31,
+        [_Location_line]: 360,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C183() {
+      return C[183] = dart.const({
+        __proto__: icon_data.IconData.prototype,
+        [IconData_matchTextDirection]: false,
+        [IconData_fontPackage]: null,
+        [IconData_fontFamily]: "MaterialIcons",
+        [IconData_codePoint]: 58530
+      });
+    },
+    get C178() {
+      return C[178] = dart.const({
+        __proto__: icon.Icon.prototype,
+        [Widget__location]: C[179] || CT.C179,
+        [Widget_key]: null,
+        [Icon_textDirection]: null,
+        [Icon_semanticLabel]: null,
+        [Icon_color]: C[133] || CT.C133,
+        [Icon_size]: null,
+        [Icon_icon]: C[183] || CT.C183
+      });
+    },
+    get C186() {
+      return C[186] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "focusNode",
+        [_Location_column]: 15,
+        [_Location_line]: 345,
+        [_Location_file]: null
+      });
+    },
+    get C187() {
+      return C[187] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "textInputAction",
+        [_Location_column]: 15,
+        [_Location_line]: 346,
+        [_Location_file]: null
+      });
+    },
+    get C188() {
+      return C[188] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "onEditingComplete",
+        [_Location_column]: 15,
+        [_Location_line]: 347,
+        [_Location_file]: null
+      });
+    },
+    get C189() {
+      return C[189] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "keyboardType",
+        [_Location_column]: 15,
+        [_Location_line]: 349,
+        [_Location_file]: null
+      });
+    },
+    get C190() {
+      return C[190] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "controller",
+        [_Location_column]: 15,
+        [_Location_line]: 350,
+        [_Location_file]: null
+      });
+    },
+    get C191() {
+      return C[191] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "validator",
+        [_Location_column]: 15,
+        [_Location_line]: 351,
+        [_Location_file]: null
+      });
+    },
+    get C192() {
+      return C[192] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "style",
+        [_Location_column]: 15,
+        [_Location_line]: 355,
+        [_Location_file]: null
+      });
+    },
+    get C193() {
+      return C[193] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "decoration",
+        [_Location_column]: 15,
+        [_Location_line]: 356,
+        [_Location_file]: null
+      });
+    },
+    get C185() {
+      return C[185] = dart.constList([C[186] || CT.C186, C[187] || CT.C187, C[188] || CT.C188, C[189] || CT.C189, C[190] || CT.C190, C[191] || CT.C191, C[192] || CT.C192, C[193] || CT.C193], widget_inspector._Location);
+    },
+    get C184() {
+      return C[184] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[185] || CT.C185,
+        [_Location_name]: null,
+        [_Location_column]: 20,
+        [_Location_line]: 344,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C196() {
+      return C[196] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "padding",
+        [_Location_column]: 13,
+        [_Location_line]: 340,
+        [_Location_file]: null
+      });
+    },
+    get C197() {
+      return C[197] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "decoration",
+        [_Location_column]: 13,
+        [_Location_line]: 341,
+        [_Location_file]: null
+      });
+    },
+    get C198() {
+      return C[198] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "child",
+        [_Location_column]: 13,
+        [_Location_line]: 344,
+        [_Location_file]: null
+      });
+    },
+    get C195() {
+      return C[195] = dart.constList([C[196] || CT.C196, C[197] || CT.C197, C[198] || CT.C198], widget_inspector._Location);
+    },
+    get C194() {
+      return C[194] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[195] || CT.C195,
+        [_Location_name]: null,
+        [_Location_column]: 11,
+        [_Location_line]: 339,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C202() {
+      return C[202] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "height",
+        [_Location_column]: 26,
+        [_Location_line]: 364,
+        [_Location_file]: null
+      });
+    },
+    get C201() {
+      return C[201] = dart.constList([C[202] || CT.C202], widget_inspector._Location);
+    },
+    get C200() {
+      return C[200] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[201] || CT.C201,
+        [_Location_name]: null,
+        [_Location_column]: 17,
+        [_Location_line]: 364,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C199() {
+      return C[199] = dart.const({
+        __proto__: basic.SizedBox.prototype,
+        [Widget__location]: C[200] || CT.C200,
+        [Widget_key]: null,
+        [SingleChildRenderObjectWidget_child]: null,
+        [SizedBox_height]: 20,
+        [SizedBox_width]: null
+      });
+    },
+    get C205() {
+      return C[205] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "icon",
+        [_Location_column]: 36,
+        [_Location_line]: 389,
+        [_Location_file]: null
+      });
+    },
+    get C206() {
+      return C[206] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "color",
+        [_Location_column]: 23,
+        [_Location_line]: 390,
+        [_Location_file]: null
+      });
+    },
+    get C204() {
+      return C[204] = dart.constList([C[205] || CT.C205, C[206] || CT.C206], widget_inspector._Location);
+    },
+    get C203() {
+      return C[203] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[204] || CT.C204,
+        [_Location_name]: null,
+        [_Location_column]: 28,
+        [_Location_line]: 388,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C209() {
+      return C[209] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "onTap",
+        [_Location_column]: 21,
+        [_Location_line]: 383,
+        [_Location_file]: null
+      });
+    },
+    get C210() {
+      return C[210] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "child",
+        [_Location_column]: 21,
+        [_Location_line]: 388,
+        [_Location_file]: null
+      });
+    },
+    get C208() {
+      return C[208] = dart.constList([C[209] || CT.C209, C[210] || CT.C210], widget_inspector._Location);
+    },
+    get C207() {
+      return C[207] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[208] || CT.C208,
+        [_Location_name]: null,
+        [_Location_column]: 31,
+        [_Location_line]: 382,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C214() {
+      return C[214] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "icon",
+        [_Location_column]: 42,
+        [_Location_line]: 396,
+        [_Location_file]: null
+      });
+    },
+    get C215() {
+      return C[215] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "color",
+        [_Location_column]: 48,
+        [_Location_line]: 396,
+        [_Location_file]: null
+      });
+    },
+    get C213() {
+      return C[213] = dart.constList([C[214] || CT.C214, C[215] || CT.C215], widget_inspector._Location);
+    },
+    get C212() {
+      return C[212] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[213] || CT.C213,
+        [_Location_name]: null,
+        [_Location_column]: 31,
+        [_Location_line]: 396,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C216() {
+      return C[216] = dart.const({
+        __proto__: icon_data.IconData.prototype,
+        [IconData_matchTextDirection]: false,
+        [IconData_fontPackage]: null,
+        [IconData_fontFamily]: "MaterialIcons",
+        [IconData_codePoint]: 58286
+      });
+    },
+    get C211() {
+      return C[211] = dart.const({
+        __proto__: icon.Icon.prototype,
+        [Widget__location]: C[212] || CT.C212,
+        [Widget_key]: null,
+        [Icon_textDirection]: null,
+        [Icon_semanticLabel]: null,
+        [Icon_color]: C[133] || CT.C133,
+        [Icon_size]: null,
+        [Icon_icon]: C[216] || CT.C216
+      });
+    },
+    get C219() {
+      return C[219] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "textInputAction",
+        [_Location_column]: 15,
+        [_Location_line]: 372,
+        [_Location_file]: null
+      });
+    },
+    get C220() {
+      return C[220] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "onEditingComplete",
+        [_Location_column]: 15,
+        [_Location_line]: 373,
+        [_Location_file]: null
+      });
+    },
+    get C221() {
+      return C[221] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "focusNode",
+        [_Location_column]: 15,
+        [_Location_line]: 375,
+        [_Location_file]: null
+      });
+    },
+    get C222() {
+      return C[222] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "obscureText",
+        [_Location_column]: 15,
+        [_Location_line]: 376,
+        [_Location_file]: null
+      });
+    },
+    get C223() {
+      return C[223] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "keyboardType",
+        [_Location_column]: 15,
+        [_Location_line]: 377,
+        [_Location_file]: null
+      });
+    },
+    get C224() {
+      return C[224] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "controller",
+        [_Location_column]: 15,
+        [_Location_line]: 378,
+        [_Location_file]: null
+      });
+    },
+    get C225() {
+      return C[225] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "validator",
+        [_Location_column]: 15,
+        [_Location_line]: 379,
+        [_Location_file]: null
+      });
+    },
+    get C226() {
+      return C[226] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "style",
+        [_Location_column]: 15,
+        [_Location_line]: 380,
+        [_Location_file]: null
+      });
+    },
+    get C227() {
+      return C[227] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "decoration",
+        [_Location_column]: 15,
+        [_Location_line]: 381,
+        [_Location_file]: null
+      });
+    },
+    get C218() {
+      return C[218] = dart.constList([C[219] || CT.C219, C[220] || CT.C220, C[221] || CT.C221, C[222] || CT.C222, C[223] || CT.C223, C[224] || CT.C224, C[225] || CT.C225, C[226] || CT.C226, C[227] || CT.C227], widget_inspector._Location);
+    },
+    get C217() {
+      return C[217] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[218] || CT.C218,
+        [_Location_name]: null,
+        [_Location_column]: 20,
+        [_Location_line]: 371,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C230() {
+      return C[230] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "padding",
+        [_Location_column]: 13,
+        [_Location_line]: 367,
+        [_Location_file]: null
+      });
+    },
+    get C231() {
+      return C[231] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "decoration",
+        [_Location_column]: 13,
+        [_Location_line]: 368,
+        [_Location_file]: null
+      });
+    },
+    get C232() {
+      return C[232] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "child",
+        [_Location_column]: 13,
+        [_Location_line]: 371,
+        [_Location_file]: null
+      });
+    },
+    get C229() {
+      return C[229] = dart.constList([C[230] || CT.C230, C[231] || CT.C231, C[232] || CT.C232], widget_inspector._Location);
+    },
+    get C228() {
+      return C[228] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[229] || CT.C229,
+        [_Location_name]: null,
+        [_Location_column]: 11,
+        [_Location_line]: 366,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C236() {
+      return C[236] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "height",
+        [_Location_column]: 26,
+        [_Location_line]: 400,
+        [_Location_file]: null
+      });
+    },
+    get C235() {
+      return C[235] = dart.constList([C[236] || CT.C236], widget_inspector._Location);
+    },
+    get C234() {
+      return C[234] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[235] || CT.C235,
+        [_Location_name]: null,
+        [_Location_column]: 17,
+        [_Location_line]: 400,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C233() {
+      return C[233] = dart.const({
+        __proto__: basic.SizedBox.prototype,
+        [Widget__location]: C[234] || CT.C234,
+        [Widget_key]: null,
+        [SingleChildRenderObjectWidget_child]: null,
+        [SizedBox_height]: 20,
+        [SizedBox_width]: null
+      });
+    },
+    get C240() {
+      return C[240] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "icon",
+        [_Location_column]: 44,
+        [_Location_line]: 430,
+        [_Location_file]: null
+      });
+    },
+    get C241() {
+      return C[241] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "color",
+        [_Location_column]: 57,
+        [_Location_line]: 430,
+        [_Location_file]: null
+      });
+    },
+    get C239() {
+      return C[239] = dart.constList([C[240] || CT.C240, C[241] || CT.C241], widget_inspector._Location);
+    },
+    get C238() {
+      return C[238] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[239] || CT.C239,
+        [_Location_name]: null,
+        [_Location_column]: 33,
+        [_Location_line]: 430,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C242() {
+      return C[242] = dart.const({
+        __proto__: icon_data.IconData.prototype,
+        [IconData_matchTextDirection]: false,
+        [IconData_fontPackage]: null,
+        [IconData_fontFamily]: "MaterialIcons",
+        [IconData_codePoint]: 59455
+      });
+    },
+    get C237() {
+      return C[237] = dart.const({
+        __proto__: icon.Icon.prototype,
+        [Widget__location]: C[238] || CT.C238,
+        [Widget_key]: null,
+        [Icon_textDirection]: null,
+        [Icon_semanticLabel]: null,
+        [Icon_color]: C[133] || CT.C133,
+        [Icon_size]: null,
+        [Icon_icon]: C[242] || CT.C242
+      });
+    },
+    get C245() {
+      return C[245] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "enabled",
+        [_Location_column]: 17,
+        [_Location_line]: 412,
+        [_Location_file]: null
+      });
+    },
+    get C246() {
+      return C[246] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "textInputAction",
+        [_Location_column]: 17,
+        [_Location_line]: 413,
+        [_Location_file]: null
+      });
+    },
+    get C247() {
+      return C[247] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "onEditingComplete",
+        [_Location_column]: 17,
+        [_Location_line]: 414,
+        [_Location_file]: null
+      });
+    },
+    get C248() {
+      return C[248] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "focusNode",
+        [_Location_column]: 17,
+        [_Location_line]: 415,
+        [_Location_file]: null
+      });
+    },
+    get C249() {
+      return C[249] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "keyboardType",
+        [_Location_column]: 17,
+        [_Location_line]: 416,
+        [_Location_file]: null
+      });
+    },
+    get C250() {
+      return C[250] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "controller",
+        [_Location_column]: 17,
+        [_Location_line]: 417,
+        [_Location_file]: null
+      });
+    },
+    get C251() {
+      return C[251] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "validator",
+        [_Location_column]: 17,
+        [_Location_line]: 418,
+        [_Location_file]: null
+      });
+    },
+    get C252() {
+      return C[252] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "style",
+        [_Location_column]: 17,
+        [_Location_line]: 425,
+        [_Location_file]: null
+      });
+    },
+    get C253() {
+      return C[253] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "decoration",
+        [_Location_column]: 17,
+        [_Location_line]: 426,
+        [_Location_file]: null
+      });
+    },
+    get C244() {
+      return C[244] = dart.constList([C[245] || CT.C245, C[246] || CT.C246, C[247] || CT.C247, C[248] || CT.C248, C[249] || CT.C249, C[250] || CT.C250, C[251] || CT.C251, C[252] || CT.C252, C[253] || CT.C253], widget_inspector._Location);
+    },
+    get C243() {
+      return C[243] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[244] || CT.C244,
+        [_Location_name]: null,
+        [_Location_column]: 22,
+        [_Location_line]: 411,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C256() {
+      return C[256] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "padding",
+        [_Location_column]: 15,
+        [_Location_line]: 407,
+        [_Location_file]: null
+      });
+    },
+    get C257() {
+      return C[257] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "decoration",
+        [_Location_column]: 15,
+        [_Location_line]: 408,
+        [_Location_file]: null
+      });
+    },
+    get C258() {
+      return C[258] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "child",
+        [_Location_column]: 15,
+        [_Location_line]: 411,
+        [_Location_file]: null
+      });
+    },
+    get C255() {
+      return C[255] = dart.constList([C[256] || CT.C256, C[257] || CT.C257, C[258] || CT.C258], widget_inspector._Location);
+    },
+    get C254() {
+      return C[254] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[255] || CT.C255,
+        [_Location_name]: null,
+        [_Location_column]: 20,
+        [_Location_line]: 406,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C261() {
+      return C[261] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "onTap",
+        [_Location_column]: 13,
+        [_Location_line]: 403,
+        [_Location_file]: null
+      });
+    },
+    get C262() {
+      return C[262] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "child",
+        [_Location_column]: 13,
+        [_Location_line]: 406,
+        [_Location_file]: null
+      });
+    },
+    get C260() {
+      return C[260] = dart.constList([C[261] || CT.C261, C[262] || CT.C262], widget_inspector._Location);
+    },
+    get C259() {
+      return C[259] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[260] || CT.C260,
+        [_Location_name]: null,
+        [_Location_column]: 11,
+        [_Location_line]: 402,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C265() {
+      return C[265] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "children",
+        [_Location_column]: 9,
+        [_Location_line]: 226,
+        [_Location_file]: null
+      });
+    },
+    get C264() {
+      return C[264] = dart.constList([C[265] || CT.C265], widget_inspector._Location);
+    },
+    get C263() {
+      return C[263] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[264] || CT.C264,
+        [_Location_name]: null,
+        [_Location_column]: 14,
+        [_Location_line]: 225,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C268() {
+      return C[268] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "key",
+        [_Location_column]: 7,
+        [_Location_line]: 224,
+        [_Location_file]: null
+      });
+    },
+    get C269() {
+      return C[269] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "child",
+        [_Location_column]: 7,
+        [_Location_line]: 225,
+        [_Location_file]: null
+      });
+    },
+    get C267() {
+      return C[267] = dart.constList([C[268] || CT.C268, C[269] || CT.C269], widget_inspector._Location);
+    },
+    get C266() {
+      return C[266] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[267] || CT.C267,
+        [_Location_name]: null,
+        [_Location_column]: 12,
+        [_Location_line]: 223,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C273() {
+      return C[273] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "data",
+        [_Location_column]: 31,
+        [_Location_line]: 445,
+        [_Location_file]: null
+      });
+    },
+    get C272() {
+      return C[272] = dart.constList([C[273] || CT.C273], widget_inspector._Location);
+    },
+    get C271() {
+      return C[271] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[272] || CT.C272,
+        [_Location_name]: null,
+        [_Location_column]: 26,
+        [_Location_line]: 445,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C270() {
+      return C[270] = dart.const({
+        __proto__: text.Text.prototype,
+        [Widget__location]: C[271] || CT.C271,
+        [Widget_key]: null,
+        [Text_textHeightBehavior]: null,
+        [Text_textWidthBasis]: null,
+        [Text_semanticsLabel]: null,
+        [Text_maxLines]: null,
+        [Text_textScaleFactor]: null,
+        [Text_overflow]: null,
+        [Text_softWrap]: null,
+        [Text_locale]: null,
+        [Text_textDirection]: null,
+        [Text_textAlign]: null,
+        [Text_strutStyle]: null,
+        [Text_style]: null,
+        [Text_textSpan]: null,
+        [Text_data]: "Please choose an option"
+      });
+    },
+    get C277() {
+      return C[277] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "padding",
+        [_Location_column]: 25,
+        [_Location_line]: 456,
+        [_Location_file]: null
+      });
+    },
+    get C278() {
+      return C[278] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "child",
+        [_Location_column]: 25,
+        [_Location_line]: 457,
+        [_Location_file]: null
+      });
+    },
+    get C276() {
+      return C[276] = dart.constList([C[277] || CT.C277, C[278] || CT.C278], widget_inspector._Location);
+    },
+    get C275() {
+      return C[275] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[276] || CT.C276,
+        [_Location_name]: null,
+        [_Location_column]: 29,
+        [_Location_line]: 455,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C282() {
+      return C[282] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "icon",
+        [_Location_column]: 33,
+        [_Location_line]: 458,
+        [_Location_file]: null
+      });
+    },
+    get C283() {
+      return C[283] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "color",
+        [_Location_column]: 27,
+        [_Location_line]: 459,
+        [_Location_file]: null
+      });
+    },
+    get C281() {
+      return C[281] = dart.constList([C[282] || CT.C282, C[283] || CT.C283], widget_inspector._Location);
+    },
+    get C280() {
+      return C[280] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[281] || CT.C281,
+        [_Location_name]: null,
+        [_Location_column]: 32,
+        [_Location_line]: 457,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C286() {
+      return C[286] = dart.const({
+        __proto__: ui.Color.prototype,
+        [Color_value]: 4294174197.0
+      });
+    },
+    get C287() {
+      return C[287] = dart.const({
+        __proto__: ui.Color.prototype,
+        [Color_value]: 4292984551.0
+      });
+    },
+    get C288() {
+      return C[288] = dart.const({
+        __proto__: ui.Color.prototype,
+        [Color_value]: 4291728344.0
+      });
+    },
+    get C289() {
+      return C[289] = dart.const({
+        __proto__: ui.Color.prototype,
+        [Color_value]: 4290406600.0
+      });
+    },
+    get C290() {
+      return C[290] = dart.const({
+        __proto__: ui.Color.prototype,
+        [Color_value]: 4289415100.0
+      });
+    },
+    get C291() {
+      return C[291] = dart.const({
+        __proto__: ui.Color.prototype,
+        [Color_value]: 4288423856.0
+      });
+    },
+    get C292() {
+      return C[292] = dart.const({
+        __proto__: ui.Color.prototype,
+        [Color_value]: 4287505578.0
+      });
+    },
+    get C293() {
+      return C[293] = dart.const({
+        __proto__: ui.Color.prototype,
+        [Color_value]: 4286259106.0
+      });
+    },
+    get C294() {
+      return C[294] = dart.const({
+        __proto__: ui.Color.prototype,
+        [Color_value]: 4285143962.0
+      });
+    },
+    get C295() {
+      return C[295] = dart.const({
+        __proto__: ui.Color.prototype,
+        [Color_value]: 4283045004.0
+      });
+    },
+    get C285() {
+      return C[285] = dart.constMap(core.int, ui.Color, [50, C[286] || CT.C286, 100, C[287] || CT.C287, 200, C[288] || CT.C288, 300, C[289] || CT.C289, 400, C[290] || CT.C290, 500, C[291] || CT.C291, 600, C[292] || CT.C292, 700, C[293] || CT.C293, 800, C[294] || CT.C294, 900, C[295] || CT.C295]);
+    },
+    get C284() {
+      return C[284] = dart.const({
+        __proto__: colors.MaterialColor.prototype,
+        [Color_value]: 4288423856.0,
+        [ColorSwatch__swatch]: C[285] || CT.C285
+      });
+    },
+    get C296() {
+      return C[296] = dart.const({
+        __proto__: icon_data.IconData.prototype,
+        [IconData_matchTextDirection]: false,
+        [IconData_fontPackage]: null,
+        [IconData_fontFamily]: "MaterialIcons",
+        [IconData_codePoint]: 57647
+      });
+    },
+    get C279() {
+      return C[279] = dart.const({
+        __proto__: icon.Icon.prototype,
+        [Widget__location]: C[280] || CT.C280,
+        [Widget_key]: null,
+        [Icon_textDirection]: null,
+        [Icon_semanticLabel]: null,
+        [Icon_color]: C[284] || CT.C284,
+        [Icon_size]: null,
+        [Icon_icon]: C[296] || CT.C296
+      });
+    },
+    get C297() {
+      return C[297] = dart.const({
+        __proto__: edge_insets.EdgeInsets.prototype,
+        [EdgeInsets_bottom]: 4,
+        [EdgeInsets_right]: 4,
+        [EdgeInsets_top]: 4,
+        [EdgeInsets_left]: 4
+      });
+    },
+    get C274() {
+      return C[274] = dart.const({
+        __proto__: basic.Padding.prototype,
+        [Widget__location]: C[275] || CT.C275,
+        [Widget_key]: null,
+        [SingleChildRenderObjectWidget_child]: C[279] || CT.C279,
+        [Padding_padding]: C[297] || CT.C297
+      });
+    },
+    get C300() {
+      return C[300] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "data",
+        [_Location_column]: 25,
+        [_Location_line]: 463,
+        [_Location_file]: null
+      });
+    },
+    get C301() {
+      return C[301] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "style",
+        [_Location_column]: 25,
+        [_Location_line]: 464,
+        [_Location_file]: null
+      });
+    },
+    get C299() {
+      return C[299] = dart.constList([C[300] || CT.C300, C[301] || CT.C301], widget_inspector._Location);
+    },
+    get C298() {
+      return C[298] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[299] || CT.C299,
+        [_Location_name]: null,
+        [_Location_column]: 23,
+        [_Location_line]: 462,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C304() {
+      return C[304] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "children",
+        [_Location_column]: 21,
+        [_Location_line]: 454,
+        [_Location_file]: null
+      });
+    },
+    get C303() {
+      return C[303] = dart.constList([C[304] || CT.C304], widget_inspector._Location);
+    },
+    get C302() {
+      return C[302] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[303] || CT.C303,
+        [_Location_name]: null,
+        [_Location_column]: 26,
+        [_Location_line]: 453,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C307() {
+      return C[307] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "onTap",
+        [_Location_column]: 19,
+        [_Location_line]: 450,
+        [_Location_file]: null
+      });
+    },
+    get C308() {
+      return C[308] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "child",
+        [_Location_column]: 19,
+        [_Location_line]: 453,
+        [_Location_file]: null
+      });
+    },
+    get C306() {
+      return C[306] = dart.constList([C[307] || CT.C307, C[308] || CT.C308], widget_inspector._Location);
+    },
+    get C305() {
+      return C[305] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[306] || CT.C306,
+        [_Location_name]: null,
+        [_Location_column]: 17,
+        [_Location_line]: 449,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C312() {
+      return C[312] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "padding",
+        [_Location_column]: 25,
+        [_Location_line]: 476,
+        [_Location_file]: null
+      });
+    },
+    get C313() {
+      return C[313] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "child",
+        [_Location_column]: 25,
+        [_Location_line]: 477,
+        [_Location_file]: null
+      });
+    },
+    get C311() {
+      return C[311] = dart.constList([C[312] || CT.C312, C[313] || CT.C313], widget_inspector._Location);
+    },
+    get C310() {
+      return C[310] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[311] || CT.C311,
+        [_Location_name]: null,
+        [_Location_column]: 29,
+        [_Location_line]: 475,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C317() {
+      return C[317] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "icon",
+        [_Location_column]: 33,
+        [_Location_line]: 478,
+        [_Location_file]: null
+      });
+    },
+    get C318() {
+      return C[318] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "color",
+        [_Location_column]: 27,
+        [_Location_line]: 479,
+        [_Location_file]: null
+      });
+    },
+    get C316() {
+      return C[316] = dart.constList([C[317] || CT.C317, C[318] || CT.C318], widget_inspector._Location);
+    },
+    get C315() {
+      return C[315] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[316] || CT.C316,
+        [_Location_name]: null,
+        [_Location_column]: 32,
+        [_Location_line]: 477,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C319() {
+      return C[319] = dart.const({
+        __proto__: icon_data.IconData.prototype,
+        [IconData_matchTextDirection]: false,
+        [IconData_fontPackage]: null,
+        [IconData_fontFamily]: "MaterialIcons",
+        [IconData_codePoint]: 58162
+      });
+    },
+    get C314() {
+      return C[314] = dart.const({
+        __proto__: icon.Icon.prototype,
+        [Widget__location]: C[315] || CT.C315,
+        [Widget_key]: null,
+        [Icon_textDirection]: null,
+        [Icon_semanticLabel]: null,
+        [Icon_color]: C[284] || CT.C284,
+        [Icon_size]: null,
+        [Icon_icon]: C[319] || CT.C319
+      });
+    },
+    get C309() {
+      return C[309] = dart.const({
+        __proto__: basic.Padding.prototype,
+        [Widget__location]: C[310] || CT.C310,
+        [Widget_key]: null,
+        [SingleChildRenderObjectWidget_child]: C[314] || CT.C314,
+        [Padding_padding]: C[297] || CT.C297
+      });
+    },
+    get C322() {
+      return C[322] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "data",
+        [_Location_column]: 25,
+        [_Location_line]: 483,
+        [_Location_file]: null
+      });
+    },
+    get C323() {
+      return C[323] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "style",
+        [_Location_column]: 25,
+        [_Location_line]: 484,
+        [_Location_file]: null
+      });
+    },
+    get C321() {
+      return C[321] = dart.constList([C[322] || CT.C322, C[323] || CT.C323], widget_inspector._Location);
+    },
+    get C320() {
+      return C[320] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[321] || CT.C321,
+        [_Location_name]: null,
+        [_Location_column]: 23,
+        [_Location_line]: 482,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C326() {
+      return C[326] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "children",
+        [_Location_column]: 21,
+        [_Location_line]: 474,
+        [_Location_file]: null
+      });
+    },
+    get C325() {
+      return C[325] = dart.constList([C[326] || CT.C326], widget_inspector._Location);
+    },
+    get C324() {
+      return C[324] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[325] || CT.C325,
+        [_Location_name]: null,
+        [_Location_column]: 26,
+        [_Location_line]: 473,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C329() {
+      return C[329] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "onTap",
+        [_Location_column]: 19,
+        [_Location_line]: 470,
+        [_Location_file]: null
+      });
+    },
+    get C330() {
+      return C[330] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "child",
+        [_Location_column]: 19,
+        [_Location_line]: 473,
+        [_Location_file]: null
+      });
+    },
+    get C328() {
+      return C[328] = dart.constList([C[329] || CT.C329, C[330] || CT.C330], widget_inspector._Location);
+    },
+    get C327() {
+      return C[327] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[328] || CT.C328,
+        [_Location_name]: null,
+        [_Location_column]: 17,
+        [_Location_line]: 469,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C333() {
+      return C[333] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "mainAxisSize",
+        [_Location_column]: 15,
+        [_Location_line]: 447,
+        [_Location_file]: null
+      });
+    },
+    get C334() {
+      return C[334] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "children",
+        [_Location_column]: 15,
+        [_Location_line]: 448,
+        [_Location_file]: null
+      });
+    },
+    get C332() {
+      return C[332] = dart.constList([C[333] || CT.C333, C[334] || CT.C334], widget_inspector._Location);
+    },
+    get C331() {
+      return C[331] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[332] || CT.C332,
+        [_Location_name]: null,
+        [_Location_column]: 22,
+        [_Location_line]: 446,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C337() {
+      return C[337] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "title",
+        [_Location_column]: 13,
+        [_Location_line]: 445,
+        [_Location_file]: null
+      });
+    },
+    get C338() {
+      return C[338] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "content",
+        [_Location_column]: 13,
+        [_Location_line]: 446,
+        [_Location_file]: null
+      });
+    },
+    get C336() {
+      return C[336] = dart.constList([C[337] || CT.C337, C[338] || CT.C338], widget_inspector._Location);
+    },
+    get C335() {
+      return C[335] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[336] || CT.C336,
+        [_Location_name]: null,
+        [_Location_column]: 18,
+        [_Location_line]: 444,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C341() {
+      return C[341] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "data",
+        [_Location_column]: 15,
+        [_Location_line]: 538,
+        [_Location_file]: null
+      });
+    },
+    get C342() {
+      return C[342] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "style",
+        [_Location_column]: 15,
+        [_Location_line]: 539,
+        [_Location_file]: null
+      });
+    },
+    get C340() {
+      return C[340] = dart.constList([C[341] || CT.C341, C[342] || CT.C342], widget_inspector._Location);
+    },
+    get C339() {
+      return C[339] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[340] || CT.C340,
+        [_Location_name]: null,
+        [_Location_column]: 20,
+        [_Location_line]: 537,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C345() {
+      return C[345] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "icon",
+        [_Location_column]: 35,
+        [_Location_line]: 559,
+        [_Location_file]: null
+      });
+    },
+    get C346() {
+      return C[346] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "color",
+        [_Location_column]: 29,
+        [_Location_line]: 560,
+        [_Location_file]: null
+      });
+    },
+    get C344() {
+      return C[344] = dart.constList([C[345] || CT.C345, C[346] || CT.C346], widget_inspector._Location);
+    },
+    get C343() {
+      return C[343] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[344] || CT.C344,
+        [_Location_name]: null,
+        [_Location_column]: 27,
+        [_Location_line]: 558,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C350() {
+      return C[350] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "width",
+        [_Location_column]: 29,
+        [_Location_line]: 565,
+        [_Location_file]: null
+      });
+    },
+    get C349() {
+      return C[349] = dart.constList([C[350] || CT.C350], widget_inspector._Location);
+    },
+    get C348() {
+      return C[348] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[349] || CT.C349,
+        [_Location_name]: null,
+        [_Location_column]: 33,
+        [_Location_line]: 564,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C347() {
+      return C[347] = dart.const({
+        __proto__: basic.SizedBox.prototype,
+        [Widget__location]: C[348] || CT.C348,
+        [Widget_key]: null,
+        [SingleChildRenderObjectWidget_child]: null,
+        [SizedBox_height]: null,
+        [SizedBox_width]: 10
+      });
+    },
+    get C352() {
+      return C[352] = dart.const({
+        __proto__: ui.FontStyle.prototype,
+        [_name$]: "FontStyle.italic",
+        index: 1
+      });
+    },
+    get C353() {
+      return C[353] = dart.const({
+        __proto__: ui.Color.prototype,
+        [Color_value]: 4278202970.0
+      });
+    },
+    get C351() {
+      return C[351] = dart.const({
+        __proto__: text_style.TextStyle.prototype,
+        [TextStyle_fontFeatures]: null,
+        [TextStyle_shadows]: null,
+        [TextStyle_debugLabel]: null,
+        [TextStyle_decorationThickness]: null,
+        [TextStyle_decorationStyle]: null,
+        [TextStyle_decorationColor]: null,
+        [TextStyle_decoration]: null,
+        [TextStyle_background]: null,
+        [TextStyle_foreground]: null,
+        [TextStyle_locale]: null,
+        [TextStyle_leadingDistribution]: null,
+        [TextStyle_height]: null,
+        [TextStyle_textBaseline]: null,
+        [TextStyle_wordSpacing]: null,
+        [TextStyle_letterSpacing]: null,
+        [TextStyle_fontStyle]: C[352] || CT.C352,
+        [TextStyle_fontWeight]: null,
+        [TextStyle_fontSize]: 18,
+        [TextStyle__package]: null,
+        [TextStyle__fontFamilyFallback]: null,
+        [TextStyle_fontFamily]: null,
+        [TextStyle_backgroundColor]: null,
+        [TextStyle_color]: C[353] || CT.C353,
+        [TextStyle_inherit]: true
+      });
+    },
+    get C356() {
+      return C[356] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "data",
+        [_Location_column]: 49,
+        [_Location_line]: 570,
+        [_Location_file]: null
+      });
+    },
+    get C357() {
+      return C[357] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "style",
+        [_Location_column]: 31,
+        [_Location_line]: 571,
+        [_Location_file]: null
+      });
+    },
+    get C355() {
+      return C[355] = dart.constList([C[356] || CT.C356, C[357] || CT.C357], widget_inspector._Location);
+    },
+    get C354() {
+      return C[354] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[355] || CT.C355,
+        [_Location_name]: null,
+        [_Location_column]: 36,
+        [_Location_line]: 569,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C360() {
+      return C[360] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "padding",
+        [_Location_column]: 29,
+        [_Location_line]: 568,
+        [_Location_file]: null
+      });
+    },
+    get C361() {
+      return C[361] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "child",
+        [_Location_column]: 29,
+        [_Location_line]: 569,
+        [_Location_file]: null
+      });
+    },
+    get C359() {
+      return C[359] = dart.constList([C[360] || CT.C360, C[361] || CT.C361], widget_inspector._Location);
+    },
+    get C358() {
+      return C[358] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[359] || CT.C359,
+        [_Location_name]: null,
+        [_Location_column]: 27,
+        [_Location_line]: 567,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C364() {
+      return C[364] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "children",
+        [_Location_column]: 25,
+        [_Location_line]: 557,
+        [_Location_file]: null
+      });
+    },
+    get C363() {
+      return C[363] = dart.constList([C[364] || CT.C364], widget_inspector._Location);
+    },
+    get C362() {
+      return C[362] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[363] || CT.C363,
+        [_Location_name]: null,
+        [_Location_column]: 30,
+        [_Location_line]: 556,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C367() {
+      return C[367] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "onTap",
+        [_Location_column]: 23,
+        [_Location_line]: 548,
+        [_Location_file]: null
+      });
+    },
+    get C368() {
+      return C[368] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "child",
+        [_Location_column]: 23,
+        [_Location_line]: 556,
+        [_Location_file]: null
+      });
+    },
+    get C366() {
+      return C[366] = dart.constList([C[367] || CT.C367, C[368] || CT.C368], widget_inspector._Location);
+    },
+    get C365() {
+      return C[365] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[366] || CT.C366,
+        [_Location_name]: null,
+        [_Location_column]: 28,
+        [_Location_line]: 547,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C371() {
+      return C[371] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "shrinkWrap",
+        [_Location_column]: 19,
+        [_Location_line]: 544,
+        [_Location_file]: null
+      });
+    },
+    get C372() {
+      return C[372] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "itemCount",
+        [_Location_column]: 19,
+        [_Location_line]: 545,
+        [_Location_file]: null
+      });
+    },
+    get C373() {
+      return C[373] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "itemBuilder",
+        [_Location_column]: 19,
+        [_Location_line]: 546,
+        [_Location_file]: null
+      });
+    },
+    get C370() {
+      return C[370] = dart.constList([C[371] || CT.C371, C[372] || CT.C372, C[373] || CT.C373], widget_inspector._Location);
+    },
+    get C369() {
+      return C[369] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[370] || CT.C370,
+        [_Location_name]: null,
+        [_Location_column]: 31,
+        [_Location_line]: 543,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C376() {
+      return C[376] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "width",
+        [_Location_column]: 15,
+        [_Location_line]: 542,
+        [_Location_file]: null
+      });
+    },
+    get C377() {
+      return C[377] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "child",
+        [_Location_column]: 15,
+        [_Location_line]: 543,
+        [_Location_file]: null
+      });
+    },
+    get C375() {
+      return C[375] = dart.constList([C[376] || CT.C376, C[377] || CT.C377], widget_inspector._Location);
+    },
+    get C374() {
+      return C[374] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[375] || CT.C375,
+        [_Location_name]: null,
+        [_Location_column]: 22,
+        [_Location_line]: 541,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C381() {
+      return C[381] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "data",
+        [_Location_column]: 35,
+        [_Location_line]: 587,
+        [_Location_file]: null
+      });
+    },
+    get C380() {
+      return C[380] = dart.constList([C[381] || CT.C381], widget_inspector._Location);
+    },
+    get C379() {
+      return C[379] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[380] || CT.C380,
+        [_Location_name]: null,
+        [_Location_column]: 30,
+        [_Location_line]: 587,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C378() {
+      return C[378] = dart.const({
+        __proto__: text.Text.prototype,
+        [Widget__location]: C[379] || CT.C379,
+        [Widget_key]: null,
+        [Text_textHeightBehavior]: null,
+        [Text_textWidthBasis]: null,
+        [Text_semanticsLabel]: null,
+        [Text_maxLines]: null,
+        [Text_textScaleFactor]: null,
+        [Text_overflow]: null,
+        [Text_softWrap]: null,
+        [Text_locale]: null,
+        [Text_textDirection]: null,
+        [Text_textAlign]: null,
+        [Text_strutStyle]: null,
+        [Text_style]: null,
+        [Text_textSpan]: null,
+        [Text_data]: "Cancel"
+      });
+    },
+    get C384() {
+      return C[384] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "onPressed",
+        [_Location_column]: 17,
+        [_Location_line]: 584,
+        [_Location_file]: null
+      });
+    },
+    get C385() {
+      return C[385] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "child",
+        [_Location_column]: 17,
+        [_Location_line]: 587,
+        [_Location_file]: null
+      });
+    },
+    get C383() {
+      return C[383] = dart.constList([C[384] || CT.C384, C[385] || CT.C385], widget_inspector._Location);
+    },
+    get C382() {
+      return C[382] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[383] || CT.C383,
+        [_Location_name]: null,
+        [_Location_column]: 15,
+        [_Location_line]: 583,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    },
+    get C388() {
+      return C[388] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "title",
+        [_Location_column]: 13,
+        [_Location_line]: 537,
+        [_Location_file]: null
+      });
+    },
+    get C389() {
+      return C[389] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "content",
+        [_Location_column]: 13,
+        [_Location_line]: 541,
+        [_Location_file]: null
+      });
+    },
+    get C390() {
+      return C[390] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "actions",
+        [_Location_column]: 13,
+        [_Location_line]: 582,
+        [_Location_file]: null
+      });
+    },
+    get C387() {
+      return C[387] = dart.constList([C[388] || CT.C388, C[389] || CT.C389, C[390] || CT.C390], widget_inspector._Location);
+    },
+    get C386() {
+      return C[386] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[387] || CT.C387,
+        [_Location_name]: null,
+        [_Location_column]: 18,
+        [_Location_line]: 536,
+        [_Location_file]: "file:///F:/DEVSKILL/FlutterDev/Project/chat_app/lib/auth/signup.dart"
+      });
+    }
+  }, false);
+  var C = Array(391).fill(void 0);
+  var I = ["package:chat_app/auth/signup.dart"];
+  signup.SignUp = class SignUp extends framework.StatefulWidget {
+    createState() {
+      return new signup._SignUpState.new();
+    }
+  };
+  (signup.SignUp.new = function(opts) {
+    let $36creationLocationd_0dea112b090073317d4 = opts && '$creationLocationd_0dea112b090073317d4' in opts ? opts.$creationLocationd_0dea112b090073317d4 : null;
+    signup.SignUp.__proto__.new.call(this, {$creationLocationd_0dea112b090073317d4: $36creationLocationd_0dea112b090073317d4});
+    ;
+  }).prototype = signup.SignUp.prototype;
+  dart.addTypeTests(signup.SignUp);
+  dart.addTypeCaches(signup.SignUp);
+  dart.setMethodSignature(signup.SignUp, () => ({
+    __proto__: dart.getMethods(signup.SignUp.__proto__),
+    createState: dart.fnType(signup._SignUpState, [])
+  }));
+  dart.setLibraryUri(signup.SignUp, I[0]);
+  var _displayNameController = dart.privateName(signup, "_displayNameController");
+  var _emailTextController = dart.privateName(signup, "_emailTextController");
+  var _phoneNumberController = dart.privateName(signup, "_phoneNumberController");
+  var _passTextController = dart.privateName(signup, "_passTextController");
+  var _positionCPTextController = dart.privateName(signup, "_positionCPTextController");
+  var _emailFocusNode = dart.privateName(signup, "_emailFocusNode");
+  var _phoneNumberFocusNode = dart.privateName(signup, "_phoneNumberFocusNode");
+  var _passFocusNode = dart.privateName(signup, "_passFocusNode");
+  var _positionCPFocusNode = dart.privateName(signup, "_positionCPFocusNode");
+  var _obscureText = dart.privateName(signup, "_obscureText");
+  var _signUpFormKey = dart.privateName(signup, "_signUpFormKey");
+  var _auth = dart.privateName(signup, "_auth");
+  var _isLoading = dart.privateName(signup, "_isLoading");
+  var _submitFormOnSignUp = dart.privateName(signup, "_submitFormOnSignUp");
+  var EdgeInsets_bottom = dart.privateName(edge_insets, "EdgeInsets.bottom");
+  var EdgeInsets_right = dart.privateName(edge_insets, "EdgeInsets.right");
+  var EdgeInsets_top = dart.privateName(edge_insets, "EdgeInsets.top");
+  var EdgeInsets_left = dart.privateName(edge_insets, "EdgeInsets.left");
+  var _Location_parameterLocations = dart.privateName(widget_inspector, "_Location.parameterLocations");
+  var _Location_name = dart.privateName(widget_inspector, "_Location.name");
+  var _Location_column = dart.privateName(widget_inspector, "_Location.column");
+  var _Location_line = dart.privateName(widget_inspector, "_Location.line");
+  var _Location_file = dart.privateName(widget_inspector, "_Location.file");
+  var Widget__location = dart.privateName(framework, "Widget._location");
+  var Widget_key = dart.privateName(framework, "Widget.key");
+  var SingleChildRenderObjectWidget_child = dart.privateName(framework, "SingleChildRenderObjectWidget.child");
+  var SizedBox_height = dart.privateName(basic, "SizedBox.height");
+  var SizedBox_width = dart.privateName(basic, "SizedBox.width");
+  var InlineSpan_style = dart.privateName(inline_span, "InlineSpan.style");
+  var TextSpan_semanticsLabel = dart.privateName(text_span, "TextSpan.semanticsLabel");
+  var TextSpan_onExit = dart.privateName(text_span, "TextSpan.onExit");
+  var TextSpan_onEnter = dart.privateName(text_span, "TextSpan.onEnter");
+  var TextSpan_mouseCursor = dart.privateName(text_span, "TextSpan.mouseCursor");
+  var TextSpan_recognizer = dart.privateName(text_span, "TextSpan.recognizer");
+  var TextSpan_children = dart.privateName(text_span, "TextSpan.children");
+  var TextSpan_text = dart.privateName(text_span, "TextSpan.text");
+  var _buildSignupForm = dart.privateName(signup, "_buildSignupForm");
+  var ProgressIndicator_semanticsValue = dart.privateName(progress_indicator, "ProgressIndicator.semanticsValue");
+  var ProgressIndicator_semanticsLabel = dart.privateName(progress_indicator, "ProgressIndicator.semanticsLabel");
+  var ProgressIndicator_valueColor = dart.privateName(progress_indicator, "ProgressIndicator.valueColor");
+  var ProgressIndicator_color = dart.privateName(progress_indicator, "ProgressIndicator.color");
+  var ProgressIndicator_backgroundColor = dart.privateName(progress_indicator, "ProgressIndicator.backgroundColor");
+  var ProgressIndicator_value = dart.privateName(progress_indicator, "ProgressIndicator.value");
+  var CircularProgressIndicator_strokeWidth = dart.privateName(progress_indicator, "CircularProgressIndicator.strokeWidth");
+  var _name = dart.privateName(progress_indicator, "_name");
+  var CircularProgressIndicator__indicatorType = dart.privateName(progress_indicator, "CircularProgressIndicator._indicatorType");
+  var Align_heightFactor = dart.privateName(basic, "Align.heightFactor");
+  var Align_widthFactor = dart.privateName(basic, "Align.widthFactor");
+  var Alignment_y = dart.privateName(alignment, "Alignment.y");
+  var Alignment_x = dart.privateName(alignment, "Alignment.x");
+  var Align_alignment = dart.privateName(basic, "Align.alignment");
+  var _showImageDialog = dart.privateName(signup, "_showImageDialog");
+  var Icon_textDirection = dart.privateName(icon, "Icon.textDirection");
+  var Icon_semanticLabel = dart.privateName(icon, "Icon.semanticLabel");
+  var Color_value = dart.privateName(ui, "Color.value");
+  var Icon_color = dart.privateName(icon, "Icon.color");
+  var Icon_size = dart.privateName(icon, "Icon.size");
+  var IconData_matchTextDirection = dart.privateName(icon_data, "IconData.matchTextDirection");
+  var IconData_fontPackage = dart.privateName(icon_data, "IconData.fontPackage");
+  var IconData_fontFamily = dart.privateName(icon_data, "IconData.fontFamily");
+  var IconData_codePoint = dart.privateName(icon_data, "IconData.codePoint");
+  var Icon_icon = dart.privateName(icon, "Icon.icon");
+  var _showTaskCategoriesDialog = dart.privateName(signup, "_showTaskCategoriesDialog");
+  var Text_textHeightBehavior = dart.privateName(text, "Text.textHeightBehavior");
+  var Text_textWidthBasis = dart.privateName(text, "Text.textWidthBasis");
+  var Text_semanticsLabel = dart.privateName(text, "Text.semanticsLabel");
+  var Text_maxLines = dart.privateName(text, "Text.maxLines");
+  var Text_textScaleFactor = dart.privateName(text, "Text.textScaleFactor");
+  var Text_overflow = dart.privateName(text, "Text.overflow");
+  var Text_softWrap = dart.privateName(text, "Text.softWrap");
+  var Text_locale = dart.privateName(text, "Text.locale");
+  var Text_textDirection = dart.privateName(text, "Text.textDirection");
+  var Text_textAlign = dart.privateName(text, "Text.textAlign");
+  var Text_strutStyle = dart.privateName(text, "Text.strutStyle");
+  var Text_style = dart.privateName(text, "Text.style");
+  var Text_textSpan = dart.privateName(text, "Text.textSpan");
+  var Text_data = dart.privateName(text, "Text.data");
+  var _getFromCamera = dart.privateName(signup, "_getFromCamera");
+  var ColorSwatch__swatch = dart.privateName(colors$, "ColorSwatch._swatch");
+  var Padding_padding = dart.privateName(basic, "Padding.padding");
+  var _getFromGallery = dart.privateName(signup, "_getFromGallery");
+  var _cropImage = dart.privateName(signup, "_cropImage");
+  var TextStyle_fontFeatures = dart.privateName(text_style, "TextStyle.fontFeatures");
+  var TextStyle_shadows = dart.privateName(text_style, "TextStyle.shadows");
+  var TextStyle_debugLabel = dart.privateName(text_style, "TextStyle.debugLabel");
+  var TextStyle_decorationThickness = dart.privateName(text_style, "TextStyle.decorationThickness");
+  var TextStyle_decorationStyle = dart.privateName(text_style, "TextStyle.decorationStyle");
+  var TextStyle_decorationColor = dart.privateName(text_style, "TextStyle.decorationColor");
+  var TextStyle_decoration = dart.privateName(text_style, "TextStyle.decoration");
+  var TextStyle_background = dart.privateName(text_style, "TextStyle.background");
+  var TextStyle_foreground = dart.privateName(text_style, "TextStyle.foreground");
+  var TextStyle_locale = dart.privateName(text_style, "TextStyle.locale");
+  var TextStyle_leadingDistribution = dart.privateName(text_style, "TextStyle.leadingDistribution");
+  var TextStyle_height = dart.privateName(text_style, "TextStyle.height");
+  var TextStyle_textBaseline = dart.privateName(text_style, "TextStyle.textBaseline");
+  var TextStyle_wordSpacing = dart.privateName(text_style, "TextStyle.wordSpacing");
+  var TextStyle_letterSpacing = dart.privateName(text_style, "TextStyle.letterSpacing");
+  var _name$ = dart.privateName(ui, "_name");
+  var TextStyle_fontStyle = dart.privateName(text_style, "TextStyle.fontStyle");
+  var TextStyle_fontWeight = dart.privateName(text_style, "TextStyle.fontWeight");
+  var TextStyle_fontSize = dart.privateName(text_style, "TextStyle.fontSize");
+  var TextStyle__package = dart.privateName(text_style, "TextStyle._package");
+  var TextStyle__fontFamilyFallback = dart.privateName(text_style, "TextStyle._fontFamilyFallback");
+  var TextStyle_fontFamily = dart.privateName(text_style, "TextStyle.fontFamily");
+  var TextStyle_backgroundColor = dart.privateName(text_style, "TextStyle.backgroundColor");
+  var TextStyle_color = dart.privateName(text_style, "TextStyle.color");
+  var TextStyle_inherit = dart.privateName(text_style, "TextStyle.inherit");
+  signup._SignUpState = class _SignUpState extends framework.State$(signup.SignUp) {
+    dispose() {
+      this[_displayNameController].dispose();
+      this[_emailTextController].dispose();
+      this[_phoneNumberController].dispose();
+      this[_passTextController].dispose();
+      this[_positionCPTextController].dispose();
+      this[_emailFocusNode].dispose();
+      this[_phoneNumberFocusNode].dispose();
+      this[_passFocusNode].dispose();
+      this[_positionCPFocusNode].dispose();
+      super.dispose();
+    }
+    [_submitFormOnSignUp]() {
+      return async.async(dart.void, (function* _submitFormOnSignUp() {
+        let isValid = dart.nullCheck(this[_signUpFormKey].currentState).validate();
+        if (isValid) {
+          this.setState(dart.fn(() => {
+            this[_isLoading] = true;
+          }, T.VoidTovoid()));
+          try {
+            yield this[_auth].createUserWithEmailAndPassword({email: this[_emailTextController].text[$trim]()[$toLowerCase](), password: this[_passTextController].text[$trim]()});
+            let user = this[_auth].currentUser;
+            let _uid = dart.nullCheck(user).uid;
+            cloud_firestore.FirebaseFirestore.instance.collection("users").doc(_uid).set(new (T.IdentityMapOfString$dynamic()).from(["createdAt", timestamp.Timestamp.now(), "designation", this[_positionCPTextController].text, "email", this[_emailTextController].text, "display_name", this[_displayNameController].text, "last_seen", timestamp.Timestamp.now(), "password", this[_passTextController].text, "phone", this[_phoneNumberController].text, "presence", true, "profile_pic", "imageUrl", "role", "", "uid", _uid]));
+            navigator.Navigator.canPop(this.context) ? navigator.Navigator.pop(T.ObjectN(), this.context) : null;
+          } catch (e) {
+            let error = dart.getThrown(e);
+            if (firebase_core_platform_interface.FirebaseException.is(error)) {
+              this.setState(dart.fn(() => {
+                this[_isLoading] = false;
+              }, T.VoidTovoid()));
+              global_methods.GlobalMethod.showErrorDialog({error: dart.nullCheck(error.message), ctx: this.context});
+            } else
+              throw e;
+          }
+        }
+        this.setState(dart.fn(() => {
+          this[_isLoading] = false;
+        }, T.VoidTovoid()));
+      }).bind(this));
+    }
+    build(context) {
+      let t1;
+      return new safe_area.SafeArea.new({child: new dialog.Dialog.new({insetPadding: C[0] || CT.C0, backgroundColor: custom_color.CustomColors.primaryColor, shape: new rounded_rectangle_border.RoundedRectangleBorder.new({borderRadius: new border_radius.BorderRadius.circular(8.0)}), child: new single_child_scroll_view.SingleChildScrollView.new({child: new basic.Padding.new({padding: C[1] || CT.C1, child: new container.Container.new({width: 400, color: custom_color.CustomColors.primaryColor, child: new basic.Column.new({mainAxisAlignment: flex.MainAxisAlignment.center, crossAxisAlignment: flex.CrossAxisAlignment.center, children: T.JSArrayOfWidget().of([new text.Text.new("SignUp", {textAlign: ui.TextAlign.center, style: google_fonts.GoogleFonts.openSans({color: colors.Colors.white, fontSize: 28.0}), $creationLocationd_0dea112b090073317d4: C[2] || CT.C2}), C[7] || CT.C7, new basic.RichText.new({text: new text_span.TextSpan.new({children: T.JSArrayOfInlineSpan().of([new text_span.TextSpan.new({text: "Already have an account", style: google_fonts.GoogleFonts.openSans({color: colors.Colors.white, fontSize: 16.0})}), C[11] || CT.C11, new text_span.TextSpan.new({recognizer: (t1 = new tap.TapGestureRecognizer.new(), (() => {
+                              t1.onTap = dart.fn(() => navigator.Navigator.canPop(context) ? navigator.Navigator.pop(T.ObjectN(), context) : null, T.VoidTovoid());
+                              return t1;
+                            })()), text: "Login", style: google_fonts.GoogleFonts.openSans({decoration: ui.TextDecoration.underline, color: colors.Colors.blue.shade300, fontWeight: ui.FontWeight.bold, fontSize: 16.0})})])}), $creationLocationd_0dea112b090073317d4: C[13] || CT.C13}), C[16] || CT.C16, this[_buildSignupForm](), C[20] || CT.C20, this[_isLoading] ? C[24] || CT.C24 : new material_button.MaterialButton.new({elevation: 0.0, minWidth: 1.7976931348623157e+308, height: 50.0, onPressed: dart.bind(this, _submitFormOnSignUp), color: custom_color.CustomColors.logoGreen, child: new text.Text.new("SignUp", {style: google_fonts.GoogleFonts.openSans({color: colors.Colors.white, fontSize: 16.0}), $creationLocationd_0dea112b090073317d4: C[39] || CT.C39}), textColor: colors.Colors.white, $creationLocationd_0dea112b090073317d4: C[43] || CT.C43})]), $creationLocationd_0dea112b090073317d4: C[52] || CT.C52}), $creationLocationd_0dea112b090073317d4: C[57] || CT.C57}), $creationLocationd_0dea112b090073317d4: C[62] || CT.C62}), $creationLocationd_0dea112b090073317d4: C[66] || CT.C66}), $creationLocationd_0dea112b090073317d4: C[69] || CT.C69}), $creationLocationd_0dea112b090073317d4: C[75] || CT.C75});
+    }
+    [_buildSignupForm]() {
+      return new form.Form.new({key: this[_signUpFormKey], child: new basic.Column.new({children: T.JSArrayOfWidget().of([new basic.Stack.new({children: T.JSArrayOfWidget().of([new basic.Padding.new({padding: C[78] || CT.C78, child: new container.Container.new({width: 200.0, height: 200.0, decoration: new box_decoration.BoxDecoration.new({border: box_border.Border.all({width: 1.0, color: colors.Colors.white}), borderRadius: new border_radius.BorderRadius.circular(16.0)}), child: new basic.ClipRRect.new({borderRadius: new border_radius.BorderRadius.circular(16.0), child: this.imageFile == null ? websafe_svg.WebsafeSvg.asset("assets/Icons/avatar.svg", {width: 25.0}) : new image.Image.file(dart.nullCheck(this.imageFile), {fit: box_fit.BoxFit.fill, $creationLocationd_0dea112b090073317d4: C[79] || CT.C79}), $creationLocationd_0dea112b090073317d4: C[83] || CT.C83}), $creationLocationd_0dea112b090073317d4: C[87] || CT.C87}), $creationLocationd_0dea112b090073317d4: C[93] || CT.C93}), new basic.Positioned.new({top: 0.0, right: 0.0, child: new ink_well.InkWell.new({onTap: dart.fn(() => {
+                      this[_showImageDialog]();
+                    }, T.VoidTovoid()), child: new container.Container.new({decoration: new box_decoration.BoxDecoration.new({color: colors.Colors.pink, border: box_border.Border.all({width: 2.0, color: colors.Colors.white}), shape: box_border.BoxShape.circle}), child: new basic.Padding.new({padding: C[78] || CT.C78, child: new icon.Icon.new(this.imageFile == null ? icons.Icons.add_a_photo : icons.Icons.edit_outlined, {color: colors.Colors.white, size: 18.0, $creationLocationd_0dea112b090073317d4: C[97] || CT.C97}), $creationLocationd_0dea112b090073317d4: C[102] || CT.C102}), $creationLocationd_0dea112b090073317d4: C[106] || CT.C106}), $creationLocationd_0dea112b090073317d4: C[110] || CT.C110}), $creationLocationd_0dea112b090073317d4: C[114] || CT.C114})]), $creationLocationd_0dea112b090073317d4: C[119] || CT.C119}), C[122] || CT.C122, new container.Container.new({padding: C[126] || CT.C126, decoration: new box_decoration.BoxDecoration.new({color: custom_color.CustomColors.secondaryColor, border: box_border.Border.all({color: colors.Colors.blue})}), child: new text_form_field.TextFormField.new({textInputAction: text_input.TextInputAction.next, onEditingComplete: dart.fn(() => focus_scope.FocusScope.of(this.context).requestFocus(this[_emailFocusNode]), T.VoidTovoid()), keyboardType: text_input.TextInputType.name_, controller: this[_displayNameController], validator: dart.fn(value => {
+                  if (dart.nullCheck(value)[$isEmpty]) {
+                    return "This Field is missing";
+                  } else {
+                    return null;
+                  }
+                }, T.StringNToStringN()), style: google_fonts.GoogleFonts.openSans({color: colors.Colors.white}), decoration: new input_decorator.InputDecoration.new({contentPadding: C[127] || CT.C127, labelText: "Display name", labelStyle: google_fonts.GoogleFonts.openSans({color: colors.Colors.white}), icon: C[128] || CT.C128, border: input_border.InputBorder.none}), $creationLocationd_0dea112b090073317d4: C[135] || CT.C135}), $creationLocationd_0dea112b090073317d4: C[144] || CT.C144}), C[149] || CT.C149, new container.Container.new({padding: C[126] || CT.C126, decoration: new box_decoration.BoxDecoration.new({color: custom_color.CustomColors.secondaryColor, border: box_border.Border.all({color: colors.Colors.blue})}), child: new text_form_field.TextFormField.new({textInputAction: text_input.TextInputAction.next, onEditingComplete: dart.fn(() => focus_scope.FocusScope.of(this.context).requestFocus(this[_phoneNumberFocusNode]), T.VoidTovoid()), focusNode: this[_emailFocusNode], keyboardType: text_input.TextInputType.emailAddress, controller: this[_emailTextController], validator: dart.fn(value => global_methods.GlobalMethod.validateEmail(dart.nullCheck(value)), T.StringNToStringN()), style: google_fonts.GoogleFonts.openSans({color: colors.Colors.white}), decoration: new input_decorator.InputDecoration.new({contentPadding: C[127] || CT.C127, labelText: "Email Address", labelStyle: google_fonts.GoogleFonts.openSans({color: colors.Colors.white}), icon: C[153] || CT.C153, border: input_border.InputBorder.none}), $creationLocationd_0dea112b090073317d4: C[159] || CT.C159}), $creationLocationd_0dea112b090073317d4: C[169] || CT.C169}), C[174] || CT.C174, new container.Container.new({padding: C[126] || CT.C126, decoration: new box_decoration.BoxDecoration.new({color: custom_color.CustomColors.secondaryColor, border: box_border.Border.all({color: colors.Colors.blue})}), child: new text_form_field.TextFormField.new({focusNode: this[_phoneNumberFocusNode], textInputAction: text_input.TextInputAction.next, onEditingComplete: dart.fn(() => focus_scope.FocusScope.of(this.context).requestFocus(this[_passFocusNode]), T.VoidTovoid()), keyboardType: text_input.TextInputType.phone, controller: this[_phoneNumberController], validator: dart.fn(value => global_methods.GlobalMethod.validatePhone(dart.nullCheck(value)), T.StringNToStringN()), style: google_fonts.GoogleFonts.openSans({color: colors.Colors.white}), decoration: new input_decorator.InputDecoration.new({contentPadding: C[127] || CT.C127, labelText: "Phone Number", labelStyle: google_fonts.GoogleFonts.openSans({color: colors.Colors.white}), icon: C[178] || CT.C178, border: input_border.InputBorder.none}), $creationLocationd_0dea112b090073317d4: C[184] || CT.C184}), $creationLocationd_0dea112b090073317d4: C[194] || CT.C194}), C[199] || CT.C199, new container.Container.new({padding: C[126] || CT.C126, decoration: new box_decoration.BoxDecoration.new({color: custom_color.CustomColors.secondaryColor, border: box_border.Border.all({color: colors.Colors.blue})}), child: new text_form_field.TextFormField.new({textInputAction: text_input.TextInputAction.next, onEditingComplete: dart.fn(() => focus_scope.FocusScope.of(this.context).requestFocus(this[_positionCPFocusNode]), T.VoidTovoid()), focusNode: this[_passFocusNode], obscureText: this[_obscureText], keyboardType: text_input.TextInputType.visiblePassword, controller: this[_passTextController], validator: dart.fn(value => global_methods.GlobalMethod.validatePassword(dart.nullCheck(value)), T.StringNToStringN()), style: google_fonts.GoogleFonts.openSans({color: colors.Colors.white}), decoration: new input_decorator.InputDecoration.new({suffixIcon: new gesture_detector.GestureDetector.new({onTap: dart.fn(() => {
+                      this.setState(dart.fn(() => {
+                        this[_obscureText] = !this[_obscureText];
+                      }, T.VoidTovoid()));
+                    }, T.VoidTovoid()), child: new icon.Icon.new(this[_obscureText] ? icons.Icons.visibility : icons.Icons.visibility_off, {color: colors.Colors.white, $creationLocationd_0dea112b090073317d4: C[203] || CT.C203}), $creationLocationd_0dea112b090073317d4: C[207] || CT.C207}), contentPadding: C[127] || CT.C127, labelText: "Password", labelStyle: google_fonts.GoogleFonts.openSans({color: colors.Colors.white}), icon: C[211] || CT.C211, border: input_border.InputBorder.none}), $creationLocationd_0dea112b090073317d4: C[217] || CT.C217}), $creationLocationd_0dea112b090073317d4: C[228] || CT.C228}), C[233] || CT.C233, new gesture_detector.GestureDetector.new({onTap: dart.fn(() => {
+                this[_showTaskCategoriesDialog]();
+              }, T.VoidTovoid()), child: new container.Container.new({padding: C[126] || CT.C126, decoration: new box_decoration.BoxDecoration.new({color: custom_color.CustomColors.secondaryColor, border: box_border.Border.all({color: colors.Colors.blue})}), child: new text_form_field.TextFormField.new({enabled: false, textInputAction: text_input.TextInputAction.done, onEditingComplete: dart.fn(() => dart.bind(this, _submitFormOnSignUp), T.VoidTovoid()), focusNode: this[_positionCPFocusNode], keyboardType: text_input.TextInputType.name_, controller: this[_positionCPTextController], validator: dart.fn(value => {
+                    if (dart.nullCheck(value)[$isEmpty]) {
+                      return "This field is missing";
+                    } else {
+                      return null;
+                    }
+                  }, T.StringNToStringN()), style: google_fonts.GoogleFonts.openSans({color: colors.Colors.white}), decoration: new input_decorator.InputDecoration.new({contentPadding: C[127] || CT.C127, labelText: "Position in the company", labelStyle: google_fonts.GoogleFonts.openSans({color: colors.Colors.white}), icon: C[237] || CT.C237, border: input_border.InputBorder.none}), $creationLocationd_0dea112b090073317d4: C[243] || CT.C243}), $creationLocationd_0dea112b090073317d4: C[254] || CT.C254}), $creationLocationd_0dea112b090073317d4: C[259] || CT.C259})]), $creationLocationd_0dea112b090073317d4: C[263] || CT.C263}), $creationLocationd_0dea112b090073317d4: C[266] || CT.C266});
+    }
+    [_showImageDialog]() {
+      dialog.showDialog(dart.dynamic, {context: this.context, builder: dart.fn(context => new dialog.AlertDialog.new({title: C[270] || CT.C270, content: new basic.Column.new({mainAxisSize: flex.MainAxisSize.min, children: T.JSArrayOfWidget().of([new ink_well.InkWell.new({onTap: dart.fn(() => {
+                  this[_getFromCamera]();
+                }, T.VoidTovoid()), child: new basic.Row.new({children: T.JSArrayOfWidget().of([C[274] || CT.C274, new text.Text.new("Camera", {style: google_fonts.GoogleFonts.openSans({color: colors.Colors.purple}), $creationLocationd_0dea112b090073317d4: C[298] || CT.C298})]), $creationLocationd_0dea112b090073317d4: C[302] || CT.C302}), $creationLocationd_0dea112b090073317d4: C[305] || CT.C305}), new ink_well.InkWell.new({onTap: dart.fn(() => {
+                  this[_getFromGallery]();
+                }, T.VoidTovoid()), child: new basic.Row.new({children: T.JSArrayOfWidget().of([C[309] || CT.C309, new text.Text.new("Gallery", {style: google_fonts.GoogleFonts.openSans({color: colors.Colors.purple}), $creationLocationd_0dea112b090073317d4: C[320] || CT.C320})]), $creationLocationd_0dea112b090073317d4: C[324] || CT.C324}), $creationLocationd_0dea112b090073317d4: C[327] || CT.C327})]), $creationLocationd_0dea112b090073317d4: C[331] || CT.C331}), $creationLocationd_0dea112b090073317d4: C[335] || CT.C335}), T.BuildContextToAlertDialog())});
+    }
+    [_getFromGallery]() {
+      return async.async(dart.void, (function* _getFromGallery() {
+        let pickedFile = (yield new image_picker.ImagePicker.new().getImage({source: image_source.ImageSource.gallery, maxHeight: 1080.0, maxWidth: 1080.0}));
+        this[_cropImage](dart.nullCheck(pickedFile).path);
+        navigator.Navigator.pop(T.ObjectN(), this.context);
+      }).bind(this));
+    }
+    [_getFromCamera]() {
+      return async.async(dart.void, (function* _getFromCamera() {
+        let pickedFile = (yield new image_picker.ImagePicker.new().getImage({source: image_source.ImageSource.camera, maxHeight: 1080.0, maxWidth: 1080.0}));
+        this[_cropImage](dart.nullCheck(pickedFile).path);
+        navigator.Navigator.pop(T.ObjectN(), this.context);
+      }).bind(this));
+    }
+    [_cropImage](filePath) {
+      return async.async(dart.void, (function* _cropImage() {
+        let croppedImage = (yield cropper.ImageCropper.cropImage({sourcePath: core.String.as(filePath), maxHeight: 1080, maxWidth: 1080}));
+        if (croppedImage != null) {
+          this.setState(dart.fn(() => {
+            this.imageFile = croppedImage;
+          }, T.VoidTovoid()));
+        }
+      }).bind(this));
+    }
+    [_showTaskCategoriesDialog]() {
+      let jobItem = false;
+      dialog.showDialog(dart.dynamic, {context: this.context, builder: dart.fn(ctx => new dialog.AlertDialog.new({title: new text.Text.new("Choose Your Designation", {style: new text_style.TextStyle.new({fontSize: 20.0, color: colors.Colors.pink.shade800}), $creationLocationd_0dea112b090073317d4: C[339] || CT.C339}), content: new basic.SizedBox.new({width: 400 * 0.9, child: new scroll_view.ListView.builder({shrinkWrap: true, itemCount: constants.Constants.jobsList[$length], itemBuilder: dart.fn((_, index) => new ink_well.InkWell.new({onTap: dart.fn(() => {
+                  this.setState(dart.fn(() => {
+                    this[_positionCPTextController].text = constants.Constants.jobsList[$_get](index);
+                    jobItem = true;
+                  }, T.VoidTovoid()));
+                  navigator.Navigator.pop(T.ObjectN(), this.context);
+                }, T.VoidTovoid()), child: new basic.Row.new({children: T.JSArrayOfWidget().of([new icon.Icon.new(icons.Icons.check_circle_rounded, {color: jobItem ? colors.Colors.green.shade200 : colors.Colors.red.shade200, $creationLocationd_0dea112b090073317d4: C[343] || CT.C343}), C[347] || CT.C347, new basic.Padding.new({padding: C[78] || CT.C78, child: new text.Text.new(constants.Constants.jobsList[$_get](index), {style: C[351] || CT.C351, $creationLocationd_0dea112b090073317d4: C[354] || CT.C354}), $creationLocationd_0dea112b090073317d4: C[358] || CT.C358})]), $creationLocationd_0dea112b090073317d4: C[362] || CT.C362}), $creationLocationd_0dea112b090073317d4: C[365] || CT.C365}), T.BuildContextAndintToInkWell()), $creationLocationd_0dea112b090073317d4: C[369] || CT.C369}), $creationLocationd_0dea112b090073317d4: C[374] || CT.C374}), actions: T.JSArrayOfWidget().of([new text_button.TextButton.new({onPressed: dart.fn(() => {
+                navigator.Navigator.canPop(this.context) ? navigator.Navigator.pop(T.ObjectN(), this.context) : null;
+              }, T.VoidTovoid()), child: C[378] || CT.C378, $creationLocationd_0dea112b090073317d4: C[382] || CT.C382})]), $creationLocationd_0dea112b090073317d4: C[386] || CT.C386}), T.BuildContextToAlertDialog())});
+    }
+  };
+  (signup._SignUpState.new = function() {
+    this[_displayNameController] = new editable_text.TextEditingController.new({text: ""});
+    this[_emailTextController] = new editable_text.TextEditingController.new({text: ""});
+    this[_phoneNumberController] = new editable_text.TextEditingController.new({text: ""});
+    this[_passTextController] = new editable_text.TextEditingController.new({text: ""});
+    this[_positionCPTextController] = new editable_text.TextEditingController.new({text: ""});
+    this[_emailFocusNode] = new focus_manager.FocusNode.new();
+    this[_phoneNumberFocusNode] = new focus_manager.FocusNode.new();
+    this[_passFocusNode] = new focus_manager.FocusNode.new();
+    this[_positionCPFocusNode] = new focus_manager.FocusNode.new();
+    this[_obscureText] = true;
+    this[_signUpFormKey] = T.GlobalKeyOfFormState().new();
+    this.imageFile = null;
+    this[_auth] = firebase_auth.FirebaseAuth.instance;
+    this[_isLoading] = false;
+    this.imageUrl = null;
+    signup._SignUpState.__proto__.new.call(this);
+    ;
+  }).prototype = signup._SignUpState.prototype;
+  dart.addTypeTests(signup._SignUpState);
+  dart.addTypeCaches(signup._SignUpState);
+  dart.setMethodSignature(signup._SignUpState, () => ({
+    __proto__: dart.getMethods(signup._SignUpState.__proto__),
+    [_submitFormOnSignUp]: dart.fnType(dart.void, []),
+    build: dart.fnType(framework.Widget, [framework.BuildContext]),
+    [_buildSignupForm]: dart.fnType(framework.Widget, []),
+    [_showImageDialog]: dart.fnType(dart.void, []),
+    [_getFromGallery]: dart.fnType(dart.void, []),
+    [_getFromCamera]: dart.fnType(dart.void, []),
+    [_cropImage]: dart.fnType(dart.void, [dart.dynamic]),
+    [_showTaskCategoriesDialog]: dart.fnType(dart.void, [])
+  }));
+  dart.setLibraryUri(signup._SignUpState, I[0]);
+  dart.setFieldSignature(signup._SignUpState, () => ({
+    __proto__: dart.getFields(signup._SignUpState.__proto__),
+    [_displayNameController]: dart.finalFieldType(editable_text.TextEditingController),
+    [_emailTextController]: dart.finalFieldType(editable_text.TextEditingController),
+    [_phoneNumberController]: dart.finalFieldType(editable_text.TextEditingController),
+    [_passTextController]: dart.finalFieldType(editable_text.TextEditingController),
+    [_positionCPTextController]: dart.finalFieldType(editable_text.TextEditingController),
+    [_emailFocusNode]: dart.finalFieldType(focus_manager.FocusNode),
+    [_phoneNumberFocusNode]: dart.finalFieldType(focus_manager.FocusNode),
+    [_passFocusNode]: dart.finalFieldType(focus_manager.FocusNode),
+    [_positionCPFocusNode]: dart.finalFieldType(focus_manager.FocusNode),
+    [_obscureText]: dart.fieldType(core.bool),
+    [_signUpFormKey]: dart.finalFieldType(framework.GlobalKey$(form.FormState)),
+    imageFile: dart.fieldType(dart.nullable(io.File)),
+    [_auth]: dart.finalFieldType(firebase_auth.FirebaseAuth),
+    [_isLoading]: dart.fieldType(core.bool),
+    imageUrl: dart.fieldType(dart.nullable(core.String))
+  }));
+  dart.trackLibraries("packages/chat_app/auth/signup.dart", {
+    "package:chat_app/auth/signup.dart": signup
+  }, {
+  }, '{"version":3,"sourceRoot":"","sources":["signup.dart"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAoBgC;IAAc;;;;;;EAC9C;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AA4BoC,MAAhC,AAAuB;AACO,MAA9B,AAAqB;AACW,MAAhC,AAAuB;AACM,MAA7B,AAAoB;AACe,MAAnC,AAA0B;AAED,MAAzB,AAAgB;AACe,MAA/B,AAAsB;AACE,MAAxB,AAAe;AACe,MAA9B,AAAqB;AACN,MAAT;IACR;;AAEwB;AAChB,sBAAqC,AAAE,eAA7B,AAAe;AAC/B,YAAI,OAAO;AASP,UAFF,cAAS;AACU,YAAjB,mBAAa;;AAGf;AAGgD,YAF9C,MAAM,AAAM,mDACD,AAAqB,AAAK,AAAO,oEAC9B,AAAoB,AAAK;AAC3B,uBAAO,AAAM;AACnB,uBAAW,AAAE,eAAN,IAAI;AAmBf,YAZgB,AAAS,AAAoB,AAAU,sDAAnB,aAAa,IAAI,MAAM,4CAC3D,aAAuB,2BACvB,eAAe,AAA0B,sCACzC,SAAS,AAAqB,iCAC9B,gBAAgB,AAAuB,mCACvC,aAAuB,2BACvB,YAAY,AAAoB,gCAChC,SAAS,AAAuB,mCAChC,YAAY,MACZ,eAAe,YACf,QAAQ,IACR,OAAO,IAAI;AAE4C,YAA/C,2BAAO,gBAAqB,qCAAI,gBAAW;;gBACzB;AAA5B;AAGE,cAFF,cAAS;AACW,gBAAlB,mBAAa;;AAEkD,cAApD,oDAAoC,eAAb,AAAM,KAAD,gBAAgB;;;;;AAK3D,QAFF,cAAS;AACW,UAAlB,mBAAa;;MAEjB;;UAG0B;;AACxB,YAAO,oCACE,qEAE2B,+CACvB,uEACsB,wCAAS,eAE/B,+DACI,sDAEI,gDAEiB,+CACb,yCACkC,mDACE,0CACrB,wBAChB,kBACE,sBACqB,4BACF,0CACD,+BAAiB,gFAGrC,8BACQ,sCACM,4BACR,kCACQ,kCACa,0CACD,+BAAiB,2BAGrC,kFACc;AACR,yCAAQ,cAAgB,2BAAO,OAAO,IACxB,qCAAI,OAAO,IACrB;;yCACF,gBACa,+CACY,oCACb,AAAK,yCACI,8BACb,0FAMtB,2CAEA,qCAQM,mDACa,gDAEH,2BACG,mCACS,4CACb,kBAAK,kBACW,0CACD,+BAAiB,8EACrB;IAoCpD;;AAGE,YAAO,yBACA,6BACE,gCACK,wBACR,+BACY,wBACR,wDAES,oCACE,eACC,mBACI,8CACK,8BAAW,YAAiB,qCAChB,wCAAS,gBAE/B,uCACsB,wCAAS,cAC7B,AAAU,yBACA,6BACT,mCACO,SAMH,qBACK,eAAT,uBACY,iQAK1B,+BACO,YACE,YACA,iCACE;AACa,sBAAlB;+CAEK,yCACO,6CACI,4BACC,8BAAW,YAAiB,8BAC3B,qCAEX,wDAEE,kBACL,AAAU,yBACE,0BACA,mCACE,2BACR,uYAUpB,qEAEc,6CACY,kDACL,8BAAkB,+BAC9B,wDAC4B,oDACd,cACJ,AAAY,0BAAT,2BAAsB,uDACZ,4CAChB,yCACD,QAAC;AACV,sBAAS,AAAE,eAAP,KAAK;AACP,0BAAO;;AAEP,0BAAO;;iDAGQ,0CAAuB,mCAC9B,uFAEG,4BACa,0CAAuB,wDAE3B,8KAK5B,qEAEc,6CACY,kDACL,8BAAkB,+BAC9B,wDAC4B,oDACd,cACJ,AAAY,0BAAT,2BAAsB,0DAC7B,qCACiB,mDAChB,uCACD,QAAC,SAAuB,0CAAmB,eAAL,KAAK,kCACnC,0CAAuB,mCAC9B,uFAEG,6BACa,0CAAuB,wDAE3B,8KAK5B,qEAEc,6CACY,kDACL,8BAAkB,+BAC9B,kDACM,8CACsB,oDACd,cACJ,AAAY,0BAAT,2BAAsB,sDACZ,4CAChB,yCACD,QAAC,SAAuB,0CAAmB,eAAL,KAAK,kCAInC,0CAAuB,mCAC9B,uFAEG,4BACa,0CAAuB,wDAE3B,8KAK5B,qEAEc,6CACY,kDACL,8BAAkB,+BAC9B,wDAC4B,oDACd,cACJ,AAAY,0BAAT,2BAAsB,yDAC7B,mCACE,kCACe,sDAChB,sCACD,QAAC,SAAuB,6CAAsB,eAAL,KAAK,kCACtC,0CAAuB,mCAC9B,qDACI,iDACH;AAGH,sBAFF,cAAS;AACqB,wBAA5B,qBAAe,CAAC;;+CAGb,kBACL,qBAAqB,yBAAmB,oCAC1B,6LAIP,wBACa,0CAAuB,wDAE3B,8KAK5B,iDACS;AACsB,gBAA3B;yCAEK,qEAEO,6CACY,kDACL,8BAAkB,+BAC9B,gDACI,wBACwB,oDACd,wBAAM,wDACd,0CACiB,4CAChB,4CACD,QAAC;AACV,wBAAS,AAAE,eAAP,KAAK;AACP,4BAAO;;AAEP,4BAAO;;mDAGQ,0CAAuB,mCAC9B,uFAEG,uCACa,0CAAuB,wDAE3B;IAOtC;;AAsDQ,MAnDN,0CACa,uBACA,QAAC,WACD,+DAEI,oCACoB,iCACjB,wBACR,iCACS;AACW,kBAAhB;2CAEK,6BACK,2CAQR,kBACE,kBACmB,0CAAuB,iNAKlD,iCACS;AACY,kBAAjB;2CAEK,6BACK,2CAQR,kBACE,mBACmB,0CAAuB;IAShE;;AAEoB;AACN,0BAAa,MAAM,AAAc,qDACvB,6CACT,kBACD;AAKgB,QAA5B,iBAAqB,AAAE,eAAZ,UAAU;AACC,QAAZ,qCAAI;MAChB;;;AAEmB;AACL,0BAAa,MAAM,AAAc,qDACvB,4CACT,kBACD;AAKgB,QAA5B,iBAAqB,AAAE,eAAZ,UAAU;AACC,QAAZ,qCAAI;MAChB;;iBAEgB;AAAD;AACP,4BAAe,MAAmB,2DACxB,QAAQ,cAAa,gBAAgB;AACrD,YAAI,YAAY;AAGZ,UAFF,cAAS;AACiB,YAAxB,iBAAY,YAAY;;;MAG9B;;;AAGO,oBAAU;AA2DT,MA1DN,0CACa,uBACA,QAAC,OACD,mCACE,kBACL,mCACO,wCAAoB,aAAkB,AAAK,qGAE3C,+BAC4B,MAAE,YACrB,8CACA,iBACS,AAAS,oDACjB,SAAC,GAAG,UACR,iCACE;AAKH,kBAJF,cAAS;AAEsB,oBAD7B,AAA0B,uCACZ,AAAQ,oCAAC,KAAK;AACd,oBAAd,UAAU;;AAEU,kBAAZ,qCAAI;2CAET,6BACK,wBACR,kBACQ,0CACE,OAAO,GACF,AAAM,+BACN,AAAI,4GAKnB,wDAES,kBACK,AAAQ,oCAAC,KAAK,ybAYjC,wBACP,2CACa;AACgD,gBAA/C,2BAAO,gBAAqB,qCAAI,gBAAW;;IAOrE;;;IAvjB4B,+BACxB,mDAA4B;IACJ,6BACxB,mDAA4B;IACJ,+BACxB,mDAA4B;IACJ,4BACxB,mDAA4B;IACJ,kCACxB,mDAA4B;IAEhB,wBAAkB;IAClB,8BAAwB;IACxB,uBAAiB;IACjB,6BAAuB;IAElC,qBAAe;IACd,uBAAiB;IACjB;IACa,cAAqB;IACnC,mBAAa;IACV;;;EAmiBV","file":"../../../../../../packages/chat_app/auth/signup.dart.lib.js"}');
+  // Exports:
+  return {
+    auth__signup: signup
+  };
+}));
+
+//# sourceMappingURL=signup.dart.lib.js.map

@@ -30,11 +30,6 @@ void main() async {
     //], child: MyApp())
     MultiProvider(providers: [
       ChangeNotifierProvider(create: (_) => LoginSignupProvider()),
-      StreamProvider(
-        create: (context) =>
-            context.read<FirebaseAuthService>().authStateChanges,
-        initialData: null,
-      ),
       //ChangeNotifierProvider(create: (_) => ProductDetail()),
     ], child: MyApp()),
   );
