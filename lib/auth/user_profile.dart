@@ -23,10 +23,10 @@ class UserProfile extends StatefulWidget {
   //const UserProfile({ Key? key }) : super(key: key);
   static const String routeName = "\profile";
 
-  final User user;
-  const UserProfile({Key? key, required User user})
-      : user = user,
-        super(key: key);
+  //final User user;
+  //const UserProfile({Key? key, required User user})
+  //    : user = user,
+  //      super(key: key);
 
   @override
   _UserProfileState createState() => _UserProfileState();
@@ -151,15 +151,15 @@ class _UserProfileState extends State<UserProfile> {
         //    email: _emailTextController.text.trim().toLowerCase(),
         //    password: _passTextController.text.trim());
         //final User? user = _auth.currentUser;
-        final _uid = widget.user.uid;
-        print(_uid);
+        //final _uid = widget.user.uid;
+        //print(_uid);
         //final ref = FirebaseStorage.instance
         //    .ref()
         //    .child('userImages')
         //    .child(_uid + '.jpg');
         //await ref.putFile(imageFile!);
         //imageUrl = await ref.getDownloadURL();
-        FirebaseFirestore.instance.collection('users').doc(_uid).set({
+        FirebaseFirestore.instance.collection('users').doc("_uid").set({
           'createdAt': Timestamp.now(),
           'designation': designation,
           'email': email,
@@ -170,7 +170,7 @@ class _UserProfileState extends State<UserProfile> {
           'presence': true,
           'profile_pic': 'imageUrl',
           'role': '',
-          'uid': _uid,
+          'uid': "_uid",
         });
         //Navigator.canPop(context) ? Navigator.pop(context) : null;
         Navigator.pushReplacementNamed(context, WaitingRoom.routeName);

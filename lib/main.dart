@@ -18,18 +18,13 @@ void main() async {
   await Firebase.initializeApp();
 
   runApp(
-    //MultiProvider(
-    //providers: [
-    //  Provider<FirebaseAuthService>(
-    //    create: (_) => FirebaseAuthService(),
-    //  ),
-    //  StreamProvider(
-    //    create: (context) => context.read<FirebaseAuthService>().authStateChanges,
-    //    initialData: null,
-    //  ),
-    //], child: MyApp())
     MultiProvider(providers: [
       ChangeNotifierProvider(create: (_) => LoginSignupProvider()),
+      StreamProvider(
+        create: (context) => context.read<FirebaseAuthService>().authState,
+        initialData: null,
+      ),
+
       //ChangeNotifierProvider(create: (_) => ProductDetail()),
     ], child: MyApp()),
   );
