@@ -11,8 +11,8 @@ class LoginSignupProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Users? _userDetails;
-  Users get userDetails => _userDetails!;
+  late Users _userDetails;
+  Users get userDetails => _userDetails;
 
   void setUserDetails(Users users) {
     _userDetails = users;

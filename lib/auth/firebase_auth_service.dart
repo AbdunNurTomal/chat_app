@@ -6,11 +6,9 @@ import '/models/user.dart';
 import '/pages/admin/admin_home_page.dart';
 import '/pages/customer/customer_home_page.dart';
 import '/pages/manager/manager_home_page.dart';
-import '/pages/message/message_home_page.dart';
 import '/pages/supervisor/supervisor_home_page.dart';
 import '/provider/login_signup_provider.dart';
 import '/utils/global_methods.dart';
-import '/utils/responsive_screen.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -18,8 +16,6 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'auth_dialog.dart';
-import 'login_page.dart';
-import 'user_profile.dart';
 
 class FirebaseAuthService {
   //final FirebaseAuth _firebaseAuth;
@@ -47,46 +43,22 @@ class FirebaseAuthService {
     }
 
     try {
-      User? user = _firebaseAuth.currentUser;
-      if (!user!.emailVerified) {
+      //User? user = _firebaseAuth.currentUser;
+      print('login>> user email veriried :');
+      print(_firebaseAuth.currentUser!.emailVerified);
+      if (!_firebaseAuth.currentUser!.emailVerified) {
         _firebaseAuth.signOut();
         GlobalMethod.showErrorDialog(
             error: 'Email ID not Verified', ctx: context);
-        await user.sendEmailVerification();
+        await _firebaseAuth.currentUser!.sendEmailVerification();
       } else {
-        print('auth dialog login user role');
-        await initializeCurrentUser(context, loginSignupProvider);
-        userRoleOperation(context, loginSignupProvider);
+        print('login>>auth dialog login user role');
+        Navigator.pushReplacementNamed(context, WelcomePage.routeName);
       }
     } on FirebaseException catch (error) {
       GlobalMethod.showErrorDialog(error: error.message!, ctx: context);
     }
-    // check email verification
-    //await userRoleOperation(context, loginSignupProvider);
-    //await userRoleOperation(loginSignupProvider);
 
-    //switch (loginSignupProvider.userDetails.userRole) {
-    //  case 'admin':
-    //Navigator.pushReplacementNamed(context, AdminHomePage.routeName);
-    //    Navigator.push(
-    //        context, MaterialPageRoute(builder: (_) => AdminHomePage()));
-    //    break;
-    //  case 'manager':
-    //Navigator.pushReplacementNamed(context, ManagerHomePage.routeName);
-    //    Navigator.push(
-    //        context, MaterialPageRoute(builder: (_) => ManagerHomePage()));
-    //    break;
-    //  case 'supervisor':
-    //Navigator.pushReplacementNamed(context, SupervisorHomePage.routeName);
-    //    Navigator.push(
-    //        context, MaterialPageRoute(builder: (_) => SupervisorHomePage()));
-    //    break;
-    //  default:
-    //Navigator.pushReplacementNamed(context, CustomerHomePage.routeName);
-    //    Navigator.push(
-    //        context, MaterialPageRoute(builder: (_) => CustomerHomePage()));
-    //    break;
-    //}
     //try {
     //  User? user = _firebaseAuth.currentUser;
     //  if (!user!.emailVerified) {
@@ -123,7 +95,7 @@ class FirebaseAuthService {
   // to get user details
   Future<void> getUserDetails(
       BuildContext context, LoginSignupProvider loginSignupProvider) async {
-    print('getUserDetails - ');
+    print('Firebase>> getUserDetails :');
     print(loginSignupProvider.user.email);
     try {
       await FirebaseFirestore.instance
@@ -131,18 +103,25 @@ class FirebaseAuthService {
           .doc(loginSignupProvider.user.uid)
           .get()
           .then((value) => {
+                print('data -'),
                 print(value.data().toString()),
                 if (value.data() == null)
                   {
-                    print('UserProfile'),
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => UserProfile())),
+                    print('if not set user profile'),
+                    GlobalMethod.needToSetUserProfile = true,
                   }
                 else
                   {
                     user = Users.fromMap(value.data()!),
+                    print('else set user profile :'),
                     print(user.displayName),
+                    print('Firebase>> user role :'),
+                    print(user.userRole),
                     loginSignupProvider.setUserDetails(user),
+                    print('Firebase>> user role from userDetails :'),
+                    print(loginSignupProvider.userDetails.userRole!),
+                    GlobalMethod.needToSetUserRole =
+                        loginSignupProvider.userDetails.userRole!,
                   }
               });
     } on FirebaseException catch (error) {
@@ -153,14 +132,11 @@ class FirebaseAuthService {
   // initialize current user
   Future<void> initializeCurrentUser(
       BuildContext context, LoginSignupProvider loginSignupProvider) async {
-    print("initialize Current User");
+    print("Firebase>> initialize Current User");
     if (_firebaseAuth.currentUser != null) {
       print("if");
       loginSignupProvider.setUser(_firebaseAuth.currentUser);
       await getUserDetails(context, loginSignupProvider);
-    } else {
-      print("else");
-      Navigator.push(context, MaterialPageRoute(builder: (_) => AuthDialog()));
     }
   }
 
@@ -239,17 +215,14 @@ class FirebaseAuthService {
       {required LoginSignupProvider loginSignupProvider,
       required BuildContext context}) async {
     UserCredential userCredential;
+    print('Firebase>> signInWithGoogle :');
 
     if (kIsWeb) {
       GoogleAuthProvider authProvider = GoogleAuthProvider();
 
       try {
         userCredential = await _firebaseAuth.signInWithPopup(authProvider);
-        if (userCredential.user != null) {
-          print('signInWithGoogle user role');
-          await initializeCurrentUser(context, loginSignupProvider);
-          userRoleOperation(context, loginSignupProvider);
-        }
+        print('for web');
       } on FirebaseException catch (error) {
         GlobalMethod.showErrorDialog(error: error.message!, ctx: context);
       }
@@ -269,11 +242,7 @@ class FirebaseAuthService {
 
         try {
           userCredential = await _firebaseAuth.signInWithCredential(credential);
-          if (userCredential.user != null) {
-            print('signInWithGoogle user role');
-            await initializeCurrentUser(context, loginSignupProvider);
-            userRoleOperation(context, loginSignupProvider);
-          }
+          print('for android');
         } on FirebaseException catch (error) {
           if (error.code == 'account-exists-with-different-credential') {
             GlobalMethod.showErrorDialog(

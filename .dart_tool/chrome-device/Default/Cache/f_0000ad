@@ -1,0 +1,519 @@
+define(['dart_sdk', 'packages/flutter/src/widgets/widget_span.dart', 'packages/flutter/src/painting/alignment.dart', 'packages/flutter/src/painting/box_fit.dart', 'packages/websafe_svg/src/platform/browser/browser_svg_loader.dart', 'packages/flutter/src/widgets/animated_switcher.dart', 'packages/flutter_svg/svg.dart', 'packages/logging/src/logger.dart'], (function load__packages__websafe_svg__src__platform__browser__browser_svg_dart(dart_sdk, packages__flutter__src__widgets__widget_span$46dart, packages__flutter__src__painting__alignment$46dart, packages__flutter__src__painting__box_fit$46dart, packages__websafe_svg__src__platform__browser__browser_svg_loader$46dart, packages__flutter__src__widgets__animated_switcher$46dart, packages__flutter_svg__svg$46dart, packages__logging__src__logger$46dart) {
+  'use strict';
+  const core = dart_sdk.core;
+  const ui = dart_sdk.ui;
+  const _internal = dart_sdk._internal;
+  const js = dart_sdk.js;
+  const _native_typed_data = dart_sdk._native_typed_data;
+  const convert = dart_sdk.convert;
+  const async = dart_sdk.async;
+  const typed_data = dart_sdk.typed_data;
+  const dart = dart_sdk.dart;
+  const dartx = dart_sdk.dartx;
+  const framework = packages__flutter__src__widgets__widget_span$46dart.src__widgets__framework;
+  const basic = packages__flutter__src__widgets__widget_span$46dart.src__widgets__basic;
+  const widget_inspector = packages__flutter__src__widgets__widget_span$46dart.src__widgets__widget_inspector;
+  const container = packages__flutter__src__widgets__widget_span$46dart.src__widgets__container;
+  const image = packages__flutter__src__widgets__widget_span$46dart.src__widgets__image;
+  const alignment = packages__flutter__src__painting__alignment$46dart.src__painting__alignment;
+  const box_fit = packages__flutter__src__painting__box_fit$46dart.src__painting__box_fit;
+  const browser_svg_loader = packages__websafe_svg__src__platform__browser__browser_svg_loader$46dart.src__platform__browser__browser_svg_loader;
+  const animated_switcher = packages__flutter__src__widgets__animated_switcher$46dart.src__widgets__animated_switcher;
+  const svg = packages__flutter_svg__svg$46dart.svg;
+  const logger = packages__logging__src__logger$46dart.src__logger;
+  var browser_svg = Object.create(dart.library);
+  var $_equals = dartx._equals;
+  var $toList = dartx.toList;
+  dart._checkModuleNullSafetyMode(true);
+  var T = {
+    VoidTovoid: () => (T.VoidTovoid = dart.constFn(dart.fnType(dart.void, [])))()
+  };
+  const CT = Object.create({
+    _: () => (C, CT)
+  });
+  dart.defineLazy(CT, {
+    get C1() {
+      return C[1] = dart.constList([], widget_inspector._Location);
+    },
+    get C0() {
+      return C[0] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[1] || CT.C1,
+        [_Location_name]: null,
+        [_Location_column]: 13,
+        [_Location_line]: 95,
+        [_Location_file]: "file:///C:/Users/Tomal/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/websafe_svg-2.0.0/lib/src/platform/browser/browser_svg.dart"
+      });
+    },
+    get C4() {
+      return C[4] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "builder",
+        [_Location_column]: 21,
+        [_Location_line]: 96,
+        [_Location_file]: null
+      });
+    },
+    get C3() {
+      return C[3] = dart.constList([C[4] || CT.C4], widget_inspector._Location);
+    },
+    get C2() {
+      return C[2] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[3] || CT.C3,
+        [_Location_name]: null,
+        [_Location_column]: 13,
+        [_Location_line]: 96,
+        [_Location_file]: "file:///C:/Users/Tomal/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/websafe_svg-2.0.0/lib/src/platform/browser/browser_svg.dart"
+      });
+    },
+    get C7() {
+      return C[7] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "bytes",
+        [_Location_column]: 30,
+        [_Location_line]: 106,
+        [_Location_file]: null
+      });
+    },
+    get C8() {
+      return C[8] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "color",
+        [_Location_column]: 19,
+        [_Location_line]: 107,
+        [_Location_file]: null
+      });
+    },
+    get C9() {
+      return C[9] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "height",
+        [_Location_column]: 19,
+        [_Location_line]: 108,
+        [_Location_file]: null
+      });
+    },
+    get C10() {
+      return C[10] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "fit",
+        [_Location_column]: 19,
+        [_Location_line]: 109,
+        [_Location_file]: null
+      });
+    },
+    get C11() {
+      return C[11] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "width",
+        [_Location_column]: 19,
+        [_Location_line]: 110,
+        [_Location_file]: null
+      });
+    },
+    get C6() {
+      return C[6] = dart.constList([C[7] || CT.C7, C[8] || CT.C8, C[9] || CT.C9, C[10] || CT.C10, C[11] || CT.C11], widget_inspector._Location);
+    },
+    get C5() {
+      return C[5] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[6] || CT.C6,
+        [_Location_name]: null,
+        [_Location_column]: 28,
+        [_Location_line]: 105,
+        [_Location_file]: "file:///C:/Users/Tomal/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/websafe_svg-2.0.0/lib/src/platform/browser/browser_svg.dart"
+      });
+    },
+    get C14() {
+      return C[14] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "src",
+        [_Location_column]: 27,
+        [_Location_line]: 117,
+        [_Location_file]: null
+      });
+    },
+    get C15() {
+      return C[15] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "color",
+        [_Location_column]: 21,
+        [_Location_line]: 118,
+        [_Location_file]: null
+      });
+    },
+    get C16() {
+      return C[16] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "height",
+        [_Location_column]: 21,
+        [_Location_line]: 119,
+        [_Location_file]: null
+      });
+    },
+    get C17() {
+      return C[17] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "fit",
+        [_Location_column]: 21,
+        [_Location_line]: 120,
+        [_Location_file]: null
+      });
+    },
+    get C18() {
+      return C[18] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "width",
+        [_Location_column]: 21,
+        [_Location_line]: 121,
+        [_Location_file]: null
+      });
+    },
+    get C13() {
+      return C[13] = dart.constList([C[14] || CT.C14, C[15] || CT.C15, C[16] || CT.C16, C[17] || CT.C17, C[18] || CT.C18], widget_inspector._Location);
+    },
+    get C12() {
+      return C[12] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[13] || CT.C13,
+        [_Location_name]: null,
+        [_Location_column]: 32,
+        [_Location_line]: 116,
+        [_Location_file]: "file:///C:/Users/Tomal/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/websafe_svg-2.0.0/lib/src/platform/browser/browser_svg.dart"
+      });
+    },
+    get C21() {
+      return C[21] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "height",
+        [_Location_column]: 19,
+        [_Location_line]: 113,
+        [_Location_file]: null
+      });
+    },
+    get C22() {
+      return C[22] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "width",
+        [_Location_column]: 19,
+        [_Location_line]: 114,
+        [_Location_file]: null
+      });
+    },
+    get C23() {
+      return C[23] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "alignment",
+        [_Location_column]: 19,
+        [_Location_line]: 115,
+        [_Location_file]: null
+      });
+    },
+    get C24() {
+      return C[24] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "child",
+        [_Location_column]: 19,
+        [_Location_line]: 116,
+        [_Location_file]: null
+      });
+    },
+    get C20() {
+      return C[20] = dart.constList([C[21] || CT.C21, C[22] || CT.C22, C[23] || CT.C23, C[24] || CT.C24], widget_inspector._Location);
+    },
+    get C19() {
+      return C[19] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[20] || CT.C20,
+        [_Location_name]: null,
+        [_Location_column]: 17,
+        [_Location_line]: 112,
+        [_Location_file]: "file:///C:/Users/Tomal/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/websafe_svg-2.0.0/lib/src/platform/browser/browser_svg.dart"
+      });
+    },
+    get C27() {
+      return C[27] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "duration",
+        [_Location_column]: 7,
+        [_Location_line]: 101,
+        [_Location_file]: null
+      });
+    },
+    get C28() {
+      return C[28] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: null,
+        [_Location_name]: "child",
+        [_Location_column]: 7,
+        [_Location_line]: 102,
+        [_Location_file]: null
+      });
+    },
+    get C26() {
+      return C[26] = dart.constList([C[27] || CT.C27, C[28] || CT.C28], widget_inspector._Location);
+    },
+    get C25() {
+      return C[25] = dart.const({
+        __proto__: widget_inspector._Location.prototype,
+        [_Location_parameterLocations]: C[26] || CT.C26,
+        [_Location_name]: null,
+        [_Location_column]: 12,
+        [_Location_line]: 100,
+        [_Location_file]: "file:///C:/Users/Tomal/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/websafe_svg-2.0.0/lib/src/platform/browser/browser_svg.dart"
+      });
+    }
+  }, false);
+  var C = Array(29).fill(void 0);
+  var I = ["package:websafe_svg/src/platform/browser/browser_svg.dart"];
+  var alignment$ = dart.privateName(browser_svg, "BrowserSvg.alignment");
+  var color$ = dart.privateName(browser_svg, "BrowserSvg.color");
+  var excludeFromSemantics$ = dart.privateName(browser_svg, "BrowserSvg.excludeFromSemantics");
+  var fit$ = dart.privateName(browser_svg, "BrowserSvg.fit");
+  var height$ = dart.privateName(browser_svg, "BrowserSvg.height");
+  var loader$ = dart.privateName(browser_svg, "BrowserSvg.loader");
+  var placeholderBuilder$ = dart.privateName(browser_svg, "BrowserSvg.placeholderBuilder");
+  var semanticsLabel$ = dart.privateName(browser_svg, "BrowserSvg.semanticsLabel");
+  var width$ = dart.privateName(browser_svg, "BrowserSvg.width");
+  browser_svg.BrowserSvg = class BrowserSvg extends framework.StatefulWidget {
+    get alignment() {
+      return this[alignment$];
+    }
+    set alignment(value) {
+      super.alignment = value;
+    }
+    get color() {
+      return this[color$];
+    }
+    set color(value) {
+      super.color = value;
+    }
+    get excludeFromSemantics() {
+      return this[excludeFromSemantics$];
+    }
+    set excludeFromSemantics(value) {
+      super.excludeFromSemantics = value;
+    }
+    get fit() {
+      return this[fit$];
+    }
+    set fit(value) {
+      super.fit = value;
+    }
+    get height() {
+      return this[height$];
+    }
+    set height(value) {
+      super.height = value;
+    }
+    get loader() {
+      return this[loader$];
+    }
+    set loader(value) {
+      super.loader = value;
+    }
+    get placeholderBuilder() {
+      return this[placeholderBuilder$];
+    }
+    set placeholderBuilder(value) {
+      super.placeholderBuilder = value;
+    }
+    get semanticsLabel() {
+      return this[semanticsLabel$];
+    }
+    set semanticsLabel(value) {
+      super.semanticsLabel = value;
+    }
+    get width() {
+      return this[width$];
+    }
+    set width(value) {
+      super.width = value;
+    }
+    createState() {
+      return new browser_svg._BrowserSvgState.new();
+    }
+  };
+  (browser_svg.BrowserSvg.new = function(opts) {
+    let alignment = opts && 'alignment' in opts ? opts.alignment : null;
+    let color = opts && 'color' in opts ? opts.color : null;
+    let excludeFromSemantics = opts && 'excludeFromSemantics' in opts ? opts.excludeFromSemantics : null;
+    let fit = opts && 'fit' in opts ? opts.fit : null;
+    let height = opts && 'height' in opts ? opts.height : null;
+    let key = opts && 'key' in opts ? opts.key : null;
+    let loader = opts && 'loader' in opts ? opts.loader : null;
+    let placeholderBuilder = opts && 'placeholderBuilder' in opts ? opts.placeholderBuilder : null;
+    let semanticsLabel = opts && 'semanticsLabel' in opts ? opts.semanticsLabel : null;
+    let width = opts && 'width' in opts ? opts.width : null;
+    let $36creationLocationd_0dea112b090073317d4 = opts && '$creationLocationd_0dea112b090073317d4' in opts ? opts.$creationLocationd_0dea112b090073317d4 : null;
+    this[alignment$] = alignment;
+    this[color$] = color;
+    this[excludeFromSemantics$] = excludeFromSemantics;
+    this[fit$] = fit;
+    this[height$] = height;
+    this[loader$] = loader;
+    this[placeholderBuilder$] = placeholderBuilder;
+    this[semanticsLabel$] = semanticsLabel;
+    this[width$] = width;
+    browser_svg.BrowserSvg.__proto__.new.call(this, {key: key, $creationLocationd_0dea112b090073317d4: $36creationLocationd_0dea112b090073317d4});
+    ;
+  }).prototype = browser_svg.BrowserSvg.prototype;
+  dart.addTypeTests(browser_svg.BrowserSvg);
+  dart.addTypeCaches(browser_svg.BrowserSvg);
+  dart.setMethodSignature(browser_svg.BrowserSvg, () => ({
+    __proto__: dart.getMethods(browser_svg.BrowserSvg.__proto__),
+    createState: dart.fnType(browser_svg._BrowserSvgState, [])
+  }));
+  dart.setLibraryUri(browser_svg.BrowserSvg, I[0]);
+  dart.setFieldSignature(browser_svg.BrowserSvg, () => ({
+    __proto__: dart.getFields(browser_svg.BrowserSvg.__proto__),
+    alignment: dart.finalFieldType(alignment.Alignment),
+    color: dart.finalFieldType(dart.nullable(ui.Color)),
+    excludeFromSemantics: dart.finalFieldType(core.bool),
+    fit: dart.finalFieldType(box_fit.BoxFit),
+    height: dart.finalFieldType(dart.nullable(core.double)),
+    loader: dart.finalFieldType(browser_svg_loader.BrowserSvgLoader),
+    placeholderBuilder: dart.finalFieldType(dart.nullable(dart.fnType(framework.Widget, [framework.BuildContext]))),
+    semanticsLabel: dart.finalFieldType(dart.nullable(core.String)),
+    width: dart.finalFieldType(dart.nullable(core.double))
+  }));
+  var _loadIndex = dart.privateName(browser_svg, "_loadIndex");
+  var _image = dart.privateName(browser_svg, "_image");
+  var _imageBytes = dart.privateName(browser_svg, "_imageBytes");
+  var ___BrowserSvgState__loader = dart.privateName(browser_svg, "_#_BrowserSvgState#_loader");
+  var _loader = dart.privateName(browser_svg, "_loader");
+  var _loadImage = dart.privateName(browser_svg, "_loadImage");
+  var _Location_parameterLocations = dart.privateName(widget_inspector, "_Location.parameterLocations");
+  var _Location_name = dart.privateName(widget_inspector, "_Location.name");
+  var _Location_column = dart.privateName(widget_inspector, "_Location.column");
+  var _Location_line = dart.privateName(widget_inspector, "_Location.line");
+  var _Location_file = dart.privateName(widget_inspector, "_Location.file");
+  var _buildPlaceholder = dart.privateName(browser_svg, "_buildPlaceholder");
+  browser_svg._BrowserSvgState = class _BrowserSvgState extends framework.State$(browser_svg.BrowserSvg) {
+    get [_loader]() {
+      let t0;
+      t0 = this[___BrowserSvgState__loader];
+      return t0 == null ? dart.throw(new _internal.LateError.fieldNI("_loader")) : t0;
+    }
+    set [_loader](t0) {
+      this[___BrowserSvgState__loader] = t0;
+    }
+    get rendererCanvasKit() {
+      return js.context._get("flutterCanvasKit") != null;
+    }
+    initState() {
+      super.initState();
+      this[_loader] = this.widget.loader;
+      this[_loadImage]();
+    }
+    didUpdateWidget(oldWidget) {
+      browser_svg.BrowserSvg.as(oldWidget);
+      super.didUpdateWidget(oldWidget);
+      if (!this.widget.loader[$_equals](oldWidget.loader)) {
+        this[_loader] = this.widget.loader;
+        this[_loadImage]();
+      }
+    }
+    [_loadImage]() {
+      return async.async(dart.void, (function* _loadImage() {
+        if (this.mounted === true) {
+          this.setState(dart.fn(() => {
+          }, T.VoidTovoid()));
+        }
+        this[_loadIndex] = this[_loadIndex] + 1;
+        let idx = this[_loadIndex];
+        try {
+          let image = (yield this[_loader].load());
+          if (idx === this[_loadIndex]) {
+            this[_imageBytes] = _native_typed_data.NativeUint8List.fromList(convert.utf8.encode(image));
+            let b64 = convert.base64.encode(dart.nullCheck(this[_imageBytes])[$toList]());
+            image = "data:image/svg+xml;base64," + b64;
+            this[_image] = image;
+            if (this.mounted === true) {
+              this.setState(dart.fn(() => {
+              }, T.VoidTovoid()));
+            }
+          }
+        } catch (e$) {
+          let e = dart.getThrown(e$);
+          let stack = dart.stackTrace(e$);
+          if (core.Object.is(e)) {
+            browser_svg._BrowserSvgState._logger.info("Error loading SVG", e, stack);
+          } else
+            throw e$;
+        }
+      }).bind(this));
+    }
+    [_buildPlaceholder](context) {
+      return this.widget.placeholderBuilder == null ? new basic.SizedBox.new({$creationLocationd_0dea112b090073317d4: C[0] || CT.C0}) : new basic.Builder.new({builder: dart.nullCheck(this.widget.placeholderBuilder), $creationLocationd_0dea112b090073317d4: C[2] || CT.C2});
+    }
+    build(context) {
+      return new animated_switcher.AnimatedSwitcher.new({duration: new core.Duration.new({milliseconds: 100}), child: this[_image] == null ? this[_buildPlaceholder](context) : this.rendererCanvasKit ? new svg.SvgPicture.memory(dart.nullCheck(this[_imageBytes]), {color: this.widget.color, height: this.widget.height, fit: this.widget.fit, width: this.widget.width, $creationLocationd_0dea112b090073317d4: C[5] || CT.C5}) : new container.Container.new({height: this.widget.height, width: this.widget.width, alignment: alignment.Alignment.center, child: new image.Image.network(dart.nullCheck(this[_image]), {color: this.widget.color, height: this.widget.height, fit: this.widget.fit, width: this.widget.width, $creationLocationd_0dea112b090073317d4: C[12] || CT.C12}), $creationLocationd_0dea112b090073317d4: C[19] || CT.C19}), $creationLocationd_0dea112b090073317d4: C[25] || CT.C25});
+    }
+  };
+  (browser_svg._BrowserSvgState.new = function() {
+    this[_loadIndex] = 0;
+    this[_image] = null;
+    this[_imageBytes] = null;
+    this[___BrowserSvgState__loader] = null;
+    browser_svg._BrowserSvgState.__proto__.new.call(this);
+    ;
+  }).prototype = browser_svg._BrowserSvgState.prototype;
+  dart.addTypeTests(browser_svg._BrowserSvgState);
+  dart.addTypeCaches(browser_svg._BrowserSvgState);
+  dart.setMethodSignature(browser_svg._BrowserSvgState, () => ({
+    __proto__: dart.getMethods(browser_svg._BrowserSvgState.__proto__),
+    [_loadImage]: dart.fnType(async.Future$(dart.void), []),
+    [_buildPlaceholder]: dart.fnType(framework.Widget, [framework.BuildContext]),
+    build: dart.fnType(framework.Widget, [framework.BuildContext])
+  }));
+  dart.setGetterSignature(browser_svg._BrowserSvgState, () => ({
+    __proto__: dart.getGetters(browser_svg._BrowserSvgState.__proto__),
+    [_loader]: browser_svg_loader.BrowserSvgLoader,
+    rendererCanvasKit: core.bool
+  }));
+  dart.setSetterSignature(browser_svg._BrowserSvgState, () => ({
+    __proto__: dart.getSetters(browser_svg._BrowserSvgState.__proto__),
+    [_loader]: browser_svg_loader.BrowserSvgLoader
+  }));
+  dart.setLibraryUri(browser_svg._BrowserSvgState, I[0]);
+  dart.setFieldSignature(browser_svg._BrowserSvgState, () => ({
+    __proto__: dart.getFields(browser_svg._BrowserSvgState.__proto__),
+    [_loadIndex]: dart.fieldType(core.int),
+    [_image]: dart.fieldType(dart.nullable(core.String)),
+    [_imageBytes]: dart.fieldType(dart.nullable(typed_data.Uint8List)),
+    [___BrowserSvgState__loader]: dart.fieldType(dart.nullable(browser_svg_loader.BrowserSvgLoader))
+  }));
+  dart.defineLazy(browser_svg._BrowserSvgState, {
+    /*browser_svg._BrowserSvgState._logger*/get _logger() {
+      return logger.Logger.new("_BrowserSvgState");
+    }
+  }, false);
+  dart.trackLibraries("packages/websafe_svg/src/platform/browser/browser_svg.dart", {
+    "package:websafe_svg/src/platform/browser/browser_svg.dart": browser_svg
+  }, {
+  }, '{"version":3,"sourceRoot":"","sources":["browser_svg.dart"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;IAwBkB;;;;;;IACH;;;;;;IACF;;;;;;IACE;;;;;;IACC;;;;;;IACS;;;;;;IACF;;;;;;IACP;;;;;;IACA;;;;;;;AAGoB;IAAkB;;;QAvBpC;QACT;QACS;QACA;QACA;QACT;QACS;QACA;QACA;QACA;;IATA;IACT;IACS;IACA;IACA;IAEA;IACA;IACA;IACA;AACX,0DAAW,GAAG;;EAAC;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAsBE;;IAAO;;AAAP;IAAO;;AAEC,YAAG,AAAO,AAAqB,iBAApB;IAA2B;;AAIjD,MAAX;AAEiB,MAAvB,gBAAU,AAAO;AACL,MAAZ;IACF;;gCAGgC;AACE,MAA1B,sBAAgB,SAAS;AAE/B,WAAI,AAAO,6BAAU,AAAU,SAAD;AACL,QAAvB,gBAAU,AAAO;AACL,QAAZ;;IAEJ;;AAEuB;AACrB,YAAI,AAAQ,iBAAG;AACE,UAAf,cAAS;;;AAEC,QAAZ,mBAAA,AAAU,mBAAA;AACN,kBAAM;AAEV;AACM,uBAAQ,MAAM,AAAQ;AAE1B,cAAI,AAAI,GAAD,KAAI;AAC2C,YAApD,oBAAwB,4CAAS,AAAK,oBAAO,KAAK;AAC9C,sBAAM,AAAO,sBAAkB,AAAE,eAAb;AACgB,YAAxC,QAAQ,AAAgC,+BAAJ,GAAG;AAEzB,YAAd,eAAS,KAAK;AAEd,gBAAI,AAAQ,iBAAG;AACE,cAAf,cAAS;;;;;cAGN;cAAG;AAAV;AAC2C,YAA3C,AAAQ,0CAAK,qBAAqB,CAAC,EAAE,KAAK;;;;MAE9C;;wBAEsC;AAClC,YAAA,AAAO,AAAmB,0CACpB,kFACA,gCAA0C,eAAzB,AAAO;IAAoB;UAG5B;AACxB,YAAO,uDACK,qCAAuB,cAC1B,AAAO,uBACR,wBAAkB,OAAO,IACzB,yBACe,0BACE,eAAX,4BACO,AAAO,2BACN,AAAO,yBACV,AAAO,wBACL,AAAO,6EAEhB,qCACU,AAAO,2BACR,AAAO,8BACO,mCACR,wBACL,eAAN,uBACO,AAAO,2BACN,AAAO,yBACV,AAAO,wBACL,AAAO;IAIhC;;;IAnFI,mBAAa;IACT;IACG;uCACW;;;EAiFxB;;;;;;;;;;;;;;;;;;;;;;;;;;;MAtFsB,oCAAO;YAAG,mBAAO","file":"../../../../../../../../../../../../../../F:/packages/websafe_svg/src/platform/browser/browser_svg.dart.lib.js"}');
+  // Exports:
+  return {
+    src__platform__browser__browser_svg: browser_svg
+  };
+}));
+
+//# sourceMappingURL=browser_svg.dart.lib.js.map

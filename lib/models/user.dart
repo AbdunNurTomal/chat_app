@@ -27,13 +27,12 @@ class Users {
   //  this.userDesignation = '',
   //  this.createdDateTime = '',
   //});
-  Users({
-    this.displayName,
-    this.userEmail,
-    this.userPassword,
-    this.userUid,
-    this.userRole
-  });
+  Users(
+      {this.displayName,
+      this.userEmail,
+      this.userPassword,
+      this.userUid,
+      this.userRole});
 
   //Users({userPassword, displayName, userEmail, userUid});
 
@@ -65,7 +64,7 @@ class Users {
   //      createdDateTime: data["created_date_time"],
   //    );
   factory Users.fromMap(Map<String, dynamic> data) => Users(
-        displayName: data["displayName"],
+        displayName: data["display_name"],
         userEmail: data["email"],
         userPassword: data["password"],
         userUid: data["uid"],
@@ -82,19 +81,29 @@ class Users {
   //  );
   //}
 
+  //Map<String, dynamic> toMap() {
+  //  return {
+  //    'display_name': displayName,
+  //    'email': userEmail,
+  //    'phone': userPhone,
+  //    'password': userPassword,
+  //    'role': userRole,
+  //    'last_seen': userLastSeen,
+  //    'presence': userPresence,
+  //    'profile_pic': userProfilePicUrl,
+  //    'designation': userDesignation,
+  //    'uid': userUid,
+  //    'created_date_time': createdDateTime
+  //  };
+  //}
+
   Map<String, dynamic> toMap() {
     return {
       'display_name': displayName,
       'email': userEmail,
-      'phone': userPhone,
       'password': userPassword,
       'role': userRole,
-      'last_seen': userLastSeen,
-      'presence': userPresence,
-      'profile_pic': userProfilePicUrl,
-      'designation': userDesignation,
       'uid': userUid,
-      'created_date_time': createdDateTime
     };
   }
 }

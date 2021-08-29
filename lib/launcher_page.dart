@@ -1,6 +1,5 @@
 import 'package:chat_app/welcome_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'auth/auth_dialog.dart';
 
@@ -23,38 +22,41 @@ class _LauncherPageState extends State<LauncherPage> {
           if (snapshot.hasError) {
             return Text(snapshot.error.toString());
           } else {
+            //Future.delayed(Duration(seconds: 2), () {
+            //  print("delay 2 seconds");
+            //});
             switch (snapshot.connectionState) {
               case ConnectionState.waiting:
-                print('waiting');
+                print('Launcher>> waiting');
                 return _circularSpin();
               case ConnectionState.active:
-                print('active');
+                print('Launcher>> active');
                 final user = snapshot.data;
                 if (user != null) {
                   if (FirebaseAuth.instance.currentUser!.emailVerified ==
                       false) {
-                    print('Email not verified');
+                    print('Launcher>> email not verified');
                     FirebaseAuth.instance.signOut();
                     //GlobalMethod.showErrorDialog(error: 'Email ID not Verified', ctx: context);
                     //user.sendEmailVerification();
-                    return Text('Send email verification');
+                    return Text('Launcher>> send email verification');
                   } else {
-                    print('Email verified');
+                    print('Launcher>> email verified');
                     return WelcomePage();
                     //return Text('Email verified');
                   }
                 } else {
-                  print('Login page');
+                  print('Launcher>> login page');
                   return AuthDialog();
                 }
               case ConnectionState.done:
-                print('done');
+                print('Launcher>> done');
                 return Text('done');
               case ConnectionState.none:
-                print('none');
+                print('Launcher>> none');
                 return Text('none');
               default:
-                print('default');
+                print('Launcher>> default');
                 return Text('default');
             }
           }

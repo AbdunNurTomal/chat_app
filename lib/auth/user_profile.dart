@@ -34,11 +34,12 @@ class UserProfile extends StatefulWidget {
 
 class _UserProfileState extends State<UserProfile> {
   //User? _user;
-  String displayName = '';
-  String email = '';
-  String phone = '';
-  String password = '';
-  String designation = '';
+  String _uid = '';
+  String _displayName = '';
+  String _email = '';
+  String _phone = '';
+  String _password = '';
+  String _designation = '';
 
   final TextEditingController _displayNameController = TextEditingController();
   final TextEditingController _emailTextController = TextEditingController();
@@ -80,51 +81,32 @@ class _UserProfileState extends State<UserProfile> {
   //    _uid = _currentUser.uid;
   //    displayName = _currentUser.username;
   //    _displayNameController.text = displayName;
-//
+  //
   //    _email = _currentUser.email;
   //  });
   //}
 
   @override
   void initState() {
-    //LoginSignupProvider loginSignupProvider =
-    //Provider.of<LoginSignupProvider>(context, listen: false);
+    LoginSignupProvider loginSignupProvider =
+        Provider.of<LoginSignupProvider>(context, listen: false);
     //_user = widget.user;
     //print("Use : $_user");
 
-    //if (_user != null) {
-    //  _displayNameController.text = _user!.displayName!;
-    //  _emailTextController.text = _user!.email!;
-    //  _phoneNumberController.text = _user!.phoneNumber!;
-    //}
-    super.initState();
-    //getCurrentUser();
-  }
+    _uid = loginSignupProvider.user.uid;
+    _displayNameController.text = loginSignupProvider.user.displayName!;
+    _emailTextController.text = loginSignupProvider.user.email!;
 
-  @override
-  void didChangeDependencies() {
-    //imageFile = _user.photoURL!;
-    //if (_user != null) {
-    //  if (_user.displayName!.isNotEmpty) {
-    //    _displayNameController.text = _user!.displayName!;
-    //  }
-    //  if (_user.email!.isNotEmpty) {
-    //    _emailTextController.text = _user!.email!;
-    //  }
-    //  if (_user.phoneNumber!) {
-    //    _phoneNumberController.text = _user!.phoneNumber!;
-    //  }
-    //}
-    super.didChangeDependencies();
+    super.initState();
   }
 
   @override
   void dispose() {
-    //  _displayNameController.dispose();
-    //  _emailTextController.dispose();
-    //  _phoneNumberController.dispose();
-    //  _passTextController.dispose();
-    //  _positionCPTextController.dispose();
+    _displayNameController.dispose();
+    _emailTextController.dispose();
+    _phoneNumberController.dispose();
+    _passTextController.dispose();
+    _positionCPTextController.dispose();
 
     _emailFocusNode.dispose();
     _phoneNumberFocusNode.dispose();
@@ -151,7 +133,7 @@ class _UserProfileState extends State<UserProfile> {
         //    email: _emailTextController.text.trim().toLowerCase(),
         //    password: _passTextController.text.trim());
         //final User? user = _auth.currentUser;
-        //final _uid = widget.user.uid;
+        //final _uid = loginSignupProvider.user.uid;
         //print(_uid);
         //final ref = FirebaseStorage.instance
         //    .ref()
@@ -159,25 +141,22 @@ class _UserProfileState extends State<UserProfile> {
         //    .child(_uid + '.jpg');
         //await ref.putFile(imageFile!);
         //imageUrl = await ref.getDownloadURL();
-        FirebaseFirestore.instance.collection('users').doc("_uid").set({
+        await FirebaseFirestore.instance.collection('users').doc(_uid).set({
           'createdAt': Timestamp.now(),
-          'designation': designation,
-          'email': email,
-          'display_name': displayName,
+          'designation': _positionCPTextController.text,
+          'email': _emailTextController.text,
+          'display_name': _displayNameController.text,
           'last_seen': Timestamp.now(),
-          'password': password,
-          'phone': phone,
+          'password': _passTextController.text,
+          'phone': _phoneNumberController.text,
           'presence': true,
           'profile_pic': 'imageUrl',
           'role': '',
-          'uid': "_uid",
+          'uid': _uid,
         });
-        //Navigator.canPop(context) ? Navigator.pop(context) : null;
-        Navigator.pushReplacementNamed(context, WaitingRoom.routeName);
+        Navigator.canPop(context) ? Navigator.pop(context) : null;
+        //Navigator.pushReplacementNamed(context, WaitingRoom.routeName);
       } on FirebaseException catch (error) {
-        setState(() {
-          _isLoading = false;
-        });
         GlobalMethod.showErrorDialog(error: error.message!, ctx: context);
       }
     }
@@ -366,23 +345,23 @@ class _UserProfileState extends State<UserProfile> {
                 color: CustomColors.secondaryColor,
                 border: Border.all(color: Colors.blue)),
             child: TextFormField(
-              //readOnly: (_user!.displayName!.isNotEmpty) ? true : false,
+              readOnly: (_displayName.isNotEmpty) ? true : false,
               textInputAction: TextInputAction.next,
               onEditingComplete: () =>
                   FocusScope.of(context).requestFocus(_emailFocusNode),
               keyboardType: TextInputType.name,
-              onSaved: (value) {
-                displayName = value!;
-              },
-              //controller: _displayNameController,
-              //initialValue: _user!.displayName,
-              //validator: (value) {
-              //  if (value!.isEmpty) {
-              //    return "This Field is missing";
-              //  } else {
-              //    return null;
-              //  }
+              //onSaved: (value) {
+              //  displayName = value!;
               //},
+              controller: _displayNameController,
+              //initialValue: _displayName,
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return "This Field is missing";
+                } else {
+                  return null;
+                }
+              },
               style: GoogleFonts.openSans(color: Colors.white),
               decoration: InputDecoration(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 10),
@@ -400,17 +379,18 @@ class _UserProfileState extends State<UserProfile> {
                 color: CustomColors.secondaryColor,
                 border: Border.all(color: Colors.blue)),
             child: TextFormField(
-              //readOnly: (_user!.email!.isNotEmpty) ? true : false,
+              readOnly: (_email.isNotEmpty) ? true : false,
               textInputAction: TextInputAction.next,
               onEditingComplete: () =>
                   FocusScope.of(context).requestFocus(_phoneNumberFocusNode),
               focusNode: _emailFocusNode,
               keyboardType: TextInputType.emailAddress,
-              onSaved: (value) {
-                email = value!;
-              },
-              //controller: _emailTextController,
-              //initialValue: _user!.email,
+              //onSaved: (value) {
+              //  email = value!;
+              //},
+              controller: _emailTextController,
+              validator: (value) => GlobalMethod.validateEmail(value!),
+              //initialValue: _email,
               //validator: (value) {
               //  if (value!.isEmpty || !value.contains("@")) {
               //    return "Please enter a valid Email adress";
@@ -435,17 +415,18 @@ class _UserProfileState extends State<UserProfile> {
                 color: CustomColors.secondaryColor,
                 border: Border.all(color: Colors.blue)),
             child: TextFormField(
-              //readOnly: (_user!.phoneNumber!.isNotEmpty) ? true : false,
+              readOnly: (_phone.isNotEmpty) ? true : false,
               focusNode: _phoneNumberFocusNode,
               textInputAction: TextInputAction.next,
               onEditingComplete: () =>
                   FocusScope.of(context).requestFocus(_passFocusNode),
               keyboardType: TextInputType.phone,
-              onSaved: (value) {
-                phone = value!;
-              },
-              //controller: _phoneNumberController,
-              //initialValue: _user!.phoneNumber,
+              //onSaved: (value) {
+              //  phone = value!;
+              //},
+              controller: _phoneNumberController,
+              validator: (value) => GlobalMethod.validatePhone(value!),
+              //initialValue: _phone,
               //validator: (value) {
               //  if (value!.isEmpty) {
               //    return "This Field is missing";
@@ -479,10 +460,11 @@ class _UserProfileState extends State<UserProfile> {
               focusNode: _passFocusNode,
               obscureText: _obscureText,
               keyboardType: TextInputType.visiblePassword,
-              onSaved: (value) {
-                password = value!;
-              },
-              //controller: _passTextController,
+              //onSaved: (value) {
+              //  password = value!;
+              //},
+              controller: _passTextController,
+              validator: (value) => GlobalMethod.validatePassword(value!),
               //validator: (value) {
               //  if (value!.isEmpty || value.length < 7) {
               //    return "Please enter a valid password";
@@ -527,10 +509,10 @@ class _UserProfileState extends State<UserProfile> {
                 onEditingComplete: () {},
                 focusNode: _positionCPFocusNode,
                 keyboardType: TextInputType.name,
-                onSaved: (value) {
-                  designation = value!;
-                },
-                //controller: _positionCPTextController,
+                //onSaved: (value) {
+                //  designation = value!;
+                //},
+                controller: _positionCPTextController,
                 validator: (value) {
                   if (value!.isEmpty) {
                     return "This field is missing";
@@ -663,7 +645,8 @@ class _UserProfileState extends State<UserProfile> {
                     return InkWell(
                       onTap: () {
                         setState(() {
-                          designation = Constants.jobsList[index];
+                          _positionCPTextController.text =
+                              Constants.jobsList[index];
                           jobItem = true;
                         });
                         Navigator.pop(context);

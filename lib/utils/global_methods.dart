@@ -5,6 +5,10 @@ import 'custom_color.dart';
 
 class GlobalMethod {
   //static String errorMsg = '';
+  static bool needToSetUserProfile = false;
+  static String needToSetUserRole = '';
+  static bool isLoggedIn = false;
+
   static dynamic screenSize(
       {required context, required String sizeWidthHeight}) {
     Size size = MediaQuery.of(context).size;
