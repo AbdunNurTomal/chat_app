@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:chat_app/auth/firebase_auth_service.dart';
 import 'package:chat_app/auth/wait_room.dart';
+import 'package:chat_app/models/check_firestore_data.dart';
 import 'package:chat_app/provider/login_signup_provider.dart';
 import 'package:chat_app/utils/constants.dart';
 import 'package:chat_app/utils/responsive_screen.dart';
@@ -22,11 +23,6 @@ import '../utils/global_methods.dart';
 class UserProfile extends StatefulWidget {
   //const UserProfile({ Key? key }) : super(key: key);
   static const String routeName = "\profile";
-
-  //final User user;
-  //const UserProfile({Key? key, required User user})
-  //    : user = user,
-  //      super(key: key);
 
   @override
   _UserProfileState createState() => _UserProfileState();
@@ -54,44 +50,15 @@ class _UserProfileState extends State<UserProfile> {
   final FocusNode _positionCPFocusNode = FocusNode();
 
   bool _obscureText = true;
-  final _signUpFormKey = GlobalKey<FormState>();
+  final _userProfileFormKey = GlobalKey<FormState>();
   File? imageFile;
-  //final FirebaseAuth _auth = FirebaseAuth.instance;
   bool _isLoading = false;
   String? imageUrl;
-
-  //FirebaseAuth auth = FirebaseAuth.instance;
-  //final userRef = FirebaseFirestore.instance.collection("users");
-  //late User _currentUser;
-//
-  //String _uid;
-  //String _username;
-  //String _email;
-  //
-  //getCurrentUser() async {
-  //  User currentUser = await context
-  //      .read<FirebaseAuthService>()
-  //      .getUserFromDB(uid: auth.currentUser!.uid);
-  //
-  //  _currentUser = currentUser;
-  //
-  //  print("${_currentUser.username}");
-  //
-  //  setState(() {
-  //    _uid = _currentUser.uid;
-  //    displayName = _currentUser.username;
-  //    _displayNameController.text = displayName;
-  //
-  //    _email = _currentUser.email;
-  //  });
-  //}
 
   @override
   void initState() {
     LoginSignupProvider loginSignupProvider =
         Provider.of<LoginSignupProvider>(context, listen: false);
-    //_user = widget.user;
-    //print("Use : $_user");
 
     _uid = loginSignupProvider.user.uid;
     _displayNameController.text = loginSignupProvider.user.displayName!;
@@ -116,31 +83,38 @@ class _UserProfileState extends State<UserProfile> {
   }
 
   void _submitFormOnSignUp() async {
-    final isValid = _signUpFormKey.currentState!.validate();
+    final isValid = _userProfileFormKey.currentState!.validate();
     if (isValid) {
-      //if (imageFile == null) {
-      //  GlobalMethod.showErrorDialog(
-      //      error: 'Please pick an image', ctx: context);
-      //  return;
-      //}
+
+      bool phoneExists = await CheckFirestoreData.checkPhoneExists(_phoneNumberController.text);
+      print("validatePhone : $phoneExists");
+      if(phoneExists){
+        GlobalMethod.showErrorDialog(error: 'Phone number already exists', ctx: context);
+      }
+      bool emailExists = await CheckFirestoreData.checkEmailExists(_emailTextController.text);
+      print("validateEmail : $emailExists");
+      if(emailExists){
+        GlobalMethod.showErrorDialog(error: 'Email already exists', ctx: context);
+      }
+
+      if (imageFile == null) {
+        GlobalMethod.showErrorDialog(
+            error: 'Please pick an image', ctx: context);
+        return;
+      }
 
       setState(() {
         _isLoading = true;
       });
 
       try {
-        //await _auth.createUserWithEmailAndPassword(
-        //    email: _emailTextController.text.trim().toLowerCase(),
-        //    password: _passTextController.text.trim());
-        //final User? user = _auth.currentUser;
-        //final _uid = loginSignupProvider.user.uid;
-        //print(_uid);
-        //final ref = FirebaseStorage.instance
-        //    .ref()
-        //    .child('userImages')
-        //    .child(_uid + '.jpg');
-        //await ref.putFile(imageFile!);
-        //imageUrl = await ref.getDownloadURL();
+        final ref = FirebaseStorage.instance
+            .ref()
+            .child('userImages')
+            .child(_uid + '.jpg');
+        await ref.putFile(imageFile!);
+        imageUrl = await ref.getDownloadURL();
+
         await FirebaseFirestore.instance.collection('users').doc(_uid).set({
           'createdAt': Timestamp.now(),
           'designation': _positionCPTextController.text,
@@ -155,7 +129,6 @@ class _UserProfileState extends State<UserProfile> {
           'uid': _uid,
         });
         Navigator.canPop(context) ? Navigator.pop(context) : null;
-        //Navigator.pushReplacementNamed(context, WaitingRoom.routeName);
       } on FirebaseException catch (error) {
         GlobalMethod.showErrorDialog(error: error.message!, ctx: context);
       }
@@ -277,7 +250,7 @@ class _UserProfileState extends State<UserProfile> {
 
   Widget _buildSignupForm() {
     return Form(
-      key: _signUpFormKey,
+      key: _userProfileFormKey,
       child: Column(
         children: [
           Stack(
@@ -596,9 +569,9 @@ class _UserProfileState extends State<UserProfile> {
       maxHeight: 1080,
       maxWidth: 1080,
     );
-    // setState(() {
-    //   imageFile = File(pickedFile!.path);
-    // });
+     setState(() {
+       imageFile = File(pickedFile!.path);
+     });
     _cropImage(pickedFile!.path);
     Navigator.pop(context);
   }
@@ -609,9 +582,9 @@ class _UserProfileState extends State<UserProfile> {
       maxHeight: 1080,
       maxWidth: 1080,
     );
-    // setState(() {
-    //   imageFile = File(pickedFile!.path);
-    // });
+     setState(() {
+       imageFile = File(pickedFile!.path);
+     });
     _cropImage(pickedFile!.path);
     Navigator.pop(context);
   }

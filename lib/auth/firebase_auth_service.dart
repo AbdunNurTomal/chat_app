@@ -25,7 +25,7 @@ class FirebaseAuthService {
   Users user = Users();
   User? get currentUser => _firebaseAuth.currentUser;
 
-  final userRef = FirebaseFirestore.instance.collection("users");
+  static final userRef = FirebaseFirestore.instance.collection("users");
 
   Stream<User?> get authState => _firebaseAuth.authStateChanges();
 

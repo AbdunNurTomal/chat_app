@@ -100,9 +100,6 @@ class _SignUpState extends State<SignUp> {
         });
         Navigator.canPop(context) ? Navigator.pop(context) : null;
       } on FirebaseException catch (error) {
-        setState(() {
-          _isLoading = false;
-        });
         GlobalMethod.showErrorDialog(error: error.message!, ctx: context);
       }
     }
@@ -350,7 +347,7 @@ class _SignUpState extends State<SignUp> {
               controller: _phoneNumberController,
               validator: (value) => GlobalMethod.validatePhone(value!),
               //onChanged: (v) {
-              //  print(' Phone number ${GlobalMethod.phoneNumberController.text}');
+              //  print(' Phone number ${_phoneNumberController.text}');
               //},
               style: GoogleFonts.openSans(color: Colors.white),
               decoration: InputDecoration(
