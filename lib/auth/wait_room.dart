@@ -42,6 +42,13 @@ class WaitingRoom extends StatelessWidget {
                   style:
                       GoogleFonts.openSans(color: Colors.white, fontSize: 28),
                 ),
+                const SizedBox(height: 20),
+                Text(
+                  'Conact : 01965824332',
+                  textAlign: TextAlign.center,
+                  style:
+                      GoogleFonts.openSans(color: Colors.white, fontSize: 28),
+                ),
               ],
             ),
           ),

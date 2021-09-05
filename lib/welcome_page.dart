@@ -9,6 +9,7 @@ import 'pages/admin/admin_home_page.dart';
 import 'pages/customer/customer_home_page.dart';
 import 'pages/manager/manager_home_page.dart';
 import 'pages/supervisor/supervisor_home_page.dart';
+import 'pages/team/team_leader.dart';
 import 'provider/login_signup_provider.dart';
 import 'package:flutter/material.dart';
 
@@ -80,7 +81,7 @@ class _WelcomePageState extends State<WelcomePage> {
       case 'supervisor':
         return SupervisorHomePage();
       case 'teamleader':
-        return TeamLeaderPage();
+        return TeameLeaderPage();
       case 'customer':
         return CustomerHomePage();
       default:

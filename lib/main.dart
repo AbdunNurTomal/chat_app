@@ -8,7 +8,7 @@ import 'auth/wait_room.dart';
 import 'pages/admin/admin_home_page.dart';
 import 'pages/customer/customer_home_page.dart';
 import 'pages/manager/manager_home_page.dart';
-import 'pages/team/leader/team_leader.dart';
+import 'pages/team/team_leader.dart';
 import 'pages/supervisor/supervisor_home_page.dart';
 import 'provider/login_signup_provider.dart';
 import 'launcher_page.dart';
@@ -50,7 +50,7 @@ class MyApp extends StatelessWidget {
           AdminHomePage.routeName: (context) => AdminHomePage(),
           CustomerHomePage.routeName: (context) => CustomerHomePage(),
           ManagerHomePage.routeName: (context) => ManagerHomePage(),
-          TeamLeaderPage.routeName: (context) => TeamLeaderPage(),
+          TeameLeaderPage.routeName: (context) => TeameLeaderPage(),
           SupervisorHomePage.routeName: (context) => SupervisorHomePage(),
           //ChatRoomPage.routeName: (context) => ChatRoomPage(),
           //UserProfilePage.routeName: (context) => UserProfilePage(),
