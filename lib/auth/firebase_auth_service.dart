@@ -25,7 +25,7 @@ class FirebaseAuthService {
   Users user = Users();
   User? get currentUser => _firebaseAuth.currentUser;
 
-  static final userRef = FirebaseFirestore.instance.collection("users");
+  final userRef = FirebaseFirestore.instance.collection("users");
 
   Stream<User?> get authState => _firebaseAuth.authStateChanges();
 
@@ -35,7 +35,7 @@ class FirebaseAuthService {
     String password = users.userPassword.toString().trim();
 
     try {
-      print("$email password $password");
+      print('login>> user email - $email & password - $password');
       await _firebaseAuth.signInWithEmailAndPassword(
           email: email, password: password);
     } on FirebaseException catch (error) {

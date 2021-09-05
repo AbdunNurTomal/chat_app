@@ -79,6 +79,8 @@ class _WelcomePageState extends State<WelcomePage> {
         return ManagerHomePage();
       case 'supervisor':
         return SupervisorHomePage();
+      case 'teamleader':
+        return TeamLeaderPage();
       case 'customer':
         return CustomerHomePage();
       default:
