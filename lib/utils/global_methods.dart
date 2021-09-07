@@ -74,6 +74,44 @@ class GlobalMethod {
     );
   }
 
+  static showAlertDialog(BuildContext context,String head,String msg) {
+
+    // set up the buttons
+    Widget remindButton = TextButton(
+      child: const Text("Remind me later"),
+      onPressed:  () {},
+    );
+    Widget cancelButton = TextButton(
+      child: const Text("Cancel"),
+      onPressed:  () {
+        Navigator.of(context).pop();
+      },
+    );
+    Widget launchButton = TextButton(
+      child: const Text("Launch missile"),
+      onPressed:  () {},
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text(head),
+      content: Text(msg),
+      actions: [
+        //remindButton,
+        cancelButton,
+        //launchButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
   static String? validateEmail(String value) {
     value = value.trim();
     if (value.isNotEmpty) {

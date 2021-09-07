@@ -112,8 +112,12 @@ class _UserProfileState extends State<UserProfile> {
             .ref()
             .child('userImages')
             .child(_uid + '.jpg');
-        await ref.putFile(imageFile!);
+        UploadTask uploadTask = ref.putFile(imageFile!);
+        uploadTask.whenComplete(() async{
+            GlobalMethod.showAlertDialog(context,"Image","Upload Success!");
+        });
         imageUrl = await ref.getDownloadURL();
+        print("UserProfile>> $imageUrl");
 
         await FirebaseFirestore.instance.collection('users').doc(_uid).set({
           'createdAt': Timestamp.now(),
@@ -124,7 +128,7 @@ class _UserProfileState extends State<UserProfile> {
           'password': _passTextController.text,
           'phone': _phoneNumberController.text,
           'presence': true,
-          'profile_pic': 'imageUrl',
+          'profile_pic': imageUrl,
           'role': '',
           'uid': _uid,
         });
@@ -132,6 +136,7 @@ class _UserProfileState extends State<UserProfile> {
       } on FirebaseException catch (error) {
         GlobalMethod.showErrorDialog(error: error.message!, ctx: context);
       }
+
     }
     setState(() {
       _isLoading = false;
@@ -577,15 +582,20 @@ class _UserProfileState extends State<UserProfile> {
   }
 
   void _getFromCamera() async {
-    PickedFile? pickedFile = await ImagePicker().getImage(
+    final pickedFile = await ImagePicker().pickImage(
       source: ImageSource.camera,
+      imageQuality: 75,
       maxHeight: 1080,
       maxWidth: 1080,
     );
-     setState(() {
-       imageFile = File(pickedFile!.path);
-     });
-    _cropImage(pickedFile!.path);
+    if(pickedFile!=null){
+      print(pickedFile.path);
+      setState(() {
+        imageFile = File(pickedFile.path);
+      });
+    }
+
+    //_cropImage(pickedFile?.path);
     Navigator.pop(context);
   }
 
