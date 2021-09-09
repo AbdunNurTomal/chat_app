@@ -1,13 +1,16 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:chat_app/utils/image_dialog.dart';
-import 'package:flutter/foundation.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:chat_app/utils/image_full_screen_wrapper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:multi_image_picker2/multi_image_picker2.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:uri_to_file/uri_to_file.dart';
+import 'dart:ui' as ui;
+import 'package:image/image.dart' as IMG;
 
 class TeameLeaderPage extends StatefulWidget {
   //const AdminHomePage({Key? key}) : super(key: key);
@@ -58,9 +61,34 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> {
   String _error = 'No Error Detected Test';
   //late final CounterStorage storage;
 
+  late Uint8List _imageByteslist;
+
   @override
   void initState() {
     super.initState();
+  }
+  Future<String> _getDirectoryPath() async{
+    final directory = await getExternalStorageDirectory();
+    final myImagePath = '${directory?.path}/MyImages';
+    final myImgDir = await Directory(myImagePath).create();
+
+    return myImagePath;
+  }
+
+  Future<ui.Image> loadImage(Uint8List bytes) async {
+    final Completer<ui.Image> completer = Completer();
+    ui.decodeImageFromList(bytes, (ui.Image img) => completer.complete(img));
+    return completer.future;
+  }
+  Future<ui.Image> resizeImage(Uint8List data) async {
+    Uint8List? resizedData = data;
+    IMG.Image? img = IMG.decodeImage(data);
+    IMG.Image resized = IMG.copyResize(img!, width: 325, height: 265);
+    resizedData = IMG.encodeJpg(resized) as Uint8List?;
+
+    final Completer<ui.Image> completer = Completer();
+    ui.decodeImageFromList(resizedData!, (ui.Image img) => completer.complete(img));
+    return completer.future;
   }
 
   Widget buildGridView() {
@@ -101,24 +129,51 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> {
                       itemCount: images.length,
                       itemBuilder: (context, index) {
                         Asset asset = images[index];
-                        print("name ${asset.name}");
-                        print("identifier ${asset.identifier}");
+                        //print("name ${asset.name}");
+                        //print("identifier ${asset.identifier}");
                         return Card(
                           elevation: 5.0,
                           child: InkWell(
                             onTap: ()async {
+                              String? imageName = images[index].name;
                               String? imageUri = images[index].identifier;
-                              //Uri? _uri = Uri.parse(imageUri!);
+                              Uri? _uri = Uri.parse(imageUri!);
                               //print("Uri - $_uri");
-                              //_file = await toFile(_uri);
-                              //print("File - $_file");
+                              _file = await toFile(_uri);
 
-                              Navigator.push(context,
-                                MaterialPageRoute(builder: (context) => ImageDialog(
-                                    imageUri: imageUri!,
-                                    tag: "generate_a_unique_tag",
-                                  ),
-                                ));
+                              final myImagePath = _getDirectoryPath();
+                              //var kompresimg = File("$myImagePath/$imageName")
+                              //  ..writeAsBytesSync(_file!.encodeJpg(gambarKecilx, quality: 95));
+
+                              await _file!.copy("$myImagePath/$imageName");
+
+                              //File imageFile = File.fromUri(_uri);
+                              //print("File - $_file");
+                              Uint8List _imageByteslist = await _file!.readAsBytes();
+                              //print("ImageByteslist - $_imageByteslist");
+                              //await _file!.readAsBytes().then((value){
+                                //_imageByteslist = Uint8List.fromList(value);
+                                //print("ImageByteslist - $_imageByteslist");
+                              //}).catchError((onError){
+                              //  print('Exception error reading image file ' + onError.toString());
+                              //});
+
+                              try{
+                                final ui.Image _myBackgroundImage;
+                                _myBackgroundImage = await loadImage(_imageByteslist);
+                                //print("MyBackgroundImage - $_myBackgroundImage");
+                                Navigator.push(context,
+                                    MaterialPageRoute(builder: (context) => ImageDialogOld(
+                                      myBackgroundImage: _myBackgroundImage,
+                                      //imageUri: _file,
+                                      imageUri: imageUri,
+                                      tag: "generate_a_unique_tag",
+                                    ),
+                                  )
+                                );
+                              } catch (e) {
+                                print(e);
+                              }
                             },
                             child: Container(
                               height: MediaQuery.of(context).size.width / 3,
