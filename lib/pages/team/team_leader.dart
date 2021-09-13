@@ -1,6 +1,9 @@
+import 'package:chat_app/models/dynamic_list.dart';
+import 'package:chat_app/provider/list_provider.dart';
 import 'package:chat_app/utils/global_methods.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:provider/provider.dart';
 
 import 'defect_image_form.dart';
 
@@ -12,22 +15,28 @@ class TeameLeaderPage extends StatefulWidget {
   _TeameLeaderPageState createState() => _TeameLeaderPageState();
 }
 
-class _TeameLeaderPageState extends State<TeameLeaderPage> with SingleTickerProviderStateMixin {
+class _TeameLeaderPageState extends State<TeameLeaderPage> {//with SingleTickerProviderStateMixin {
+  //GlobalKey<FormState> _formKey;
+  var taskItems;
+  int counter = 0;
+  late DynamicList listClass;
+
   final _formKey = GlobalKey<FormState>();
-  final List<Widget> _picturesReportFormWidget = [];
+  //final List<Widget> _picturesReportFormWidget = [];
   final String _error = 'No Problem';
   bool processButtn = false;
 
   @override
   void initState() {
     super.initState();
+
+    taskItems = Provider.of<ListProvider>(context, listen: false);
+    listClass = DynamicList(taskItems.list);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: Scaffold(
+    return Scaffold(
         appBar: AppBar(
           leading: Builder(
             builder: (BuildContext context) {
@@ -60,9 +69,7 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> with SingleTickerProv
                     content: Text('Trying to add field in form'),
                   ),
                 );
-                setState(() {
-                  _picturesReportFormWidget.add(const DefectImageForm());
-                });
+                taskItems.addItem(DefectImageForm());
               },
             ),
         /*
@@ -100,30 +107,89 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> with SingleTickerProv
           },
         ),
          */
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
+        body: Column(
+            key: _formKey,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              (!processButtn) ? Text('Error: $_error'): ElevatedButton(
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child:
+                (!processButtn) ? Text('Error: $_error'): ElevatedButton(
                   onPressed: (){
 
                   },
                   child: const Text("Process")
-              ),
-              const SizedBox(height: 10),
-              Flexible(
-                child: ListView.builder(
-                  itemCount: _picturesReportFormWidget.length,
-                  itemBuilder: (context,index){
-                    return _picturesReportFormWidget[index];
-                  },
                 ),
               ),
+              Consumer<ListProvider>(builder: (context, provider, child) {
+                return Expanded(
+                  child: ListView.separated(
+                    itemCount: listClass.list.length,
+                    separatorBuilder: (context, index) => const Divider(
+                        height: 8,
+                        color: Colors.black,
+                      ),
+                    itemBuilder: buildList,
+                  ),
+                );
+              }),
             ],
           ),
-        ),
-      ),
     );
   }
+
+  Widget buildList(BuildContext context, int index) {
+    counter++;
+    return Dismissible(
+      key: Key(counter.toString()),
+      direction: DismissDirection.endToStart,
+      onDismissed: (DismissDirection direction){
+          taskItems.deleteItem(index);
+      },
+      confirmDismiss: (DismissDirection direction) async {
+        return await showDialog(
+        context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text("Delete Confirmation"),
+              content: const Text(
+              "Are you sure you want to delete this item?"),
+              actions: <Widget>[
+                ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: const Text("Delete"),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text("Cancel"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+      secondaryBackground: Container(
+        child: const Center(
+          child: Text(
+            'Delete',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+        color: Colors.red,
+      ),
+      background: Container(),
+      child: Container(
+        margin: const EdgeInsets.all(6),
+        decoration: BoxDecoration(
+            border: Border.all(
+              color: Colors.black45,
+              width: 3,
+            ),
+            borderRadius: BorderRadius.circular(5)
+        ),
+        child: listClass.list[index],
+      )
+    );
+  }
+
 }

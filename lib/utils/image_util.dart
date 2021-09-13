@@ -1,3 +1,4 @@
+/*
 import 'dart:async';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
@@ -60,3 +61,4 @@ class ImagePainter extends CustomPainter {
   @override
   bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
+*/

@@ -1,3 +1,4 @@
+import 'package:chat_app/provider/list_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -25,7 +26,8 @@ void main() async {
         create: (context) => context.read<FirebaseAuthService>().authState,
         initialData: null,
       ),
-
+      ChangeNotifierProvider<ListProvider>(
+          create: (context) => ListProvider(), child: TeameLeaderPage()),
       //ChangeNotifierProvider(create: (_) => ProductDetail()),
     ], child: MyApp()),
   );
