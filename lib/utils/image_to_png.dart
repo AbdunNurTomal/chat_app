@@ -60,11 +60,3 @@ imglib.Image _convertYUV420(CameraImage image) {
   return img;
 }
 */
-class DefectImageForm extends StatelessWidget {
-  const DefectImageForm({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container();
-  }
-}

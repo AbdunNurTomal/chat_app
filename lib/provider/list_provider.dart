@@ -1,16 +1,20 @@
+import 'package:chat_app/models/list_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 
 class ListProvider with ChangeNotifier {
-  List<Widget> list = [];
+  List<ListItem> _listItem = [];
 
-  void addItem(Widget item) {
-    list.add(item);
+  List<ListItem> get allListItem => _listItem;
+
+  void addItem(ListItem item) {
+    print("item : $item");
+    _listItem.add(item);
     notifyListeners();
   }
 
-  void deleteItem(int index) {
-    list.removeAt(index);
+  void deleteItem(ListItem item) {
+    _listItem.remove(item);
     notifyListeners();
   }
 }

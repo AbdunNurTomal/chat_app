@@ -1,8 +1,8 @@
 class Defects {
-  String? itemNumber;
-  String? itemName;
+  String itemNumber;
+  String itemName;
 
-  Defects({this.itemNumber,this.itemName,});
+  Defects({required this.itemNumber,required this.itemName});
 
   factory Defects.fromMap(Map<String, dynamic> data) => Defects(
     itemNumber: data["item_number"],

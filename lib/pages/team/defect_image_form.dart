@@ -15,9 +15,20 @@ import 'dart:ui' as ui;
 import 'package:image/image.dart' as IMG;
 
 class DefectImageForm extends StatefulWidget {
-  //String defectItemName;
-  //DefectImageForm({Key? key, required this.defectItemName}) : super(key: key);
-  const DefectImageForm({Key? key}) : super(key: key);
+  final int ddItemValue;
+  final String ddItem;
+  final ValueChanged<int> onChangedDDItemValue;
+  final ValueChanged<String> onChangedDDItem;
+  final VoidCallback onSavedItem;
+
+  const DefectImageForm({
+    Key? key,
+    this.ddItemValue=0,
+    this.ddItem='',
+    required this.onChangedDDItemValue,
+    required this.onChangedDDItem,
+    required this.onSavedItem,
+  }) : super(key: key);
 
   @override
   State<DefectImageForm> createState() => _DefectImageFormState();
@@ -35,12 +46,14 @@ class _DefectImageFormState extends State<DefectImageForm> {
   File? _file;
   //late final CounterStorage storage;
   var selectedItem;
-  Defects defect = Defects();
+  //Defects defect = Defects();
+  late Defects defect;
 
   late Uint8List _imageByteslist;
 
   String? dropdownValue;
 
+  bool _imagePickButton = false;
   @override
   void initState() {
     super.initState();
@@ -110,6 +123,7 @@ class _DefectImageFormState extends State<DefectImageForm> {
                     );
                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
                     setState(() {
+                      _imagePickButton = true;
                       selectedItem = _queryItem;
                     });
                   },
@@ -131,7 +145,7 @@ class _DefectImageFormState extends State<DefectImageForm> {
     return Container(
       decoration: BoxDecoration(
           border: Border.all(
-            color: Colors.black45,
+            color: Colors.lightBlueAccent,
             width: 2,
           ),
           color: Colors.lightBlue,
@@ -167,8 +181,9 @@ class _DefectImageFormState extends State<DefectImageForm> {
           Container(
             alignment: Alignment.centerRight,
             child: ElevatedButton(
+              onPressed: (_imagePickButton) ? loadAssets : null,
               child: const Text("Pick"),
-              onPressed: loadAssets,
+              style: ElevatedButton.styleFrom(primary: Colors.orange, onPrimary: Colors.black),
             ),
           ),
         ],
@@ -179,7 +194,7 @@ class _DefectImageFormState extends State<DefectImageForm> {
     return Container(
       decoration: BoxDecoration(
           border: Border.all(
-            color: Colors.black45,
+            color: Colors.black12,
             width: 2,
           ),
           color: Colors.black54,
