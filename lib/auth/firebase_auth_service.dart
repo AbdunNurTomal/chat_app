@@ -267,4 +267,13 @@ class FirebaseAuthService {
     }
     //return user;
   }
+
+  static Stream<QuerySnapshot<Map<String, dynamic>>> getAllMessages() {
+    return FirebaseFirestore.instance.collection('defect_items')
+        .orderBy('item_number', descending: true)
+        .snapshots();
+  }
+
+
+
 }

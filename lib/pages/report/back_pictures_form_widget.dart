@@ -106,7 +106,7 @@ class _PicturesFormWidgetState extends State<PicturesFormWidget> {
               _queryCat.add(
                 DropdownMenuItem(
                   child: Text(
-                    defect.itemName!,
+                    defect.itemName,
                     style: const TextStyle(color: Colors.black),
                   ),
                   value: "${defect.itemNumber}",

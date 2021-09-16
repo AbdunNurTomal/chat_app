@@ -6,6 +6,8 @@ import 'package:multi_image_picker2/multi_image_picker2.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
+import 'edit_list_item_dialog_widget.dart';
+
 class ItemWidget extends StatelessWidget {
   final ListItem  listItem;
   const ItemWidget({Key? key, required this.listItem}) : super(key: key);
@@ -51,7 +53,7 @@ class ItemWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             buildDDItemHead(listItem.item!),
-            buildGridView(listItem.images!),
+            buildGridView(listItem.images),
             //if (todo.description.isNotEmpty)
             //  Container(
             //    margin: EdgeInsets.only(top: 4),
@@ -91,11 +93,11 @@ class ItemWidget extends StatelessWidget {
     );
   }
   void editItem(BuildContext context, ListItem listItem) {
-    //Navigator.of(context).push(
-    //  MaterialPageRoute(
-    //    builder: (context) => EditTodoPage(todo: todo),
-    //  ),
-    //);
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => EditListItemDialogWidget(listItem: listItem),
+      ),
+    );
     print("Edit Page");
   }
 

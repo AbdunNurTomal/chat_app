@@ -21,7 +21,7 @@ import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 //import 'package:uri_to_file/uri_to_file.dart';
 
-import 'defect_image_form.dart';
+import '../report/back_defect_image_form.dart';
 
 class TeameLeaderPage extends StatefulWidget {
   static const String routeName = "\team_leader";

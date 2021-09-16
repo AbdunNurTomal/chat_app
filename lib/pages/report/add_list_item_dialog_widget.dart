@@ -5,21 +5,14 @@ import 'dart:ui' as ui;
 
 import 'package:chat_app/models/defect.dart';
 import 'package:chat_app/models/list_item.dart';
-import 'package:chat_app/pages/report/pictures_form_widget.dart';
-import 'package:chat_app/pages/team/defect_image_form.dart';
 import 'package:chat_app/provider/list_provider.dart';
-import 'package:chat_app/utils/constants.dart';
-import 'package:chat_app/utils/custom_color.dart';
 import 'package:chat_app/utils/image_full_screen_wrapper.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:multi_image_picker2/multi_image_picker2.dart';
 import 'package:provider/provider.dart';
 import 'package:uri_to_file/uri_to_file.dart';
 
-//import 'widgets/pictures_report_form_widget.dart';
 
 class AddListItemDialogWidget extends StatefulWidget {
   const AddListItemDialogWidget({Key? key}) : super(key: key);
@@ -31,38 +24,46 @@ class AddListItemDialogWidget extends StatefulWidget {
 class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
   final _formKey = GlobalKey<FormState>();
   String _error = 'No Problem';
-  var selectedItem;
 
   List<Asset> images = <Asset>[];
   File? _file;
-  //Defects defect = Defects();
   bool _imagePickButton = false;
 
   int ddItemValue = 0;
   String ddItem = '';
-  TextEditingController controller = TextEditingController();
-  String? filter;
-  late Defects defect;
-  //List<Defects> defect = [];
+  late ListProvider _defectProvider;
+  final TextEditingController _ddIemController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     //fill countries with objects
-    controller.addListener(() {
-      setState(() {
-        filter = controller.text;
-      });
-    });
+    //controller.addListener(() {
+    //  setState(() {
+    //    filter = controller.text;
+    //  });
+    //});
+  }
+
+  @override
+  void didChangeDependencies() {
+    _defectProvider = Provider.of<ListProvider>(context,listen: false);
+    _defectProvider.callDefect();
+    super.didChangeDependencies();
   }
 
   @override
   void dispose() {
     super.dispose();
-    controller.dispose();
+    _ddIemController.dispose();
   }
 
-  //List<Asset> ddImages = <Asset>[];
+  List<Defects> getSuggestions(String query) => List.of(_defectProvider.defect).where((defect) {
+    final itemLower = defect.itemName.toLowerCase();
+    final queryLower = query.toLowerCase();
+
+    return itemLower.contains(queryLower);
+  }).toList();
 
   @override
   Widget build(BuildContext context) {
@@ -78,64 +79,38 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
           )
         ],
       ),
-      body: Container(
-          child: Builder(
-          builder: (context) => Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              //title
-              /*
-              TextFormField(
-                decoration: const InputDecoration(
-                  border: UnderlineInputBorder(),
-                  labelText: 'Title',
-                ),
-                textInputAction: TextInputAction.next,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please provide a valid name';
-                  }
-                  if (value.length > 200) {
-                    return 'Name should not exceed 20 chars';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  ddItem = value!;
-                },
-              ),
-
-               */
-              //const SizedBox(height: 8),
-              //title
-              Container(color: Colors.green,child: ddItemFromFirebase()),
-              const SizedBox(height: 8),
-              Container(
-                alignment: Alignment.center,
-                child: ElevatedButton(
-                  onPressed: (_imagePickButton) ? loadAssets : null,
-                  child: const Text("Pick"),
-                  style: ElevatedButton.styleFrom(
-                      primary: Colors.orange, onPrimary: Colors.black),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Expanded(child: buildGridView()),
-              //PicturesFormWidget(
-              //  onChangedDDItemValue: (ddItemValue) =>
-              //      setState(() => this.ddItemValue = ddItemValue),
-              //  onChangedDDItem: (ddItem) =>
-              //      setState(() => this.ddItem = ddItem),
-              //onChangedDescription: (description) => setState(() => this.description = description),
-              //  onSavedItem: addItem,
-              //),
-            ]
+      body: Builder(
+      builder: (context) => Form(
+      key: _formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          //title
+          Container(color: Colors.green,child: ddItemFromFirebase()),
+          const SizedBox(height: 8),
+          Container(
+            alignment: Alignment.center,
+            child: ElevatedButton(
+              onPressed: (_imagePickButton) ? loadAssets : null,
+              child: const Text("Pick"),
+              style: ElevatedButton.styleFrom(
+                  primary: Colors.orange, onPrimary: Colors.black),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Expanded(child: buildGridView()),
+          //PicturesFormWidget(
+          //  onChangedDDItemValue: (ddItemValue) =>
+          //      setState(() => this.ddItemValue = ddItemValue),
+          //  onChangedDDItem: (ddItem) =>
+          //      setState(() => this.ddItem = ddItem),
+          //onChangedDescription: (description) => setState(() => this.description = description),
+          //  onSavedItem: addItem,
+          //),
+        ]
         ),
     ),
     ),
-      ),
     );
   }
 
@@ -163,128 +138,55 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
   }
 
   Widget ddItemFromFirebase() {
-    /*
-    return StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('defect_items').snapshots(),
-        builder: (context, snapshot){
-          if (!snapshot.hasData) {
-            return const Text("Loading.....");
-          }else{
-            List<DropdownMenuItem> _queryCat = [];
-            for (int i = 0; i < snapshot.data!.docs.length; i++) {
-              DocumentSnapshot snap = snapshot.data!.docs[i];
-              //print("Snap ${snap.data()}");
-              defect = Defects.fromMap(snap.data() as Map<String, dynamic>);
-              //print("Defect >> ${defect.itemName}");
-              _queryCat.add(
-                DropdownMenuItem(
-                  child: Text(
-                    defect.itemName!,
-                    style: const TextStyle(color: Colors.black),
-                  ),
-                  value: "${defect.itemNumber}",
-                ),
-              );
-            }
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                const Icon(FontAwesomeIcons.coins,
-                    size: 20.0, color: Colors.white),
-                const SizedBox(width: 10.0),
-                DropdownButton<dynamic>(
-                  items: _queryCat,
-                  onChanged: (_queryItem) {
-                    const snackBar = SnackBar(
-                      content: Text(
-                        'Selected defect item',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    );
-                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                    setState(() {
-                      _imagePickButton = true;
-                      selectedItem = int.parse(_queryItem);
-                      print("_queryItem $_queryItem && selectedItem $selectedItem");
-                      final item = _queryCat.asMap();
-                      print("Item $item[2]");
-                      //ddItem = item[selectedItem];
-                    });
-                  },
-                  value: selectedItem,
-                  isExpanded: false,
-                  hint: const Text(
-                    "Selected defect item",
-                    style: TextStyle(color: Colors.black),
-                  ),
-                ),
-              ],
-            );
-          }
+    return TypeAheadFormField(
+      //hideSuggestionsOnKeyboardHide: false,
+      hideOnEmpty: true,
+      textFieldConfiguration: TextFieldConfiguration(
+        autofocus: true,
+        controller: _ddIemController,
+        decoration: const InputDecoration(
+          prefixIcon: Icon(Icons.search),
+          border: OutlineInputBorder(),
+          hintText: 'Enter a defect item',
+          hintStyle: TextStyle(
+              fontFamily: 'Metropolis-SemiBold',
+              color: Colors.black87),
+          ),
+        ),
+      suggestionsCallback: getSuggestions,
+      itemBuilder: (context, Defects? suggestion) {
+        final defect = suggestion!;
+
+        return ListTile(
+          leading: Text(defect.itemNumber),
+          title: Text(defect.itemName),
+        );
+      },
+      transitionBuilder: (context, suggestionsBox, controller) {
+        return suggestionsBox;
+      },
+      noItemsFoundBuilder: (context) => Container(
+        height: 40,
+        child: const Center(
+          child: Text(
+            'No Defects Found.',
+            style: TextStyle(fontSize: 20),
+          ),
+        ),
+      ),
+      onSuggestionSelected: (Defects? suggestion) {
+        _ddIemController.text = suggestion!.itemName;
+        setState((){_imagePickButton = true;});
+        //Navigator.of(context).pop(null);
+      },
+      validator: (value) {
+        if (value!.isEmpty) {
+          return 'Please select a defect item';
         }
+      },
+      onSaved: (value) => ddItem = value!,
     );
-
-     */
-    return StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('defect_items')
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const Text("Loading.....");
-          } else {
-            List<DropdownMenuItem> _queryCat = [];
-            for (int i = 0; i < snapshot.data!.docs.length; i++) {
-              DocumentSnapshot snap = snapshot.data!.docs[i];
-              //print("Snap ${snap.data()}");
-              defect = Defects.fromMap(snap.data() as Map<String, dynamic>);
-              //print("Defect >> ${defect.itemName}");
-              _queryCat.add(
-                DropdownMenuItem(
-                  child: Text(
-                    defect.itemName,
-                    style: const TextStyle(color: Colors.black),
-                  ),
-                  //value: defect.itemNumber,
-                  value: defect.itemName,
-                ),
-              );
-            }
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                const Icon(FontAwesomeIcons.coins,
-                    size: 20.0, color: Colors.white),
-                const SizedBox(width: 10.0),
-                DropdownButton<dynamic>(
-                  items: _queryCat,
-                  onChanged: (_queryItem) {
-                    const snackBar = SnackBar(
-                      content: Text(
-                        'Selected defect item',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    );
-                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                    setState(() {
-                      _imagePickButton = true;
-                      selectedItem = _queryItem;
-                      ddItem = selectedItem;
-                    });
-                    print("Selected item : $selectedItem");
-                  },
-                  value: selectedItem,
-                  isExpanded: false,
-                  hint: const Text(
-                    "Selected defect item",
-                    style: TextStyle(color: Colors.black),
-                  ),
-                ),
-              ],
-            );
-          }
-        });
   }
-
 
   Future<ui.Image> loadImage(Uint8List bytes) async {
     final Completer<ui.Image> completer = Completer();
