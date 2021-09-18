@@ -29,26 +29,35 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
   File? _file;
   bool _imagePickButton = false;
 
-  int ddItemValue = 0;
+  String ddItemValue = '';
   String ddItem = '';
   late ListProvider _defectProvider;
   final TextEditingController _ddIemController = TextEditingController();
 
+  //late List<Defects> updatedDefect=[];
+
+  static AnimationController? _animationController;
+  // void Function(AnimationStatus) _statusListener;
+
   @override
   void initState() {
     super.initState();
-    //fill countries with objects
-    //controller.addListener(() {
-    //  setState(() {
-    //    filter = controller.text;
-    //  });
-    //});
+    // _statusListener = (AnimationStatus status) {
+    //   if (status == AnimationStatus.completed ||
+    //       status == AnimationStatus.dismissed) {
+    //     _suggestionsBoxController.resize();
+    //   }
+    //   _animationController!.addStatusListener(_statusListener);
+    _defectProvider = Provider.of<ListProvider>(context,listen: false);
+
+    // updatedDefect = _defectProvider.allListDefect;
   }
 
   @override
   void didChangeDependencies() {
-    _defectProvider = Provider.of<ListProvider>(context,listen: false);
-    _defectProvider.callDefect();
+    // _defectProvider = Provider.of<ListProvider>(context);
+    // updatedDefect = _defectProvider.allListDefect;
+    // print("updated defect : $updatedDefect");
     super.didChangeDependencies();
   }
 
@@ -56,10 +65,12 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
   void dispose() {
     super.dispose();
     _ddIemController.dispose();
+    // _animationController!.removeStatusListener(_statusListener);
+    // _animationController!.dispose();
   }
 
-  List<Defects> getSuggestions(String query) => List.of(_defectProvider.defect).where((defect) {
-    final itemLower = defect.itemName.toLowerCase();
+  List<Defects> getSuggestions(String query) => List.of(DefectData.defect).where((updatedDefect) {
+    final itemLower = updatedDefect.itemName.toLowerCase();
     final queryLower = query.toLowerCase();
 
     return itemLower.contains(queryLower);
@@ -67,14 +78,15 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
 
   @override
   Widget build(BuildContext context) {
-    print("Add List Item Dialog Widget");
+    //print("Add List Item Dialog Widget");
+    print("Defect : ${DefectData.defect}");
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add New Item',
+        title: const Text('Add New Pictures Item',
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
         actions: [
           IconButton(
-              onPressed: _addItem,
+              onPressed: _saveItem,
               icon: const Icon(Icons.save)
           )
         ],
@@ -114,12 +126,12 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
     );
   }
 
-  void _addItem() {
+  void _saveItem() {
     if (_formKey.currentState!.validate()) {
       //save data to database
       _formKey.currentState!.save();
 
-      print("ddItem >> $ddItem");
+      //print("ddItem >> $ddItem");
       final listItem = ListItem(
         id: DateTime.now().toString(),
         itemValue: ddItemValue,
@@ -129,9 +141,10 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
         createdTime: DateTime.now(),
       );
 
-      print("listItem >> $listItem");
-      final provider = Provider.of<ListProvider>(context, listen: false);
-      provider.addItem(listItem);
+      //print("listItem >> $listItem");
+      //final provider = Provider.of<ListProvider>(context, listen: false);
+      _defectProvider.addItem(listItem);
+      DefectData.deleteDefectItem(ddItem);
 
       Navigator.of(context).pop();
     }
@@ -154,16 +167,21 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
           ),
         ),
       suggestionsCallback: getSuggestions,
-      itemBuilder: (context, Defects? suggestion) {
-        final defect = suggestion!;
-
+      itemBuilder: (context, Defects suggestion) {
         return ListTile(
-          leading: Text(defect.itemNumber),
-          title: Text(defect.itemName),
+          //leading: Text(suggestion.itemNumber),
+          title: Text(suggestion.itemName),
         );
       },
-      transitionBuilder: (context, suggestionsBox, controller) {
+      transitionBuilder: (context, suggestionsBox, _animationController) {
         return suggestionsBox;
+        // return FadeTransition(
+        //   child: suggestionsBox,
+        //   opacity: CurvedAnimation(
+        //       parent: _animationController,
+        //       curve: Curves.fastOutSlowIn
+        //   ),
+        // );
       },
       noItemsFoundBuilder: (context) => Container(
         height: 40,
@@ -174,8 +192,8 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
           ),
         ),
       ),
-      onSuggestionSelected: (Defects? suggestion) {
-        _ddIemController.text = suggestion!.itemName;
+      onSuggestionSelected: (Defects suggestion) {
+        _ddIemController.text = suggestion.itemName;
         setState((){_imagePickButton = true;});
         //Navigator.of(context).pop(null);
       },

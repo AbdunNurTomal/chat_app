@@ -1,4 +1,6 @@
 
+import 'package:chat_app/auth/firebase_auth_service.dart';
+
 class Defects {
   String itemNumber;
   String itemName;
@@ -32,4 +34,30 @@ class Defects {
 
   @override
   String toString() => itemName;
+}
+
+class DefectData{
+  static List<Defects> defect = [];
+  // List<Defects> get allListDefect => defect;
+
+  static void callDefect() async{
+    FirebaseAuthService.getAllMessages().listen((snapshot) {
+      defect = List.generate(
+          snapshot.docs.length, (index) =>
+          Defects.fromMap(snapshot.docs[index].data())
+      );
+    });
+  }
+
+  static void addDefectItem(Defects filter) {
+    //print("All Defect items $filter : $defect");
+    defect.add(Defects(itemNumber: filter.itemNumber, itemName: filter.itemName));
+    //print("After deleted : $defect");
+  }
+
+  static void deleteDefectItem(String filter) {
+    //print("All Defect items $filter : $defect");
+    defect.removeWhere((item) => item.itemName == filter);
+    //print("After deleted : $defect");
+  }
 }

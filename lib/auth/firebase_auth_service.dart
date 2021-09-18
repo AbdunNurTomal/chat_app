@@ -270,7 +270,7 @@ class FirebaseAuthService {
 
   static Stream<QuerySnapshot<Map<String, dynamic>>> getAllMessages() {
     return FirebaseFirestore.instance.collection('defect_items')
-        .orderBy('item_number', descending: true)
+        .orderBy('item_number', descending: false)
         .snapshots();
   }
 

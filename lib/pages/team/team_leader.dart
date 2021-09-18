@@ -10,6 +10,7 @@
 //import 'package:image/image.dart' as IMG;
 
 //import 'package:chat_app/models/dynamic_list.dart';
+import 'package:chat_app/models/defect.dart';
 import 'package:chat_app/models/list_item.dart';
 import 'package:chat_app/pages/report/add_list_item_dialog_widget.dart';
 import 'package:chat_app/pages/report/item_widget.dart';
@@ -45,9 +46,11 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> {//with SingleTickerP
   int counter = 0;
   //bool processButton = false;
   //String _error = 'No Problem';
+  // late ListProvider defectItemProvider = Provider.of<ListProvider>(context, listen: false);
 
   @override
   void initState() {
+    DefectData.callDefect();
     super.initState();
   }
 

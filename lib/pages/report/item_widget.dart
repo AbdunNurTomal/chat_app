@@ -1,3 +1,4 @@
+import 'package:chat_app/models/defect.dart';
 import 'package:chat_app/models/list_item.dart';
 import 'package:chat_app/provider/list_provider.dart';
 import 'package:flutter/material.dart';
@@ -34,11 +35,11 @@ class ItemWidget extends StatelessWidget {
           icon: Icons.delete,
         )
       ],
-      child: buildTodo(context),
+      child: buildItem(context),
     ),
   );
-  Widget buildTodo(BuildContext context) {
-    print("List Item : ${listItem.item}");
+  Widget buildItem(BuildContext context) {
+    //print("List Item : ${listItem.item}");
     return GestureDetector(
       onTap: () => editItem(context, listItem),
       child: Container(
@@ -79,6 +80,11 @@ class ItemWidget extends StatelessWidget {
           ElevatedButton(
             onPressed: () {
               provider.deleteItem(listItem);
+              final deleteToAddItem = Defects(
+                itemNumber: listItem.itemValue!,
+                itemName: listItem.item!,
+              );
+              DefectData.addDefectItem(deleteToAddItem);
               Navigator.of(context).pop(false);
             },
             child: const Text("Delete"),
@@ -93,6 +99,11 @@ class ItemWidget extends StatelessWidget {
     );
   }
   void editItem(BuildContext context, ListItem listItem) {
+    // final deleteToAddItem = Defects(
+    //   itemNumber: listItem.itemValue!,
+    //   itemName: listItem.item!,
+    // );
+    // DefectData.callDefect();
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => EditListItemDialogWidget(listItem: listItem),

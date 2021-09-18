@@ -6,6 +6,7 @@ import 'dart:ui' as ui;
 import 'package:chat_app/models/defect.dart';
 import 'package:chat_app/models/list_item.dart';
 import 'package:chat_app/provider/list_provider.dart';
+import 'package:chat_app/utils/custom_color.dart';
 import 'package:chat_app/utils/image_full_screen_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -28,12 +29,12 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
 
   List<Asset> images = <Asset>[];
   File? _file;
-  bool _imagePickButton = false;
 
-  int ddItemValue = 0;
+  String ddItemValue = '';
   String ddItem = '';
   late ListProvider _defectProvider;
   final TextEditingController _ddIemController = TextEditingController();
+
 
   @override
   void initState() {
@@ -44,12 +45,13 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
     //    filter = controller.text;
     //  });
     //});
+    _ddIemController.text = widget.listItem.item!;
+    images = widget.listItem.images;
+    _defectProvider = Provider.of<ListProvider>(context,listen: false);
   }
 
   @override
-  void didChangeDependencies() {
-    _defectProvider = Provider.of<ListProvider>(context,listen: false);
-    _defectProvider.callDefect();
+  void didChangeDependencies() {;
     super.didChangeDependencies();
   }
 
@@ -59,7 +61,7 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
     _ddIemController.dispose();
   }
 
-  List<Defects> getSuggestions(String query) => List.of(_defectProvider.defect).where((defect) {
+  List<Defects> getSuggestions(String query) => List.of(DefectData.defect).where((defect) {
     final itemLower = defect.itemName.toLowerCase();
     final queryLower = query.toLowerCase();
 
@@ -68,14 +70,14 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
 
   @override
   Widget build(BuildContext context) {
-    print("Add List Item Dialog Widget");
+    print("Edit List Item Dialog Widget");
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add New Item',
+        title: const Text('Edit Item',
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
         actions: [
           IconButton(
-              onPressed: _addItem,
+              onPressed: _saveItem,
               icon: const Icon(Icons.save)
           )
         ],
@@ -92,7 +94,7 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
           Container(
             alignment: Alignment.center,
             child: ElevatedButton(
-              onPressed: (_imagePickButton) ? loadAssets : null,
+              onPressed: loadAssets,
               child: const Text("Pick"),
               style: ElevatedButton.styleFrom(
                   primary: Colors.orange, onPrimary: Colors.black),
@@ -115,12 +117,12 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
     );
   }
 
-  void _addItem() {
+  void _saveItem() {
     if (_formKey.currentState!.validate()) {
       //save data to database
       _formKey.currentState!.save();
 
-      print("ddItem >> $ddItem");
+      //print("ddItem >> $ddItem");
       final listItem = ListItem(
         id: DateTime.now().toString(),
         itemValue: ddItemValue,
@@ -130,16 +132,41 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
         createdTime: DateTime.now(),
       );
 
-      print("listItem >> $listItem");
-      final provider = Provider.of<ListProvider>(context, listen: false);
-      provider.addItem(listItem);
+      //print("listItem >> $listItem");
+      _defectProvider = Provider.of<ListProvider>(context, listen: false);
+      _defectProvider.addItem(listItem);
 
       Navigator.of(context).pop();
     }
   }
 
   Widget ddItemFromFirebase() {
-    return TypeAheadFormField(
+    return Padding(
+      padding: const EdgeInsets.all(5.0),
+      child: TextFormField(
+       readOnly: true,
+        controller: _ddIemController,
+        style: const TextStyle(color: Colors.black),
+        decoration: const InputDecoration(
+            contentPadding:
+            EdgeInsets.symmetric(horizontal: 10),
+            // labelText: 'Password',
+            // labelStyle: TextStyle(color: Colors.white),
+            icon: Icon(Icons.search, color: Colors.black),
+            border: InputBorder.none),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Please provide a valid password.';
+          }
+          return null;
+        },
+      ),
+    );
+
+
+
+      /*
+      TypeAheadFormField(
       //hideSuggestionsOnKeyboardHide: false,
       hideOnEmpty: true,
       textFieldConfiguration: TextFieldConfiguration(
@@ -152,15 +179,13 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
           hintStyle: TextStyle(
               fontFamily: 'Metropolis-SemiBold',
               color: Colors.black87),
-          ),
-        ),
+            ),
+      ),
       suggestionsCallback: getSuggestions,
-      itemBuilder: (context, Defects? suggestion) {
-        final defect = suggestion!;
-
+      itemBuilder: (context, Defects suggestion) {
         return ListTile(
-          leading: Text(defect.itemNumber),
-          title: Text(defect.itemName),
+          //leading: Text(suggestion.itemNumber),
+          title: Text(suggestion.itemName),
         );
       },
       transitionBuilder: (context, suggestionsBox, controller) {
@@ -187,6 +212,8 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
       },
       onSaved: (value) => ddItem = value!,
     );
+
+       */
   }
 
   Future<ui.Image> loadImage(Uint8List bytes) async {

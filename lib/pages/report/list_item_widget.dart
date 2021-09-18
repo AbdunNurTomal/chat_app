@@ -14,19 +14,24 @@ class ListItemWidget extends StatefulWidget {
 class _ListItemWidgetState extends State<ListItemWidget> {
   late ListProvider taskItems;
 
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   void didChangeDependencies() {
-    taskItems = Provider.of<ListProvider>(context);
+
     super.didChangeDependencies();
   }
   @override
   Widget build(BuildContext context) {
+    taskItems = Provider.of<ListProvider>(context);
     final listClass = taskItems.allListItem;
     return listClass.isEmpty
         ? const Center(
           child: Text(
-            'No Item.',
+            'No Item Found.',
             style: TextStyle(fontSize: 20),
           ),
         )
