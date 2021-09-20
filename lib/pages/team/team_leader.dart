@@ -247,7 +247,7 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> {//with SingleTickerP
                           countImage++;
                           //String? imageName = allItem.allListItem[i].images[j].name;
                           String? imageUri = allItem.allListItem[i].images[j].identifier;
-                          //saveImage(imageUri!,countItem,countImage);
+                          saveImage(imageUri!,countItem,countImage);
                         }
                       }
                     }
@@ -307,10 +307,10 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> {//with SingleTickerP
       ui.PictureRecorder recorder = ui.PictureRecorder();
       Canvas c = Canvas(recorder);
 
-      final textStyle = TextStyle(color: Colors.black, fontSize: 30);
-      TextSpan textSpan = TextSpan(text: 'Hello, world.',style: textStyle);
+      final textStyle = TextStyle(color: Colors.white, fontSize: 30);
+      TextSpan textSpan = TextSpan(text: itemName,style: textStyle);
       TextPainter textPainter = TextPainter(text: textSpan,textDirection: TextDirection.ltr);
-      textPainter.layout(minWidth: 300,maxWidth: 300);
+      textPainter.layout(minWidth: 0,maxWidth: 300);
 
       Offset offset = Offset(50.0, 50.0);
       textPainter.paint(c, offset);
@@ -318,10 +318,12 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> {//with SingleTickerP
       // c.drawPaint(paint);
       ui.Picture picture = recorder.endRecording();
       ui.Image img = await picture.toImage(300, 300);
-      ByteData? byteData = await img.toByteData();
-print("byteData $byteData");
-      Uint8List jpgBytes = byteData!.buffer.asUint8List();
 
+// print("img $img");
+      ByteData? byteData = await img.toByteData(format: ui.ImageByteFormat.png);
+// print("byteData $byteData");
+      Uint8List jpgBytes = byteData!.buffer.asUint8List();
+// print("jpgBytes $jpgBytes");
       var testdir = await  Directory('${dir?.path}/images').create(recursive: true);
       new File('${testdir.path}/$fileName\_0.jpg').create(recursive: true);
 
