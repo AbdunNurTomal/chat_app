@@ -1,3 +1,86 @@
+import 'dart:convert';
+import 'dart:io';
+import 'dart:async';
+import 'dart:math';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+import 'dart:ui';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:uri_to_file/uri_to_file.dart';
+
+class ImageUtility {
+
+  static Future<ui.Image> loadImage(Uint8List bytes) async {
+    final Completer<ui.Image> completer = Completer();
+    ui.decodeImageFromList(bytes, (ui.Image img) => completer.complete(img));
+    return completer.future;
+  }
+
+  static Future<ui.Image> loadUiImage(String assetPath) async {
+    final data = await rootBundle.load(assetPath);
+    final list = Uint8List.view(data.buffer);
+    final completer = Completer<ui.Image>();
+    ui.decodeImageFromList(list, completer.complete);
+    return completer.future;
+  }
+
+  // Future<void> watermarkPicture( String picture, String watermark, String fileName) async {
+  //   Uri _uriPicture = Uri.parse(picture);
+  //   File _filePicture = await toFile(_uriPicture);
+  //   Uri _uriWatermark = Uri.parse(watermark);
+  //   File _fileWatermark = await toFile(_uriWatermark);
+  //
+  //   try {
+  //     ui.PictureRecorder recorder = ui.PictureRecorder();
+  //     ui.Canvas c = ui.Canvas(recorder);
+  //     //var rect = Rect.fromLTWH(0.0, 0.0, _width, _height);
+  //     //c.clipRect(rect);
+  //
+  //     final bytesPicture = _filePicture.readAsBytesSync();
+  //     String img64Picture = base64Encode(bytesPicture);
+  //     final decodedBytesPicture = base64Decode(img64Picture);
+  //     final ui.Image originalImage = await ImageUtility.loadImage(
+  //         decodedBytesPicture);
+  //
+  //     final bytesWatermark = _fileWatermark.readAsBytesSync();
+  //     String img64Watermark = base64Encode(bytesWatermark);
+  //     final decodedBytesWatermark = base64Decode(img64Watermark);
+  //     final ui.Image watermarkImage = await ImageUtility.loadImage(
+  //         decodedBytesWatermark);
+  //
+  //     Paint
+  //     final mergedImage = c.Image(originalImage.width + watermarkImage.width, max(originalImage.height, watermarkImage.height));
+  //     ui.copyInto(mergedImage, originalImage, blend = false);
+  //     ui.copyInto(mergedImage, watermarkImage, dstx = originalImage.width, blend = false);
+  //
+  //     final documentDirectory = await getApplicationDocumentsDirectory();
+  //     final file = new File(join(documentDirectory.path, "merged_image.jpg"));
+  //     file.writeAsBytesSync(encodeJpg(mergedImage));
+  //
+  //     c.drawImage(originalImage, watermarkImage);
+  //
+  //     // Easy customisation for the position of the watermark in the next two lines
+  //     final int positionX = (originalImage.width / 2 - watermarkImage.width / 2)
+  //         .toInt();
+  //     final int positionY = (originalImage.height -
+  //         watermarkImage.height * 1.15).toInt();
+  //
+  //     ui.copyInto(
+  //       originalImage,
+  //       image,
+  //       dstX: positionX,
+  //       dstY: positionY,
+  //     );
+  //
+  //     final File watermarkedFile = File(watermark);
+  //     await watermarkedFile.writeAsBytes(ui.encodeJpg(originalImage));
+  //
+  //   }catch (e) {
+  //     print(e);
+  //   }
+  //
+  // }
+}
 /*
 import 'dart:async';
 import 'dart:typed_data';

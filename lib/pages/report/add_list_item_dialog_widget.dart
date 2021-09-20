@@ -7,6 +7,7 @@ import 'package:chat_app/models/defect.dart';
 import 'package:chat_app/models/list_item.dart';
 import 'package:chat_app/provider/list_provider.dart';
 import 'package:chat_app/utils/image_full_screen_wrapper.dart';
+import 'package:chat_app/utils/image_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:multi_image_picker2/multi_image_picker2.dart';
@@ -206,11 +207,7 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
     );
   }
 
-  Future<ui.Image> loadImage(Uint8List bytes) async {
-    final Completer<ui.Image> completer = Completer();
-    ui.decodeImageFromList(bytes, (ui.Image img) => completer.complete(img));
-    return completer.future;
-  }
+
   Widget buildGridView() {
     return Container(
       decoration: BoxDecoration(
@@ -272,7 +269,8 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
 
                             try{
                               final ui.Image _myBackgroundImage;
-                              _myBackgroundImage = await loadImage(_imageByteslist);
+                              _myBackgroundImage = await ImageUtility.loadImage(_imageByteslist);
+
                               //print("MyBackgroundImage - $_myBackgroundImage");
                               Navigator.push(context,
                                   MaterialPageRoute(builder: (context) => ImageDialogOld(

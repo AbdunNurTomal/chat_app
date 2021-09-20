@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'package:multi_image_picker2/multi_image_picker2.dart';
 
@@ -11,8 +10,8 @@ class ListItem {
 
   ListItem({
     this.id,
-    this.itemValue,
-    this.item,
+    required this.itemValue,
+    required this.item,
     required this.images,
     this.createdTime,
   });
