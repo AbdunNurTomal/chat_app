@@ -19,14 +19,14 @@ class ItemWidget extends StatelessWidget {
     child: Slidable(
       actionPane: const SlidableDrawerActionPane(),
       key: Key(listItem.id!),
-      actions: [
-        IconSlideAction(
-          color: Colors.green,
-          onTap: () => editItem(context, listItem),
-          caption: 'Edit',
-          icon: Icons.edit,
-        )
-      ],
+      // actions: [
+      //   IconSlideAction(
+      //     color: Colors.green,
+      //     onTap: () => editItem(context, listItem),
+      //     caption: 'Edit',
+      //     icon: Icons.edit,
+      //   )
+      // ],
       secondaryActions: [
         IconSlideAction(
           color: Colors.red,
@@ -75,7 +75,7 @@ class ItemWidget extends StatelessWidget {
       return AlertDialog(
         title: const Text("Delete Confirmation"),
         content: const Text(
-            "Are you sure you want to delete this item?"),
+            "Are you sure, want to delete this item?"),
         actions: <Widget>[
           ElevatedButton(
             onPressed: () {
@@ -99,11 +99,8 @@ class ItemWidget extends StatelessWidget {
     );
   }
   void editItem(BuildContext context, ListItem listItem) {
-    // final deleteToAddItem = Defects(
-    //   itemNumber: listItem.itemValue!,
-    //   itemName: listItem.item!,
-    // );
-    // DefectData.callDefect();
+    DefectData.callDefect();
+    DefectData.deleteDefectItem(listItem.item!);
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => EditListItemDialogWidget(listItem: listItem),

@@ -10,5 +10,5 @@ public final class BuildConfig {
   // Field from default config.
   public static final String LIBRARY_NAME = "flutter-fire-rtdb";
   // Field from default config.
-  public static final String LIBRARY_VERSION = "7.2.2";
+  public static final String LIBRARY_VERSION = "8.0.0";
 }

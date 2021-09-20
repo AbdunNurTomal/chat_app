@@ -1,28 +1,23 @@
-//import 'dart:async';
-//import 'dart:io';
-//import 'dart:typed_data';
-//import 'dart:ui' as ui;
+import 'dart:convert';
+import 'dart:io';
+import 'dart:math';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 
-//import 'package:chat_app/models/defect.dart';
-//import 'package:chat_app/utils/image_full_screen_wrapper.dart';
-//import 'package:cloud_firestore/cloud_firestore.dart';
-//import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-//import 'package:image/image.dart' as IMG;
-
-//import 'package:chat_app/models/dynamic_list.dart';
 import 'package:chat_app/models/defect.dart';
-import 'package:chat_app/models/list_item.dart';
 import 'package:chat_app/pages/report/add_list_item_dialog_widget.dart';
-import 'package:chat_app/pages/report/item_widget.dart';
 import 'package:chat_app/pages/report/list_item_widget.dart';
 import 'package:chat_app/provider/list_provider.dart';
+import 'package:chat_app/utils/global_methods.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-//import 'package:multi_image_picker2/multi_image_picker2.dart';
+import 'package:image/image.dart' as IMG;
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-//import 'package:uri_to_file/uri_to_file.dart';
-
-import '../report/back_defect_image_form.dart';
+import 'package:step_progress_indicator/step_progress_indicator.dart';
+import 'package:chat_app/pages/report/process_image_report.dart';
+import 'package:uri_to_file/uri_to_file.dart';
 
 class TeameLeaderPage extends StatefulWidget {
   static const String routeName = "\team_leader";
@@ -46,60 +41,154 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> {//with SingleTickerP
   int counter = 0;
   //bool processButton = false;
   //String _error = 'No Problem';
-  // late ListProvider defectItemProvider = Provider.of<ListProvider>(context, listen: false);
+  late ListProvider allItem;
+
+  late final List<DownloadController> _downloadControllers;
+
+  // Random r = Random();
+  // Uint8List getImage() {
+  //   Uint8List bytes =
+  //   Uint8List.fromList(List<int>.generate(10000, (i) => r.nextInt(255)));
+  //   Bitmap bitmap = Bitmap.fromHeadless(50, 50, bytes); // Not async
+  //   Uint8List headedBitmap = bitmap.buildHeaded();
+  //   return headedBitmap;
+  // }
 
   @override
   void initState() {
     DefectData.callDefect();
+    _downloadControllers = List<DownloadController>.generate(
+        2, (index) => SimulatedDownloadController(onOpenDownload: () {
+        _openDownload(index);
+      }),
+    );
     super.initState();
   }
 
+  void _openDownload(int index) {
+    // ScaffoldMessenger.of(context).showSnackBar(
+    //   SnackBar(
+    //     content: Text('Open App ${index + 1}'),
+    //   ),
+    // );
+  }
+
   void _showProcessDialog(context) {
-    // flutter defined function
     showDialog(
+      barrierDismissible: false,
       context: context,
       builder: (BuildContext context) {
-        // return alert dialog object
         return AlertDialog(
-          title: new Text('I am Title'),
+          insetPadding: const EdgeInsets.all(8.0),
+          title: const Center(child: Text('Precess Report File')),
           content: Container(
-            height: 150.0,
+            width: MediaQuery.of(context).size.width*0.8,
+            height: 250,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                new Row(
+                StepProgressIndicator(
+                  totalSteps: 6,
+                  currentStep: 4,
+                  size: 36,
+                  selectedColor: Colors.black,
+                  unselectedColor: Colors.grey,
+                  customStep: (index, color, _) => color == Colors.black
+                      ? Container(
+                    color: color,
+                    child: const Icon(
+                      Icons.check,
+                      color: Colors.white,
+                    ),
+                  )
+                      : Container(
+                    color: color,
+                    child: const Icon(
+                      Icons.remove,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 40.0),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    new Icon(Icons.toys),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8.0),
-                      child: new Text(' First Item'),
+                    const Icon(Icons.picture_as_pdf_sharp),
+                    const Padding(
+                      padding: EdgeInsets.only(left: 8.0),
+                      child: Text(' Create a Pdf report'),
+                    ),
+                    SizedBox(
+                      width: 96.0,
+                      child: AnimatedBuilder(
+                        animation: _downloadControllers[0],
+                        builder: (context, child) {
+                          return DownloadButton(
+                            status: _downloadControllers[0].downloadStatus,
+                            downloadProgress: _downloadControllers[0].progress,
+                            onDownload: _downloadControllers[0].startDownload,
+                            onCancel: _downloadControllers[0].stopDownload,
+                            onOpen: _downloadControllers[0].openDownload,
+                          );
+                        },
+                      ),
                     ),
                   ],
                 ),
-                new SizedBox(
-                  height: 20.0,
-                ),
-                new Row(
+                const SizedBox(height: 20.0),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    new Icon(Icons.toys),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8.0),
-                      child: new Text(' Second Item'),
+                    const Icon(Icons.video_collection_sharp),
+                    const Padding(
+                      padding: EdgeInsets.only(left: 8.0),
+                      child: Text(' Create a Video report'),
+                    ),
+                    SizedBox(
+                      width: 96.0,
+                      child: AnimatedBuilder(
+                        animation: _downloadControllers[1],
+                        builder: (context, child) {
+                          return DownloadButton(
+                            status: _downloadControllers[1].downloadStatus,
+                            downloadProgress: _downloadControllers[1].progress,
+                            onDownload: _downloadControllers[1].startDownload,
+                            onCancel: _downloadControllers[1].stopDownload,
+                            onOpen: _downloadControllers[1].openDownload,
+                          );
+                        },
+                      ),
                     ),
                   ],
                 ),
-                new SizedBox(
-                  height: 20.0,
-                ),
-                new Row(
-                  children: <Widget>[
-                    new Icon(Icons.toys),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8.0),
-                      child: new Text('Third Item'),
+                const SizedBox(height: 40.0),
+                InkWell(
+                  child: Container(
+                    padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
+                    decoration: const BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.all(Radius.circular(32)),
+                      // borderRadius: BorderRadius.only(
+                      //   bottomLeft: Radius.circular(32.0),
+                      //   bottomRight: Radius.circular(32.0)
+                      // ),
                     ),
-                  ],
+                    child: const Text(
+                      "Done",
+                      style: TextStyle(color: Colors.white),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
                 ),
+                // Row(
+                //   children: const <Widget>[
+                //     Icon(Icons.toys),
+                //     Padding(
+                //       padding: EdgeInsets.only(left: 8.0),
+                //       child: Text('Third Item'),
+                //     ),
+                //   ],
+                // ),
               ],
             ),
           ),
@@ -107,6 +196,7 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> {//with SingleTickerP
       },
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -134,25 +224,6 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> {//with SingleTickerP
             ],
           ),
           actions: <Widget>[
-            //IconButton(
-            //  icon: const Icon(Icons.add),
-            //  tooltip: 'Add form field',
-              //onPressed: () {
-                //ScaffoldMessenger.of(context).showSnackBar(
-                //  const SnackBar(
-                //    content: Text('Trying to add field in form'),
-                //  ),
-                //);
-                //taskItems.addItem(DefectImageForm(itemIndex: counter));
-
-              //  const AddListItemDialogWidget();
-              //},
-            //  onPressed: () => showDialog(
-            //    context: context,
-            //    builder: (context) => AddListItemDialogWidget(),
-            //    barrierDismissible: false,
-            //  ),
-            //),
             PopupMenuButton<String>(
               elevation: 20,
               enabled: true,
@@ -162,7 +233,28 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> {//with SingleTickerP
                 //});
                 switch(value){
                   case 'Process':
-                    _showProcessDialog(context);
+                    allItem = Provider.of<ListProvider>(context,listen: false);
+                    //print("Item <<>> ${allItem.allListItem[0].images[0].identifier}");
+
+                    for(int i=0;i<allItem.allListItem.length;i++){
+                      int countItem=0,countImage=0;
+                      countItem++;
+                      String item = allItem.allListItem[i].item!;
+                      createImage(item,countItem);
+                      String itemValue = allItem.allListItem[i].itemValue!;
+                      if(allItem.allListItem[i].images.isNotEmpty){
+                        for(int j=0;j<allItem.allListItem[i].images.length;j++){
+                          countImage++;
+                          //String? imageName = allItem.allListItem[i].images[j].name;
+                          String? imageUri = allItem.allListItem[i].images[j].identifier;
+                          //saveImage(imageUri!,countItem,countImage);
+                        }
+                      }
+                    }
+
+
+                    //saveImage(imageUri!,imageName!);
+                    (allItem.allListItem.isNotEmpty) ? _showProcessDialog(context) : GlobalMethod.showAlertDialog(context,"Report Process Operation","No item found!!!");
                     break;
                 }
               },
@@ -193,42 +285,6 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> {//with SingleTickerP
               barrierDismissible: false,
             ),
         ),
-
-        /*
-        body: Column(
-            //key: _formKey,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(10.0),
-                child:
-                (!processButtn) ? Text('Error: $_error'): ElevatedButton(
-                  onPressed: (){
-
-                  },
-                  child: const Text("Process")
-                ),
-              ),
-              Consumer<ListProvider>(builder: (context, provider, child) {
-                return Expanded(
-                  child: ListView.separated(
-                    itemCount: listClass.length,
-                    separatorBuilder: (context, index) => const Divider(
-                        height: 8,
-                        color: Colors.black,
-                      ),
-                    //itemBuilder: buildList,
-                    itemBuilder: (context, index) {
-                      final listItem = listClass[index];
-                      return ListItemWidget(listItem: listItem);
-                    },
-                  ),
-                );
-              }),
-            ],
-          ),
-
-       */
         body:  Container(
             //margin: const EdgeInsets.all(6),
             decoration: const BoxDecoration(
@@ -244,6 +300,61 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> {//with SingleTickerP
         ),
     );
   }
+  Future<void> createImage(String itemName, int fileName) async {
+    try {
+      var dir = await getExternalStorageDirectory();
+
+      ui.PictureRecorder recorder = ui.PictureRecorder();
+      Canvas c = Canvas(recorder);
+
+      final textStyle = TextStyle(color: Colors.black, fontSize: 30);
+      TextSpan textSpan = TextSpan(text: 'Hello, world.',style: textStyle);
+      TextPainter textPainter = TextPainter(text: textSpan,textDirection: TextDirection.ltr);
+      textPainter.layout(minWidth: 300,maxWidth: 300);
+
+      Offset offset = Offset(50.0, 50.0);
+      textPainter.paint(c, offset);
+
+      // c.drawPaint(paint);
+      ui.Picture picture = recorder.endRecording();
+      ui.Image img = await picture.toImage(300, 300);
+      ByteData? byteData = await img.toByteData();
+print("byteData $byteData");
+      Uint8List jpgBytes = byteData!.buffer.asUint8List();
+
+      var testdir = await  Directory('${dir?.path}/images').create(recursive: true);
+      new File('${testdir.path}/$fileName\_0.jpg').create(recursive: true);
+
+      File('${testdir.path}/$fileName\_0.jpg').writeAsBytesSync(jpgBytes);
+
+    } catch (e) {
+      print(e);
+    }
+  }
+  Future<bool> saveImage(String file, int itemNumber, int slNo) async {
+    try {
+      String fileName = '$itemNumber\_$slNo.jpg';
+      Uri _uri = Uri.parse(file);
+      File _file = await toFile(_uri);
+
+      var dir = await getExternalStorageDirectory();
+      var testdir = await  Directory('${dir?.path}/images').create(recursive: true);
+
+      final bytes = _file.readAsBytesSync();
+      String img64 = base64Encode(bytes);
+      new File('${testdir.path}/$fileName').create(recursive: true);
+      File('${testdir.path}/$fileName').exists().then((_) { return false;});
+      final decodedBytes = base64Decode(img64);
+
+      File('${testdir.path}/$fileName').writeAsBytesSync(decodedBytes);
+
+      return true;
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
+
 
 /*
   Future<ui.Image> loadImage(Uint8List bytes) async {
@@ -507,3 +618,254 @@ class Item {
   final Icon icon;
 }
 */
+
+enum DownloadStatus {
+  notDownloaded,
+  fetchingDownload,
+  downloading,
+  downloaded,
+}
+
+abstract class DownloadController implements ChangeNotifier {
+  DownloadStatus get downloadStatus;
+  double get progress;
+
+  void startDownload();
+  void stopDownload();
+  void openDownload();
+}
+
+class SimulatedDownloadController extends DownloadController
+    with ChangeNotifier {
+  SimulatedDownloadController({
+    DownloadStatus downloadStatus = DownloadStatus.notDownloaded,
+    double progress = 0.0,
+    required VoidCallback onOpenDownload,
+  })   : _downloadStatus = downloadStatus,
+        _progress = progress,
+        _onOpenDownload = onOpenDownload;
+
+  DownloadStatus _downloadStatus;
+  @override
+  DownloadStatus get downloadStatus => _downloadStatus;
+
+  double _progress;
+  @override
+  double get progress => _progress;
+
+  final VoidCallback _onOpenDownload;
+
+  bool _isDownloading = false;
+
+  @override
+  void startDownload() {
+    if (downloadStatus == DownloadStatus.notDownloaded) {
+      _doSimulatedDownload();
+    }
+  }
+
+  @override
+  void stopDownload() {
+    if (_isDownloading) {
+      _isDownloading = false;
+      _downloadStatus = DownloadStatus.notDownloaded;
+      _progress = 0.0;
+      notifyListeners();
+    }
+  }
+
+  @override
+  void openDownload() {
+    if (downloadStatus == DownloadStatus.downloaded) {
+      _onOpenDownload();
+    }
+  }
+
+  Future<void> _doSimulatedDownload() async {
+    _isDownloading = true;
+    _downloadStatus = DownloadStatus.fetchingDownload;
+    notifyListeners();
+
+    // Wait a second to simulate fetch time.
+    await Future<void>.delayed(const Duration(seconds: 1));
+
+    // If the user chose to cancel the download, stop the simulation.
+    if (!_isDownloading) {
+      return;
+    }
+
+    // Shift to the downloading phase.
+    _downloadStatus = DownloadStatus.downloading;
+    notifyListeners();
+
+    const downloadProgressStops = [0.0, 0.15, 0.45, 0.80, 1.0];
+    for (final stop in downloadProgressStops) {
+      // Wait a second to simulate varying download speeds.
+      await Future<void>.delayed(const Duration(seconds: 1));
+
+      // If the user chose to cancel the download, stop the simulation.
+      if (!_isDownloading) {
+        return;
+      }
+
+      // Update the download progress.
+      _progress = stop;
+      notifyListeners();
+    }
+
+    // Wait a second to simulate a final delay.
+    await Future<void>.delayed(const Duration(seconds: 1));
+
+    // If the user chose to cancel the download, stop the simulation.
+    if (!_isDownloading) {
+      return;
+    }
+
+    // Shift to the downloaded state, completing the simulation.
+    _downloadStatus = DownloadStatus.downloaded;
+    _isDownloading = false;
+    notifyListeners();
+  }
+}
+
+@immutable
+class DownloadButton extends StatelessWidget {
+  const DownloadButton({
+    Key? key,
+    required this.status,
+    this.downloadProgress = 0.0,
+    required this.onDownload,
+    required this.onCancel,
+    required this.onOpen,
+    this.transitionDuration = const Duration(milliseconds: 500),
+  }) : super(key: key);
+
+  final DownloadStatus status;
+  final double downloadProgress;
+  final VoidCallback onDownload;
+  final VoidCallback onCancel;
+  final VoidCallback onOpen;
+  final Duration transitionDuration;
+
+  bool get _isDownloading => status == DownloadStatus.downloading;
+
+  bool get _isFetching => status == DownloadStatus.fetchingDownload;
+
+  bool get _isDownloaded => status == DownloadStatus.downloaded;
+
+  void _onPressed() {
+    switch (status) {
+      case DownloadStatus.notDownloaded:
+        onDownload();
+        break;
+      case DownloadStatus.fetchingDownload:
+      // do nothing.
+        break;
+      case DownloadStatus.downloading:
+        onCancel();
+        break;
+      case DownloadStatus.downloaded:
+        onOpen();
+        break;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: _onPressed,
+      child: Stack(
+        children: [
+          _buildButtonShape(
+            child: _buildText(context),
+          ),
+          _buildDownloadingProgress(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildButtonShape({required Widget child}) {
+    return AnimatedContainer(
+      duration: transitionDuration,
+      curve: Curves.ease,
+      width: double.infinity,
+      decoration: _isFetching
+          ? ShapeDecoration(
+        shape: const CircleBorder(),
+        color: Colors.white.withOpacity(0.0),
+      )
+          : const ShapeDecoration(
+        shape: StadiumBorder(),
+        color: CupertinoColors.lightBackgroundGray,
+      ),
+      child: child,
+    );
+  }
+
+  Widget _buildText(BuildContext context) {
+    final text = _isDownloaded ? 'OPEN' : 'GET';
+    final opacity = _isFetching ? 0.0 : 1.0;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: AnimatedOpacity(
+        duration: transitionDuration,
+        opacity: opacity,
+        curve: Curves.ease,
+        child: Text(
+          text,
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.button?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: CupertinoColors.activeBlue,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDownloadingProgress() {
+    return Positioned.fill(
+      child: AnimatedOpacity(
+        duration: transitionDuration,
+        opacity: _isFetching ? 1.0 : 0.0,
+        curve: Curves.ease,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            _buildProgressIndicator(),
+            if (_isDownloading)
+              const Icon(
+                Icons.stop,
+                size: 14.0,
+                color: CupertinoColors.activeBlue,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProgressIndicator() {
+    return AspectRatio(
+      aspectRatio: 1.0,
+      child: TweenAnimationBuilder<double>(
+        tween: Tween(begin: 0.0, end: downloadProgress),
+        duration: const Duration(milliseconds: 200),
+        builder: (context, progress, child) {
+          return CircularProgressIndicator(
+            backgroundColor: _isDownloading
+                ? CupertinoColors.lightBackgroundGray
+                : Colors.white.withOpacity(0.0),
+            valueColor: AlwaysStoppedAnimation(_isFetching
+                ? CupertinoColors.lightBackgroundGray
+                : CupertinoColors.activeBlue),
+            strokeWidth: 2.0,
+            value: _isFetching ? null : progress,
+          );
+        },
+      ),
+    );
+  }
+}
