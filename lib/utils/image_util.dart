@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:async';
-import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'dart:ui';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:path_provider/path_provider.dart';
 import 'package:uri_to_file/uri_to_file.dart';
 
 class ImageUtility {
@@ -24,62 +26,111 @@ class ImageUtility {
     return completer.future;
   }
 
-  // Future<void> watermarkPicture( String picture, String watermark, String fileName) async {
-  //   Uri _uriPicture = Uri.parse(picture);
-  //   File _filePicture = await toFile(_uriPicture);
-  //   Uri _uriWatermark = Uri.parse(watermark);
-  //   File _fileWatermark = await toFile(_uriWatermark);
-  //
-  //   try {
-  //     ui.PictureRecorder recorder = ui.PictureRecorder();
-  //     ui.Canvas c = ui.Canvas(recorder);
-  //     //var rect = Rect.fromLTWH(0.0, 0.0, _width, _height);
-  //     //c.clipRect(rect);
-  //
-  //     final bytesPicture = _filePicture.readAsBytesSync();
-  //     String img64Picture = base64Encode(bytesPicture);
-  //     final decodedBytesPicture = base64Decode(img64Picture);
-  //     final ui.Image originalImage = await ImageUtility.loadImage(
-  //         decodedBytesPicture);
-  //
-  //     final bytesWatermark = _fileWatermark.readAsBytesSync();
-  //     String img64Watermark = base64Encode(bytesWatermark);
-  //     final decodedBytesWatermark = base64Decode(img64Watermark);
-  //     final ui.Image watermarkImage = await ImageUtility.loadImage(
-  //         decodedBytesWatermark);
-  //
-  //     Paint
-  //     final mergedImage = c.Image(originalImage.width + watermarkImage.width, max(originalImage.height, watermarkImage.height));
-  //     ui.copyInto(mergedImage, originalImage, blend = false);
-  //     ui.copyInto(mergedImage, watermarkImage, dstx = originalImage.width, blend = false);
-  //
-  //     final documentDirectory = await getApplicationDocumentsDirectory();
-  //     final file = new File(join(documentDirectory.path, "merged_image.jpg"));
-  //     file.writeAsBytesSync(encodeJpg(mergedImage));
-  //
-  //     c.drawImage(originalImage, watermarkImage);
-  //
-  //     // Easy customisation for the position of the watermark in the next two lines
-  //     final int positionX = (originalImage.width / 2 - watermarkImage.width / 2)
-  //         .toInt();
-  //     final int positionY = (originalImage.height -
-  //         watermarkImage.height * 1.15).toInt();
-  //
-  //     ui.copyInto(
-  //       originalImage,
-  //       image,
-  //       dstX: positionX,
-  //       dstY: positionY,
-  //     );
-  //
-  //     final File watermarkedFile = File(watermark);
-  //     await watermarkedFile.writeAsBytes(ui.encodeJpg(originalImage));
-  //
-  //   }catch (e) {
-  //     print(e);
-  //   }
-  //
-  // }
+  static Future<void> createImage(String itemName, int fileName) async {
+    try {
+      var dir = await getExternalStorageDirectory();
+
+      ui.PictureRecorder recorder = ui.PictureRecorder();
+      Canvas c = Canvas(recorder);
+      var rect = Rect.fromLTWH(0.0, 0.0, 300.0, 300.0);
+      c.clipRect(rect);
+
+      final textStyle = TextStyle(color: Colors.white, fontSize: 24);
+      TextSpan textSpan = TextSpan(text: itemName,style: textStyle);
+      TextPainter textPainter = TextPainter(text: textSpan,textDirection: TextDirection.ltr);
+      textPainter.layout(minWidth: 0,maxWidth: 300);
+
+      Offset offset = Offset(10.0, 10.0);
+      textPainter.paint(c, offset);
+
+      // c.drawPaint(paint);
+      ui.Picture picture = recorder.endRecording();
+      ui.Image img = await picture.toImage(300, 300);
+
+// print("img $img");
+      ByteData? byteData = await img.toByteData(format: ui.ImageByteFormat.png);
+// print("byteData $byteData");
+      Uint8List jpgBytes = byteData!.buffer.asUint8List();
+// print("jpgBytes $jpgBytes");
+      var testdir = await Directory('${dir?.path}/images').create(recursive: true);
+      File('${testdir.path}/$fileName\_0.jpg').create(recursive: true);
+
+      File('${testdir.path}/$fileName\_0.jpg').writeAsBytesSync(jpgBytes);
+
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  static Future<bool> saveImage(String file, int itemNumber, int slNo) async {
+    try {
+      String fileName = '$itemNumber\_$slNo.jpg';
+      String itemName = '$itemNumber\_$slNo';
+
+      Uri _uri = Uri.parse(file);
+      File _file = await toFile(_uri);
+
+      var dir = await getExternalStorageDirectory();
+      var testdir = await  Directory('${dir?.path}/images').create(recursive: true);
+
+      final bytes = _file.readAsBytesSync();
+      String img64 = base64Encode(bytes);
+      File('${testdir.path}/$fileName').create(recursive: true);
+      File('${testdir.path}/$fileName').exists().then((_) { return false;});
+      final decodedBytes = base64Decode(img64);
+
+      File('${testdir.path}/$fileName').writeAsBytesSync(decodedBytes);
+
+      final ui.Image _imageBackgroud = await ImageUtility.loadImage(decodedBytes);
+      writeLogoInsideImage('${testdir.path}/$fileName',_imageBackgroud.width,_imageBackgroud.height,itemName);
+
+      return true;
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
+
+  static Future<void> writeLogoInsideImage(String imagePath,int width, int height, String itemName) async{
+    ui.PictureRecorder recorder = ui.PictureRecorder();
+    Canvas c = Canvas(recorder);
+
+    Uri _uriPicture = Uri.parse(imagePath);
+    File _filePicture = await toFile(_uriPicture);
+    final bytesPicture = _filePicture.readAsBytesSync();
+    String img64Picture = base64Encode(bytesPicture);
+    final decodedBytesPicture = base64Decode(img64Picture);
+    final ui.Image originalImage = await ImageUtility.loadImage(
+        decodedBytesPicture);
+    c.drawImage(originalImage, Offset.zero, Paint());
+
+    final ui.Image _logoImage = await ImageUtility.loadUiImage('assets/images/pqc.png');
+    final double positionX = (originalImage.width - _logoImage.width * 1.15).toDouble();
+    final double positionY = (originalImage.height - _logoImage.height * 1.15).toDouble();
+    c.drawImage(_logoImage, Offset(positionX,positionY), Paint());
+
+    // var rect = Rect.fromLTWH(50.0, 50.0, _width, _height);
+    // c.clipRect(rect);
+    const textStyle = TextStyle(backgroundColor: Colors.white, color: Colors.black, fontSize: 24);
+    TextSpan textSpan = TextSpan(text: itemName,style: textStyle);
+    TextPainter textPainter = TextPainter(text: textSpan,textDirection: TextDirection.ltr);
+    textPainter.layout(minWidth: 0,maxWidth: originalImage.width.toDouble());
+
+    print('width : ${originalImage.width}');
+    print('Height : ${originalImage.height}');
+    final double testPositionX = (originalImage.width - 60).toDouble();
+    final double testPositionY = (originalImage.height - (originalImage.height - 50)).toDouble();
+    //Offset offset = Offset(testPositionX,testPositionY);
+    //Offset offset = Offset(10.0, 10.0);
+    textPainter.paint(c, Offset(testPositionX, testPositionY));
+
+    ui.Picture picture = recorder.endRecording();
+    ui.Image img = await picture.toImage(width, height);
+
+    ByteData? byteData = await img.toByteData(format: ui.ImageByteFormat.png);
+    Uint8List jpgBytes = byteData!.buffer.asUint8List();
+    File(imagePath).writeAsBytesSync(jpgBytes);
+  }
 }
 /*
 import 'dart:async';

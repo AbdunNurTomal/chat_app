@@ -1,13 +1,12 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
-import 'dart:async';
+import 'package:chat_app/utils/painter.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:uri_to_file/uri_to_file.dart';
-import 'package:flutter/services.dart';
-import 'package:path_provider/path_provider.dart';
 
 class ImageDialogOld extends StatefulWidget {
   final String imageUri;
@@ -25,17 +24,74 @@ class DrawingArea {
   Paint areaPaint;
   DrawingArea({required this.point, required this.areaPaint});
 }
+enum enumToolTypes { pencil, eraser, rectangle, circle, text }
+
+class ToolIconsData {
+  IconData icon;
+  bool isSelected;
+  enumToolTypes toolType;
+  ToolIconsData(this.icon, this.toolType, {this.isSelected = false});
+}
+class RecordPaints{
+  int? startIndex;
+  int? endIndex;
+
+  RecordPaints(this.startIndex, this.endIndex);
+}
 
 class _ImageDialogOldState extends State<ImageDialogOld> {
   GlobalKey globalKey = GlobalKey();
 
-  List<DrawingArea> points = [];
-  double opacity = 1.0;
-  StrokeCap strokeType = StrokeCap.round;
-  double strokeWidth = 2.0;
+  List<PaintedPoints> pointsList = [];
+  List<PaintedPoints> paintListDeleted = [];
+  List<RecordPaints> paintedPoints = [];
+  // late RecordPaints? recordPaints;
+  //List<DrawingArea> points = [];
+
+  enumToolTypes selectedTool = enumToolTypes.pencil;
+  List<enumToolTypes> drawHistory = [];
+
+  bool isCanvasLocked = false;
+  bool saveClicked = false;
+
+  List<PaintedSquires> squaresList = [];
+  late PaintedSquires? unfinishedSquare;
+
+  List<PaintedCircles> circleList = [];
+  late PaintedCircles? unfinishedCircle;
+
+  StrokeCap strokeType = StrokeCap.square;
+  double strokeWidth = 3.0;
   Color selectedColor = Colors.black;
 
-  //var pictureRecorder = new ui.PictureRecorder();
+  Paint getPoint() {
+    if (selectedTool == enumToolTypes.eraser) {
+      return Paint()
+        ..strokeCap = strokeType
+        ..isAntiAlias = true
+        ..strokeWidth = strokeWidth
+        ..color = Colors.white;
+    } else {
+      return Paint()
+        ..strokeCap = strokeType
+        ..isAntiAlias = true
+        ..strokeWidth = strokeWidth
+        ..color = selectedColor;
+    }
+  }
+
+  void showToastMessage(String message) {
+    Fluttertoast.showToast(
+        msg: message,
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.black87,
+        textColor: Colors.white,
+        fontSize: 16.0);
+  }
+
+  double opacity = 1.0;
+
 
   @override
   void initState() {
@@ -55,6 +111,7 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
     //print("File - $_file");
     return _file;
   }
+/*
   Future<String> _getDirectoryPath() async{
     final directory = await getExternalStorageDirectory();
     final myImagePath = '${directory?.path}/MyImages';
@@ -104,10 +161,11 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
     //    name: "canvas_image");
     //print(result);
   }
+*/
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
+    // final height = MediaQuery.of(context).size.height;
 
     void selectColor() {
       showDialog(
@@ -119,7 +177,7 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
               child: BlockPicker(
                 pickerColor: selectedColor,
                 onColorChanged: (color) {
-                  this.setState(() {
+                  setState(() {
                     selectedColor = color;
                   });
                 },
@@ -130,7 +188,7 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: Text("Close"))
+                  child: const Text("Close"))
             ],
           );
         },
@@ -139,167 +197,455 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Stack(
-          children: <Widget>[
-            /*
-          Container(
-            decoration: BoxDecoration(
-                gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color.fromRGBO(138, 35, 135, 1.0),
-                      Color.fromRGBO(233, 64, 87, 1.0),
-                      Color.fromRGBO(242, 113, 33, 1.0),
-                    ])),
-          ),
-
-             */
-          FloatingActionButton(
-            heroTag: "paint_save",
-            child: Icon(Icons.save),
-            tooltip: 'Save',
-            onPressed: () {
-              //min: 0, max: 50
-              setState(() {
-                _capturePng();
-              });
-            },
-          ),
-          Center(
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      width: width * 0.8,
-                      height: height * 0.8,
+      body: SafeArea(
+        child: Container(
+          // decoration: const BoxDecoration(
+          //   border: Border.symmetric(
+          //       vertical: BorderSide(color: Colors.black54, width: 6)),
+          // ),
+          padding: const EdgeInsets.all(1.0),
+          child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                // Container(
+                //   width: width * 0.9,
+                //   height: height * 0.1,
+                //   decoration: BoxDecoration(
+                //       borderRadius: const BorderRadius.all(Radius.circular(5.0)),
+                //       boxShadow: [
+                //         BoxShadow(
+                //           color: Colors.blue.withOpacity(0.3),
+                //           blurRadius: 1.0,
+                //           // spreadRadius: 0.1,
+                //         )
+                //       ]),
+                //   child: Row(
+                //     crossAxisAlignment: CrossAxisAlignment.center,
+                //     mainAxisAlignment: MainAxisAlignment.start,
+                //     children: <Widget>[
+                //       GestureDetector(
+                //         onTap: () {
+                //           setState(() {
+                //             saveClicked = true;
+                //           });
+                //         },
+                //         child: MenuItem("Save"),
+                //       ),
+                //       GestureDetector(
+                //         onTap: () {
+                //           setState(() {
+                //             if (drawHistory.isNotEmpty) {
+                //               enumToolTypes lastAction = drawHistory.last;
+                //               if (lastAction == enumToolTypes.eraser || lastAction == enumToolTypes.pencil) {
+                //                 if (paintedPoints.isNotEmpty) {
+                //                   RecordPaints lastPoint = paintedPoints.last;
+                //                   pointsList!.removeRange(lastPoint.startIndex!, lastPoint.endIndex!);
+                //                   paintedPoints.removeLast();
+                //                 }
+                //               } else if (lastAction == enumToolTypes.rectangle) {
+                //                 squaresList.removeLast();
+                //               } else {
+                //                 circleList.removeLast();
+                //               }
+                //               drawHistory.removeLast();
+                //             }
+                //             //pointsListDeleted.;
+                //           });
+                //         },
+                //         child: MenuItem("Undo"),
+                //       ),
+                //       GestureDetector(
+                //         onTap: () {
+                //           setState(() {
+                //             pointsList!.clear();
+                //             paintedPoints.clear();
+                //             squaresList.clear();
+                //             circleList.clear();
+                //           });
+                //         },
+                //         child: MenuItem("Clear"),
+                //       ),
+                //     ],
+                //   ),
+                // ),
+                Container(
+                  width: width * 1.0,
+                  decoration: BoxDecoration(
+                    // color: Colors.black,
+                      borderRadius: const BorderRadius.all(Radius.circular(5.0)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black45.withOpacity(0.1),
+                          // blurRadius: 1.0,
+                          // spreadRadius: 0.1,
+                        )]
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Wrap(children: getToolBoxIcons()),
+                      // const SizedBox(height: 20),
+                      // Container(
+                      //   width: 80,
+                      //   height: 90,
+                      //   decoration: BoxDecoration(
+                      //     border: Border.all(color: Colors.grey, width: 2),
+                      //   ),
+                      //   child: Column(
+                      //     mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      //     mainAxisSize: MainAxisSize.min,
+                      //     children: <Widget>[
+                      //       strokeWidthWidget(3),
+                      //       strokeWidthWidget(5),
+                      //       strokeWidthWidget(7),
+                      //     ],
+                      //   ),
+                      // ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: LayoutBuilder(builder: (context, constraints) {
+                    return Container(
+                      width: width * 0.9,
+                      // height: height * 0.7,
                       decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                          // borderRadius: const BorderRadius.all(Radius.circular(5.0)),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.4),
-                              blurRadius: 5.0,
-                              spreadRadius: 1.0,
+                              color: Colors.yellowAccent.withOpacity(0.3),
+                              // blurRadius: 1.0,
+                              // spreadRadius: 0.1,
                             )
                           ]),
                       child: GestureDetector(
+                        key: globalKey,
                         onPanUpdate: (details) {
+                          if (isCanvasLocked) return;
                           setState(() {
-                            points.add(DrawingArea(
-                                point: details.localPosition,
-                                areaPaint: Paint()
-                                  ..strokeCap = strokeType
-                                  ..isAntiAlias = true
-                                  ..color = selectedColor
-                                  ..strokeWidth = strokeWidth));
+                            final renderBox = context.findRenderObject() as RenderBox;
+                            if (selectedTool == enumToolTypes.pencil || selectedTool == enumToolTypes.eraser) {
+                              pointsList.add(
+                                PaintedPoints(
+                                  points: renderBox.globalToLocal(details.globalPosition),
+                                  paint: getPoint(),
+                                ),
+                              );
+                            } else if (selectedTool == enumToolTypes.rectangle) {
+                              unfinishedSquare!.end = renderBox.globalToLocal(details.globalPosition);
+                            } else if (selectedTool == enumToolTypes.circle) {
+                              unfinishedCircle!.end = renderBox.globalToLocal(details.globalPosition);
+                            }
                           });
                         },
                         onPanStart: (details) {
+                          if (isCanvasLocked) return;
                           setState(() {
-                            points.add(DrawingArea(
-                                point: details.localPosition,
-                                areaPaint: Paint()
-                                  ..strokeCap = strokeType
-                                  ..isAntiAlias = true
-                                  ..color = selectedColor
-                                  ..strokeWidth = strokeWidth));
+                            final renderBox = context.findRenderObject() as RenderBox;
+                            if (selectedTool == enumToolTypes.pencil || selectedTool == enumToolTypes.eraser) {
+                              if (pointsList.isNotEmpty) {
+                                paintedPoints.add(RecordPaints(pointsList.length, null));
+                              } else {
+                                paintedPoints.add(RecordPaints(0, null));
+                              }
+                              pointsList.add(
+                                PaintedPoints(
+                                  points: renderBox.globalToLocal(details.globalPosition),
+                                  paint: getPoint(),
+                                ),
+                              );
+                            } else if (selectedTool == enumToolTypes.rectangle) {
+                              unfinishedSquare = PaintedSquires(null,null,null);
+                              Offset os = renderBox.globalToLocal(details.globalPosition);
+                              unfinishedSquare!.start = os;
+                              unfinishedSquare!.end = os;
+                              unfinishedSquare!.paint = getPoint();
+                            } else if (selectedTool == enumToolTypes.circle) {
+                              unfinishedCircle = PaintedCircles(null,null,null);
+                              Offset os = renderBox.globalToLocal(details.globalPosition);
+                              unfinishedCircle!.start = os;
+                              unfinishedCircle!.end = os;
+                              unfinishedCircle!.paint = getPoint();
+                            }
                           });
                         },
                         onPanEnd: (details) {
+                          if (isCanvasLocked) return;
                           setState(() {
-                            //points = null;
+                            drawHistory.add(selectedTool);
+                            if (selectedTool == enumToolTypes.pencil || selectedTool == enumToolTypes.eraser) {
+                              paintedPoints.firstWhere((element) => element.endIndex == null).endIndex = pointsList.length;
+                              // pointsList.add();
+                            } else if (selectedTool == enumToolTypes.rectangle) {
+                              setState(() {
+                                squaresList.add(unfinishedSquare!);
+                                unfinishedSquare = null;
+                              });
+                            } else if (selectedTool == enumToolTypes.circle) {
+                              setState(() {
+                                circleList.add(unfinishedCircle!);
+                                unfinishedCircle = null;
+                              });
+                            }
                           });
                         },
-                        child: SizedBox.expand(
-                          child: RepaintBoundary(
-                            key: globalKey,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                              //child: Hero(
-                              //  tag: widget.tag,
-                                child: Stack(
-                                  children: [
-                                    Center(
-                                      child: FutureBuilder(
-                                        future: _getLocalFile(widget.imageUri),
-                                        builder: (BuildContext context, AsyncSnapshot<File> snapshot) {
-                                          return snapshot.data != null ? Image.file(snapshot.data!) : Container();
-                                        }
-                                      ),
-                                    ),
-                                   CustomPaint(
-                                     size: Size.infinite,
-                                      painter: MyCustomPainter(
-                                        points: points,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              //),
-                            ),
-                          ),
-                        ),
-                        //),
-                        ///onTap: () {
-                          //Navigator.pop(context);
-                        //},
+                        // child: SizedBox.expand(
+                        //   child: RepaintBoundary(
+                        //     key: globalKey,
+                        //     child: ClipRRect(
+                        //       // borderRadius: const BorderRadius.all(
+                        //       //     Radius.circular(10.0)),
+                        //       //child: Hero(
+                        //       //  tag: widget.tag,
+                        //       child: Stack(
+                        //         children: [
+                        //           ClipRect(
+                        //             child: Container(
+                        //               //Canvas
+                        //               color: Colors.white,
+                        //               //margin: EdgeInsets.only(bottom: 50, right: 80),
+                        //               child: CustomPaint(
+                        //                 size: Size(
+                        //                     constraints.widthConstraints().maxWidth,
+                        //                     constraints
+                        //                         .heightConstraints()
+                        //                         .maxHeight),
+                        //                 // painter: PainterCanvas(
+                        //                 //   pointsList: paintList,
+                        //                 //   squaresList: squaresList,
+                        //                 //   circlesList: circleList,
+                        //                 //   unfinishedSquare: unfinishedSquare,
+                        //                 //   unfinishedCircle: unfinishedCircle,
+                        //                 //   saveImage: saveClicked,
+                        //                 //   // saveCallback: (Picture picture) async {
+                        //                 //   //   var status =
+                        //                 //   //   await Permission.storage.status;
+                        //                 //   //   if (!status.isGranted) {
+                        //                 //   //     await Permission.storage.request();
+                        //                 //   //   }
+                        //                 //   //   if (status.isGranted) {
+                        //                 //   //     final img = await picture.toImage(
+                        //                 //   //         constraints.maxWidth.round(),
+                        //                 //   //         constraints.maxHeight.round());
+                        //                 //   //     final bytes = await img.toByteData(
+                        //                 //   //         format: ImageByteFormat.png);
+                        //                 //   //     await ImageGallerySaver.saveImage(
+                        //                 //   //       Uint8List.fromList(
+                        //                 //   //           bytes.buffer.asUint8List()),
+                        //                 //   //       quality: 100,
+                        //                 //   //       name:
+                        //                 //   //       DateTime.now().toIso8601String(),
+                        //                 //   //     );
+                        //                 //   //     showToastMessage(
+                        //                 //   //         "Image saved to gallery.");
+                        //                 //   //   }
+                        //                 //   //   setState(() {
+                        //                 //   //     saveClicked = false;
+                        //                 //   //   });
+                        //                 //   // },
+                        //                 // ),
+                        //               ),
+                        //             ),
+                        //           ),
+                        //           Center(
+                        //             child: FutureBuilder(
+                        //                 future: _getLocalFile(widget.imageUri),
+                        //                 builder: (BuildContext context,
+                        //                     AsyncSnapshot<File> snapshot) {
+                        //                   return snapshot.data != null
+                        //                       ? Image.file(snapshot.data!)
+                        //                       : Container();
+                        //                 }
+                        //             ),
+                        //           ),
+                        //           // CustomPaint(
+                        //           //   size: Size.infinite,
+                        //           //   painter: MyCustomPainter(
+                        //           //     //points: points,
+                        //           //   ),
+                        //           // ),
+                        //         ],
+                        //       ),
+                        //       //),
+                        //     ),
+                        //   ),
+                        // ),
                       ),
-                    ),
+                    );
+                  }),
+                ),
+                Container(
+                  width: width * 1.0,
+                  decoration: BoxDecoration(
+                      // color: Colors.black,
+                      borderRadius: const BorderRadius.all(Radius.circular(5.0)),
+                      boxShadow: [
+                          BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          // blurRadius: 1.0,
+                          // spreadRadius: 0.1,
+                        )]
                   ),
-                  Container(
-                    width: width * 0.8,
-                    decoration: BoxDecoration(
-                        color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(20.0))),
-                    child: Row(
-                      children: <Widget>[
-                        IconButton(
-                        icon: Icon(
-                          Icons.color_lens,
-                          color: selectedColor,
-                        ),
-                        onPressed: () {
-                          selectColor();
-                        }),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      IconButton(
+                      icon: Icon(
+                        Icons.color_lens,
+                        color: selectedColor,
+                      ),
+                      onPressed: () {
+                        selectColor();
+                      }),
 
-                        Expanded(
-                          child: Slider(
-                            min: 1.0,
-                            max: 5.0,
-                            label: "Stroke $strokeWidth",
-                            activeColor: selectedColor,
-                            value: strokeWidth,
-                            onChanged: (double value) {
-                              setState(() {
-                                strokeWidth = value;
-                              });
-                            },
+                      Expanded(
+                        child: Slider(
+                          min: 1.0,
+                          max: 5.0,
+                          label: "Stroke $strokeWidth",
+                          activeColor: selectedColor,
+                          value: strokeWidth,
+                          onChanged: (double value) {
+                            setState(() {
+                              strokeWidth = value;
+                            });
+                          },
+                        ),
+                      ),
+
+                      IconButton(
+                          icon: const Icon(
+                            Icons.layers_clear,
+                            color: Colors.black,
                           ),
-                        ),
-
-                        IconButton(
-                            icon: Icon(
-                              Icons.layers_clear,
-                              color: Colors.black,
-                            ),
-                            onPressed: () {
-                              setState((){
-                                points.clear();
-                              });
-                            }),
-                      ],
-                    ),
+                          onPressed: () {
+                            setState((){
+                              // points.clear();
+                              pointsList.clear();
+                              paintedPoints.clear();
+                              squaresList.clear();
+                              circleList.clear();
+                            });
+                          }),
+                      IconButton(
+                          tooltip: isCanvasLocked
+                              ? "Click to unlock drawing"
+                              : "Click to lock drawing",
+                          icon: Icon(
+                            isCanvasLocked ? Icons.lock_outline : Icons.lock_open,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              isCanvasLocked = !isCanvasLocked;
+                            });
+                          })
+                    ],
                   ),
-                ]
-              ),
+                ),
+              ]
+            ),
+        ),
+      ),
+    );
+  }
+  Widget strokeWidthWidget(double width) {
+    bool isSelected = strokeWidth == width ? true : false;
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: (10 - width), horizontal: 2),
+      decoration: BoxDecoration(
+        border: Border.all(
+            width: 1, color: isSelected ? Colors.black : Colors.grey),
+      ),
+      child: Material(
+        elevation: isSelected ? 1 : 0,
+        child: InkWell(
+          onTap: () {
+            setState(() {
+              strokeWidth = width;
+            });
+          },
+          child: Container(
+            width: 50,
+            height: width,
+            color: Colors.black,
           ),
-        ],
+        ),
+      ),
+    );
+  }
+  List<ToolIconsData> lstToolIcons = [
+    ToolIconsData(Icons.create, enumToolTypes.pencil, isSelected: true),
+    ToolIconsData(FontAwesomeIcons.eraser, enumToolTypes.eraser),
+    ToolIconsData(Icons.crop_square, enumToolTypes.rectangle),
+    ToolIconsData(Icons.radio_button_unchecked, enumToolTypes.circle),
+
+    // ToolIconsData(Icons.text_fields, enumToolTypes.text), //TODO
+  ];
+  List<Widget> getToolBoxIcons() {
+    List<Widget> lstWidgets = [];
+    for (ToolIconsData item in lstToolIcons) {
+      lstWidgets.add(
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              selectedTool = item.toolType;
+              lstToolIcons
+                  .firstWhere((element) => element.isSelected == true)
+                  .isSelected = false;
+              lstToolIcons
+                  .firstWhere((element) => element.icon == item.icon)
+                  .isSelected = true;
+            });
+          },
+          child: ToolIcon(
+            item.icon,
+            isActive: item.isSelected,
+          ),
+        ),
+      );
+    }
+    return lstWidgets;
+  }
+}
+class MenuItem extends StatelessWidget {
+  final String itemName;
+  MenuItem(this.itemName);
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: <Widget>[
+        InkWell(
+          child: Text(itemName),
+        ),
+        const SizedBox(
+          width: 10,
+        )
+      ],
+    );
+  }
+}
+class ToolIcon extends StatelessWidget {
+  final IconData iconData;
+  final bool isActive;
+  ToolIcon(this.iconData, {this.isActive = false});
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: EdgeInsets.all(0),
+      elevation: 0.5,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(0)),
+      ),
+      color: isActive ? Colors.white24 : Colors.white,
+      child: Container(
+        child: IconButton(icon: Icon(iconData), onPressed: null),
       ),
     );
   }
 }
+
+
 class MyCustomPainter extends CustomPainter {
   final List<DrawingArea> points;
   List<Offset> offsetPoints = [];

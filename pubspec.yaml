@@ -57,6 +57,7 @@ dependencies:
   firebase_database: ^8.0.0
   flutter_typeahead: ^3.2.1
   step_progress_indicator: ^1.0.1
+  fluttertoast: ^8.0.8
 
 dev_dependencies:
   flutter_test:

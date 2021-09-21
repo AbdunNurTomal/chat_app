@@ -86,7 +86,7 @@ class _ImageDialogState extends State<ImageDialog> {
       body:Stack(
         children: <Widget>[
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
                 gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
