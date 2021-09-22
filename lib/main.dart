@@ -47,7 +47,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.indigo,
         ),
-        home: TeameLeaderPage(),
+        home: LauncherPage(),
         routes: {
           LauncherPage.routeName: (context) => LauncherPage(),
           WaitingRoom.routeName: (context) => WaitingRoom(),

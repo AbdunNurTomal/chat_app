@@ -6,6 +6,7 @@ import 'dart:ui' as ui;
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 import 'package:uri_to_file/uri_to_file.dart';
@@ -131,6 +132,22 @@ class ImageUtility {
     Uint8List jpgBytes = byteData!.buffer.asUint8List();
     File(imagePath).writeAsBytesSync(jpgBytes);
   }
+
+  Future<String> _getDirectoryPath() async{
+    final directory = await getExternalStorageDirectory();
+    final myImagePath = '${directory?.path}/MyImages';
+    final myImgDir = await Directory(myImagePath).create();
+
+    return myImagePath;
+  }
+  // Future<void> _capturePng() async {
+  //   RenderRepaintBoundary boundary = globalKey.currentContext
+  //       ?.findRenderObject() as RenderRepaintBoundary;
+  //   ui.Image image = await boundary.toImage();
+  //   ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+  //   Uint8List pngBytes = byteData!.buffer.asUint8List();
+  //   //print(pngBytes);
+  // }
 }
 /*
 import 'dart:async';

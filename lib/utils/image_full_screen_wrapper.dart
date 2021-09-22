@@ -1,30 +1,29 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'dart:ui' as ui;
+import 'dart:ui';
 import 'package:chat_app/utils/painter.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:uri_to_file/uri_to_file.dart';
 
 class ImageDialogOld extends StatefulWidget {
   final String imageUri;
-  final String tag;
+  final String imageName;
   final ui.Image myBackgroundImage;
 
-  const ImageDialogOld({ Key? key, required this.myBackgroundImage, required this.imageUri, required this.tag}) : super(key: key);
+  const ImageDialogOld({ Key? key, required this.myBackgroundImage, required this.imageUri, required this.imageName}) : super(key: key);
 
   @override
   State<ImageDialogOld> createState() => _ImageDialogOldState();
 }
 
-class DrawingArea {
-  Offset point;
-  Paint areaPaint;
-  DrawingArea({required this.point, required this.areaPaint});
-}
-enum enumToolTypes { pencil, eraser, rectangle, circle, text }
+enum enumToolTypes { pencil, eraser, rectangle, circle, text, undo, save }
 
 class ToolIconsData {
   IconData icon;
@@ -36,7 +35,7 @@ class RecordPaints{
   int? startIndex;
   int? endIndex;
 
-  RecordPaints(this.startIndex, this.endIndex);
+  RecordPaints({this.startIndex, this.endIndex});
 }
 
 class _ImageDialogOldState extends State<ImageDialogOld> {
@@ -55,10 +54,10 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
   bool saveClicked = false;
 
   List<PaintedSquires> squaresList = [];
-  late PaintedSquires? unfinishedSquare;
+  PaintedSquires unfinishedSquare = PaintedSquires(paint: Paint(),start: Offset(0.0,0.0),end: Offset(0.0,0.0));
 
   List<PaintedCircles> circleList = [];
-  late PaintedCircles? unfinishedCircle;
+  PaintedCircles unfinishedCircle = PaintedCircles(paint: Paint(),start: Offset(0.0,0.0),end: Offset(0.0,0.0));
 
   StrokeCap strokeType = StrokeCap.square;
   double strokeWidth = 3.0;
@@ -69,7 +68,7 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
       return Paint()
         ..strokeCap = strokeType
         ..isAntiAlias = true
-        ..strokeWidth = strokeWidth
+        ..strokeWidth = 10.0
         ..color = Colors.white;
     } else {
       return Paint()
@@ -79,7 +78,6 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
         ..color = selectedColor;
     }
   }
-
   void showToastMessage(String message) {
     Fluttertoast.showToast(
         msg: message,
@@ -91,7 +89,6 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
   }
 
   double opacity = 1.0;
-
 
   @override
   void initState() {
@@ -108,60 +105,9 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
   Future<File> _getLocalFile(String filename) async {
     Uri _uri = Uri.parse(filename);
     File _file = await toFile(_uri);
-    //print("File - $_file");
     return _file;
   }
-/*
-  Future<String> _getDirectoryPath() async{
-    final directory = await getExternalStorageDirectory();
-    final myImagePath = '${directory?.path}/MyImages';
-    final myImgDir = await Directory(myImagePath).create();
 
-    return myImagePath;
-  }
-  Future<void> _capturePng() async {
-    RenderRepaintBoundary boundary = globalKey.currentContext?.findRenderObject() as RenderRepaintBoundary;
-    ui.Image image = await boundary.toImage();
-    ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-    Uint8List pngBytes = byteData!.buffer.asUint8List();
-    //print(pngBytes);
-
-/*
-    String fileName = "FB_IMG_1627019045107.jpg";
-    String dir = (await getApplicationDocumentsDirectory()).path;
-    String savePath = '$dir/$fileName';
-
-    if (await File(savePath).exists()) {
-      print("File exists");
-    } else {
-      print("File don't exists $savePath");
-    }
-
- */
-
-    String fileName = "FB_IMG_1627019045107.jpg";
-    final myImagePath = _getDirectoryPath();
-    String savePath = '$myImagePath/$fileName';
-
-    File imageFile = await _getLocalFile(savePath);
-    print("Image file $imageFile");
-    if( await File(savePath).exists()){
-      imageFile.create(recursive: true);
-    }else{
-      print("Not Found");
-    }
-    imageFile.writeAsBytes(pngBytes);
-
-    //if (!(await Permission.storage.status.isGranted))
-    //  await Permission.storage.request();
-
-    //final result = await ImageGallerySaver.saveImage(
-    //    Uint8List.fromList(pngBytes),
-    //    quality: 60,
-    //    name: "canvas_image");
-    //print(result);
-  }
-*/
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -196,355 +142,474 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
     }
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Color(0xFFC0C0C0),
+      appBar: AppBar(
+        actions: [
+          IconButton(
+            onPressed: (){
+              setState(() {
+                saveClicked = true;
+              });
+            },
+            icon: Icon(Icons.save)
+          )
+        ],
+      ),
       body: SafeArea(
         child: Container(
-          // decoration: const BoxDecoration(
-          //   border: Border.symmetric(
-          //       vertical: BorderSide(color: Colors.black54, width: 6)),
-          // ),
-          padding: const EdgeInsets.all(1.0),
+          decoration: const BoxDecoration(
+            border: Border.symmetric(
+                vertical: BorderSide(color: Colors.black54, width: 6)),
+          ),
+          padding: const EdgeInsets.only(top: 3.0, bottom: 3.0),
           child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                // Container(
-                //   width: width * 0.9,
-                //   height: height * 0.1,
-                //   decoration: BoxDecoration(
-                //       borderRadius: const BorderRadius.all(Radius.circular(5.0)),
-                //       boxShadow: [
-                //         BoxShadow(
-                //           color: Colors.blue.withOpacity(0.3),
-                //           blurRadius: 1.0,
-                //           // spreadRadius: 0.1,
-                //         )
-                //       ]),
-                //   child: Row(
-                //     crossAxisAlignment: CrossAxisAlignment.center,
-                //     mainAxisAlignment: MainAxisAlignment.start,
-                //     children: <Widget>[
-                //       GestureDetector(
-                //         onTap: () {
-                //           setState(() {
-                //             saveClicked = true;
-                //           });
-                //         },
-                //         child: MenuItem("Save"),
-                //       ),
-                //       GestureDetector(
-                //         onTap: () {
-                //           setState(() {
-                //             if (drawHistory.isNotEmpty) {
-                //               enumToolTypes lastAction = drawHistory.last;
-                //               if (lastAction == enumToolTypes.eraser || lastAction == enumToolTypes.pencil) {
-                //                 if (paintedPoints.isNotEmpty) {
-                //                   RecordPaints lastPoint = paintedPoints.last;
-                //                   pointsList!.removeRange(lastPoint.startIndex!, lastPoint.endIndex!);
-                //                   paintedPoints.removeLast();
-                //                 }
-                //               } else if (lastAction == enumToolTypes.rectangle) {
-                //                 squaresList.removeLast();
-                //               } else {
-                //                 circleList.removeLast();
-                //               }
-                //               drawHistory.removeLast();
-                //             }
-                //             //pointsListDeleted.;
-                //           });
-                //         },
-                //         child: MenuItem("Undo"),
-                //       ),
-                //       GestureDetector(
-                //         onTap: () {
-                //           setState(() {
-                //             pointsList!.clear();
-                //             paintedPoints.clear();
-                //             squaresList.clear();
-                //             circleList.clear();
-                //           });
-                //         },
-                //         child: MenuItem("Clear"),
-                //       ),
-                //     ],
-                //   ),
-                // ),
-                Container(
-                  width: width * 1.0,
-                  decoration: BoxDecoration(
-                    // color: Colors.black,
-                      borderRadius: const BorderRadius.all(Radius.circular(5.0)),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black45.withOpacity(0.1),
-                          // blurRadius: 1.0,
-                          // spreadRadius: 0.1,
-                        )]
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Wrap(children: getToolBoxIcons()),
-                      // const SizedBox(height: 20),
-                      // Container(
-                      //   width: 80,
-                      //   height: 90,
-                      //   decoration: BoxDecoration(
-                      //     border: Border.all(color: Colors.grey, width: 2),
-                      //   ),
-                      //   child: Column(
-                      //     mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      //     mainAxisSize: MainAxisSize.min,
-                      //     children: <Widget>[
-                      //       strokeWidthWidget(3),
-                      //       strokeWidthWidget(5),
-                      //       strokeWidthWidget(7),
-                      //     ],
-                      //   ),
-                      // ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: LayoutBuilder(builder: (context, constraints) {
-                    return Container(
-                      width: width * 0.9,
-                      // height: height * 0.7,
-                      decoration: BoxDecoration(
-                          // borderRadius: const BorderRadius.all(Radius.circular(5.0)),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.yellowAccent.withOpacity(0.3),
-                              // blurRadius: 1.0,
-                              // spreadRadius: 0.1,
-                            )
-                          ]),
-                      child: GestureDetector(
-                        key: globalKey,
-                        onPanUpdate: (details) {
-                          if (isCanvasLocked) return;
-                          setState(() {
-                            final renderBox = context.findRenderObject() as RenderBox;
-                            if (selectedTool == enumToolTypes.pencil || selectedTool == enumToolTypes.eraser) {
-                              pointsList.add(
-                                PaintedPoints(
-                                  points: renderBox.globalToLocal(details.globalPosition),
-                                  paint: getPoint(),
-                                ),
-                              );
-                            } else if (selectedTool == enumToolTypes.rectangle) {
-                              unfinishedSquare!.end = renderBox.globalToLocal(details.globalPosition);
-                            } else if (selectedTool == enumToolTypes.circle) {
-                              unfinishedCircle!.end = renderBox.globalToLocal(details.globalPosition);
-                            }
-                          });
-                        },
-                        onPanStart: (details) {
-                          if (isCanvasLocked) return;
-                          setState(() {
-                            final renderBox = context.findRenderObject() as RenderBox;
-                            if (selectedTool == enumToolTypes.pencil || selectedTool == enumToolTypes.eraser) {
-                              if (pointsList.isNotEmpty) {
-                                paintedPoints.add(RecordPaints(pointsList.length, null));
-                              } else {
-                                paintedPoints.add(RecordPaints(0, null));
-                              }
-                              pointsList.add(
-                                PaintedPoints(
-                                  points: renderBox.globalToLocal(details.globalPosition),
-                                  paint: getPoint(),
-                                ),
-                              );
-                            } else if (selectedTool == enumToolTypes.rectangle) {
-                              unfinishedSquare = PaintedSquires(null,null,null);
-                              Offset os = renderBox.globalToLocal(details.globalPosition);
-                              unfinishedSquare!.start = os;
-                              unfinishedSquare!.end = os;
-                              unfinishedSquare!.paint = getPoint();
-                            } else if (selectedTool == enumToolTypes.circle) {
-                              unfinishedCircle = PaintedCircles(null,null,null);
-                              Offset os = renderBox.globalToLocal(details.globalPosition);
-                              unfinishedCircle!.start = os;
-                              unfinishedCircle!.end = os;
-                              unfinishedCircle!.paint = getPoint();
-                            }
-                          });
-                        },
-                        onPanEnd: (details) {
-                          if (isCanvasLocked) return;
-                          setState(() {
-                            drawHistory.add(selectedTool);
-                            if (selectedTool == enumToolTypes.pencil || selectedTool == enumToolTypes.eraser) {
-                              paintedPoints.firstWhere((element) => element.endIndex == null).endIndex = pointsList.length;
-                              // pointsList.add();
-                            } else if (selectedTool == enumToolTypes.rectangle) {
-                              setState(() {
-                                squaresList.add(unfinishedSquare!);
-                                unfinishedSquare = null;
-                              });
-                            } else if (selectedTool == enumToolTypes.circle) {
-                              setState(() {
-                                circleList.add(unfinishedCircle!);
-                                unfinishedCircle = null;
-                              });
-                            }
-                          });
-                        },
-                        // child: SizedBox.expand(
-                        //   child: RepaintBoundary(
-                        //     key: globalKey,
-                        //     child: ClipRRect(
-                        //       // borderRadius: const BorderRadius.all(
-                        //       //     Radius.circular(10.0)),
-                        //       //child: Hero(
-                        //       //  tag: widget.tag,
-                        //       child: Stack(
-                        //         children: [
-                        //           ClipRect(
-                        //             child: Container(
-                        //               //Canvas
-                        //               color: Colors.white,
-                        //               //margin: EdgeInsets.only(bottom: 50, right: 80),
-                        //               child: CustomPaint(
-                        //                 size: Size(
-                        //                     constraints.widthConstraints().maxWidth,
-                        //                     constraints
-                        //                         .heightConstraints()
-                        //                         .maxHeight),
-                        //                 // painter: PainterCanvas(
-                        //                 //   pointsList: paintList,
-                        //                 //   squaresList: squaresList,
-                        //                 //   circlesList: circleList,
-                        //                 //   unfinishedSquare: unfinishedSquare,
-                        //                 //   unfinishedCircle: unfinishedCircle,
-                        //                 //   saveImage: saveClicked,
-                        //                 //   // saveCallback: (Picture picture) async {
-                        //                 //   //   var status =
-                        //                 //   //   await Permission.storage.status;
-                        //                 //   //   if (!status.isGranted) {
-                        //                 //   //     await Permission.storage.request();
-                        //                 //   //   }
-                        //                 //   //   if (status.isGranted) {
-                        //                 //   //     final img = await picture.toImage(
-                        //                 //   //         constraints.maxWidth.round(),
-                        //                 //   //         constraints.maxHeight.round());
-                        //                 //   //     final bytes = await img.toByteData(
-                        //                 //   //         format: ImageByteFormat.png);
-                        //                 //   //     await ImageGallerySaver.saveImage(
-                        //                 //   //       Uint8List.fromList(
-                        //                 //   //           bytes.buffer.asUint8List()),
-                        //                 //   //       quality: 100,
-                        //                 //   //       name:
-                        //                 //   //       DateTime.now().toIso8601String(),
-                        //                 //   //     );
-                        //                 //   //     showToastMessage(
-                        //                 //   //         "Image saved to gallery.");
-                        //                 //   //   }
-                        //                 //   //   setState(() {
-                        //                 //   //     saveClicked = false;
-                        //                 //   //   });
-                        //                 //   // },
-                        //                 // ),
-                        //               ),
-                        //             ),
-                        //           ),
-                        //           Center(
-                        //             child: FutureBuilder(
-                        //                 future: _getLocalFile(widget.imageUri),
-                        //                 builder: (BuildContext context,
-                        //                     AsyncSnapshot<File> snapshot) {
-                        //                   return snapshot.data != null
-                        //                       ? Image.file(snapshot.data!)
-                        //                       : Container();
-                        //                 }
-                        //             ),
-                        //           ),
-                        //           // CustomPaint(
-                        //           //   size: Size.infinite,
-                        //           //   painter: MyCustomPainter(
-                        //           //     //points: points,
-                        //           //   ),
-                        //           // ),
-                        //         ],
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Expanded(
+                child: Container(
+                  // color: Color(0xFFC0C0C0),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        // Container(
+                        //   width: width * 0.9,
+                        //   height: height * 0.1,
+                        //   decoration: BoxDecoration(
+                        //       borderRadius: const BorderRadius.all(Radius.circular(5.0)),
+                        //       boxShadow: [
+                        //         BoxShadow(
+                        //           color: Colors.blue.withOpacity(0.3),
+                        //           blurRadius: 1.0,
+                        //           // spreadRadius: 0.1,
+                        //         )
+                        //       ]),
+                        //   child: Row(
+                        //     crossAxisAlignment: CrossAxisAlignment.center,
+                        //     mainAxisAlignment: MainAxisAlignment.start,
+                        //     children: <Widget>[
+                        //       GestureDetector(
+                        //         onTap: () {
+                        //           setState(() {
+                        //             saveClicked = true;
+                        //           });
+                        //         },
+                        //         child: MenuItem("Save"),
                         //       ),
-                        //       //),
-                        //     ),
+                        //       GestureDetector(
+                        //         onTap: () {
+                        //           if (selectedTool == enumToolTypes.undo) {
+                        //             setState(() {
+                        //               if (drawHistory.isNotEmpty) {
+                        //                 enumToolTypes lastAction = drawHistory
+                        //                     .last;
+                        //                 if (lastAction ==
+                        //                     enumToolTypes.eraser ||
+                        //                     lastAction ==
+                        //                         enumToolTypes.pencil) {
+                        //                   if (paintedPoints.isNotEmpty) {
+                        //                     RecordPaints lastPoint = paintedPoints
+                        //                         .last;
+                        //                     pointsList.removeRange(
+                        //                         lastPoint.startIndex!,
+                        //                         lastPoint.endIndex!);
+                        //                     paintedPoints.removeLast();
+                        //                   }
+                        //                 } else if (lastAction ==
+                        //                     enumToolTypes.rectangle) {
+                        //                   squaresList.removeLast();
+                        //                 } else {
+                        //                   circleList.removeLast();
+                        //                 }
+                        //                 drawHistory.removeLast();
+                        //               }
+                        //               //pointsListDeleted.;
+                        //             });
+                        //           }
+                        //         },
+                                // child: MenuItem("Undo"),
+                              // ),
+                        //       GestureDetector(
+                        //         onTap: () {
+                        //           setState(() {
+                        //             pointsList!.clear();
+                        //             paintedPoints.clear();
+                        //             squaresList.clear();
+                        //             circleList.clear();
+                        //           });
+                        //         },
+                        //         child: MenuItem("Clear"),
+                        //       ),
+                        //     ],
                         //   ),
                         // ),
-                      ),
-                    );
-                  }),
-                ),
-                Container(
-                  width: width * 1.0,
-                  decoration: BoxDecoration(
-                      // color: Colors.black,
-                      borderRadius: const BorderRadius.all(Radius.circular(5.0)),
-                      boxShadow: [
-                          BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          // blurRadius: 1.0,
-                          // spreadRadius: 0.1,
-                        )]
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      IconButton(
-                      icon: Icon(
-                        Icons.color_lens,
-                        color: selectedColor,
-                      ),
-                      onPressed: () {
-                        selectColor();
-                      }),
+                        Container(
+                          width: width * 1.0,
+                          decoration: BoxDecoration(
+                            // color: Colors.black,
+                            //   borderRadius: const BorderRadius.all(Radius.circular(5.0)),
+                              boxShadow: [
+                                BoxShadow(
+                                  // color: Colors.black45.withOpacity(0.1),
+                                  color: Colors.white.withOpacity(0.5),
+                                  // blurRadius: 1.0,
+                                  // spreadRadius: 0.1,
+                                )]
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Wrap(children: getToolBoxIcons()),
+                              // const SizedBox(height: 20),
+                              // Container(
+                              //   width: 80,
+                              //   height: 90,
+                              //   decoration: BoxDecoration(
+                              //     border: Border.all(color: Colors.grey, width: 2),
+                              //   ),
+                              //   child: Column(
+                              //     mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              //     mainAxisSize: MainAxisSize.min,
+                              //     children: <Widget>[
+                              //       strokeWidthWidget(3),
+                              //       strokeWidthWidget(5),
+                              //       strokeWidthWidget(7),
+                              //     ],
+                              //   ),
+                              // ),
 
-                      Expanded(
-                        child: Slider(
-                          min: 1.0,
-                          max: 5.0,
-                          label: "Stroke $strokeWidth",
-                          activeColor: selectedColor,
-                          value: strokeWidth,
-                          onChanged: (double value) {
-                            setState(() {
-                              strokeWidth = value;
-                            });
-                          },
+                            ],
+                          ),
                         ),
-                      ),
+                        Expanded(
+                          child: LayoutBuilder(builder: (context, constraints) {
+                            return Container(
+                              width: constraints.widthConstraints().maxWidth,
+                              height: constraints.heightConstraints().maxHeight,
+                              color: Colors.black.withOpacity(0.7),
+                              // height: height * 0.5,
+                              // decoration: BoxDecoration(
+                              //     // borderRadius: const BorderRadius.all(Radius.circular(5.0)),
+                              //     boxShadow: [
+                              //       BoxShadow(
+                              //         color: Colors.yellowAccent.withOpacity(0.3),
+                              //         // blurRadius: 1.0,
+                              //         // spreadRadius: 0.1,
+                              //       )
+                              //     ]),
+                              child: GestureDetector(
+                                key: globalKey,
+                                onPanUpdate: (details) {
+                                  if (isCanvasLocked) return;
+                                  setState(() {
+                                    final renderBox = context.findRenderObject() as RenderBox;
+                                    if (selectedTool == enumToolTypes.pencil || selectedTool == enumToolTypes.eraser) {
+                                      pointsList.add(
+                                        PaintedPoints(
+                                          points: renderBox.globalToLocal(details.globalPosition),
+                                          paint: getPoint(),
+                                        ),
+                                      );
+                                    } else if (selectedTool == enumToolTypes.rectangle) {
+                                      unfinishedSquare.end = renderBox.globalToLocal(details.globalPosition);
+                                    } else if (selectedTool == enumToolTypes.circle) {
+                                      unfinishedCircle.end = renderBox.globalToLocal(details.globalPosition);
+                                    }
+                                  });
+                                },
+                                onPanStart: (details) {
+                                  if (isCanvasLocked) return;
+                                  setState(() {
+                                    final renderBox = context.findRenderObject() as RenderBox;
+                                    if (selectedTool == enumToolTypes.pencil || selectedTool == enumToolTypes.eraser) {
+                                      if (pointsList.isNotEmpty) {
+                                        paintedPoints.add(RecordPaints(startIndex: pointsList.length, endIndex: null));
+                                      } else {
+                                        paintedPoints.add(RecordPaints(startIndex: null, endIndex: null));
+                                      }
+                                      pointsList.add(
+                                        PaintedPoints(
+                                          points: renderBox.globalToLocal(details.globalPosition),
+                                          paint: getPoint(),
+                                        ),
+                                      );
+                                    } else if (selectedTool == enumToolTypes.rectangle) {
+                                      unfinishedSquare = PaintedSquires(paint: Paint(),start: Offset(0.0,0.0),end: Offset(0.0,0.0));
+                                      Offset os = renderBox.globalToLocal(details.globalPosition);
+                                      unfinishedSquare.start = os;
+                                      unfinishedSquare.end = os;
+                                      unfinishedSquare.paint = getPoint();
+                                    } else if (selectedTool == enumToolTypes.circle) {
+                                      unfinishedCircle = PaintedCircles(paint: Paint(),start: Offset(0.0,0.0),end: Offset(0.0,0.0));
+                                      Offset os = renderBox.globalToLocal(details.globalPosition);
+                                      //print("offset : $os");
+                                      unfinishedCircle.start = os;
+                                      unfinishedCircle.end = os;
+                                      unfinishedCircle.paint = getPoint();
+                                      //print("unfinishedCircle : ${unfinishedCircle.paint.color}");
+                                    }
+                                  });
+                                },
+                                onPanEnd: (details) {
+                                  if (isCanvasLocked) return;
+                                  setState(() {
+                                    drawHistory.add(selectedTool);
+                                    if (selectedTool == enumToolTypes.pencil || selectedTool == enumToolTypes.eraser) {
+                                      paintedPoints.firstWhere((element) => element.endIndex == null).endIndex = pointsList.length;
+                                      // pointsList.add(null);
+                                    } else if (selectedTool == enumToolTypes.rectangle) {
+                                      setState(() {
+                                        squaresList.add(unfinishedSquare);
+                                        // unfinishedSquare = null;
+                                        unfinishedSquare = PaintedSquires(paint: Paint(),start: Offset(0.0,0.0),end: Offset(0.0,0.0));
+                                      });
+                                    } else if (selectedTool == enumToolTypes.circle) {
+                                      setState(() {
+                                        circleList.add(unfinishedCircle);
+                                        // unfinishedCircle = null;
+                                        unfinishedCircle = PaintedCircles(paint: Paint(),start: Offset(0.0,0.0),end: Offset(0.0,0.0));
+                                      });
+                                      print("circleList : ${circleList[0].paint},${circleList[0].start},${circleList[0].end}");
+                                    }
+                                  });
+                                },
+                                child: SizedBox.expand(
+                                  child: RepaintBoundary(
+                                    child: ClipRRect(
+                                      child: Stack(
+                                        children: [
+                                          Center(
+                                            child: FutureBuilder(
+                                                future: _getLocalFile(widget.imageUri),
+                                                builder: (BuildContext context,
+                                                    AsyncSnapshot<File> snapshot) {
+                                                  return snapshot.data != null
+                                                      ? Image.file(snapshot.data!)
+                                                      : Container();
+                                                }
+                                            ),
+                                          ),
+                                          ClipRect(
+                                            child: CustomPaint(
+                                              size: Size(
+                                                  constraints.widthConstraints().maxWidth,
+                                                  constraints
+                                                      .heightConstraints()
+                                                      .maxHeight),
+                                              painter: PainterCanvas(
+                                                imageUri: widget.imageUri,
+                                                pointsList: pointsList,
+                                                squaresList: squaresList,
+                                                circlesList: circleList,
+                                                unfinishedSquare: unfinishedSquare,
+                                                unfinishedCircle: unfinishedCircle,
+                                                saveImage: saveClicked,
+                                                saveCallback: (Picture picture) async {
+                                                  var status =
+                                                  await Permission.storage.status;
+                                                  if (!status.isGranted) {
+                                                  await Permission.storage.request();
+                                                  }
+                                                  if (status.isGranted) {
+                                                    final img = await picture
+                                                        .toImage(
+                                                        constraints.maxWidth
+                                                            .round(),
+                                                        constraints.maxHeight
+                                                            .round());
+                                                    ByteData? byteData = await img
+                                                        .toByteData(
+                                                        format: ImageByteFormat
+                                                            .png);
+                                                    print(
+                                                        "byteData : $byteData");
+                                                    await ImageGallerySaver
+                                                        .saveImage(
+                                                      Uint8List.fromList(
+                                                          byteData!.buffer
+                                                              .asUint8List()),
+                                                      quality: 100,
+                                                      name: widget.imageName,
+                                                    );
 
-                      IconButton(
-                          icon: const Icon(
-                            Icons.layers_clear,
-                            color: Colors.black,
-                          ),
-                          onPressed: () {
-                            setState((){
-                              // points.clear();
-                              pointsList.clear();
-                              paintedPoints.clear();
-                              squaresList.clear();
-                              circleList.clear();
-                            });
+                                                    showToastMessage(
+                                                        "Image saved to gallery.");
+                                                  }
+                                                  setState(() {
+                                                    saveClicked = false;
+                                                  });
+                                                },
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                // child: SizedBox.expand(
+                                //   child: RepaintBoundary(
+                                //     key: globalKey,
+                                //     child: ClipRRect(
+                                //       // borderRadius: const BorderRadius.all(
+                                //       //     Radius.circular(10.0)),
+                                //       //child: Hero(
+                                //       //  tag: widget.tag,
+                                //       child: Stack(
+                                //         children: [
+                                //           ClipRect(
+                                //             child: Container(
+                                //               //Canvas
+                                //               color: Colors.white,
+                                //               //margin: EdgeInsets.only(bottom: 50, right: 80),
+                                //               child: CustomPaint(
+                                //                 size: Size(
+                                //                     constraints.widthConstraints().maxWidth,
+                                //                     constraints
+                                //                         .heightConstraints()
+                                //                         .maxHeight),
+                                //                 // painter: PainterCanvas(
+                                //                 //   pointsList: paintList,
+                                //                 //   squaresList: squaresList,
+                                //                 //   circlesList: circleList,
+                                //                 //   unfinishedSquare: unfinishedSquare,
+                                //                 //   unfinishedCircle: unfinishedCircle,
+                                //                 //   saveImage: saveClicked,
+                                //                 //   // saveCallback: (Picture picture) async {
+                                //                 //   //   var status =
+                                //                 //   //   await Permission.storage.status;
+                                //                 //   //   if (!status.isGranted) {
+                                //                 //   //     await Permission.storage.request();
+                                //                 //   //   }
+                                //                 //   //   if (status.isGranted) {
+                                //                 //   //     final img = await picture.toImage(
+                                //                 //   //         constraints.maxWidth.round(),
+                                //                 //   //         constraints.maxHeight.round());
+                                //                 //   //     final bytes = await img.toByteData(
+                                //                 //   //         format: ImageByteFormat.png);
+                                //                 //   //     await ImageGallerySaver.saveImage(
+                                //                 //   //       Uint8List.fromList(
+                                //                 //   //           bytes.buffer.asUint8List()),
+                                //                 //   //       quality: 100,
+                                //                 //   //       name:
+                                //                 //   //       DateTime.now().toIso8601String(),
+                                //                 //   //     );
+                                //                 //   //     showToastMessage(
+                                //                 //   //         "Image saved to gallery.");
+                                //                 //   //   }
+                                //                 //   //   setState(() {
+                                //                 //   //     saveClicked = false;
+                                //                 //   //   });
+                                //                 //   // },
+                                //                 // ),
+                                //               ),
+                                //             ),
+                                //           ),
+                                //           Center(
+                                //             child: FutureBuilder(
+                                //                 future: _getLocalFile(widget.imageUri),
+                                //                 builder: (BuildContext context,
+                                //                     AsyncSnapshot<File> snapshot) {
+                                //                   return snapshot.data != null
+                                //                       ? Image.file(snapshot.data!)
+                                //                       : Container();
+                                //                 }
+                                //             ),
+                                //           ),
+                                //           // CustomPaint(
+                                //           //   size: Size.infinite,
+                                //           //   painter: MyCustomPainter(
+                                //           //     //points: points,
+                                //           //   ),
+                                //           // ),
+                                //         ],
+                                //       ),
+                                //       //),
+                                //     ),
+                                //   ),
+                                // ),
+                              ),
+                            );
                           }),
-                      IconButton(
-                          tooltip: isCanvasLocked
-                              ? "Click to unlock drawing"
-                              : "Click to lock drawing",
-                          icon: Icon(
-                            isCanvasLocked ? Icons.lock_outline : Icons.lock_open,
+                        ),
+                        Container(
+                          width: width * 1.0,
+                          decoration: BoxDecoration(
+                              // color: Colors.black,
+                              borderRadius: const BorderRadius.all(Radius.circular(5.0)),
+                              boxShadow: [
+                                BoxShadow(
+                                color: Colors.white.withOpacity(0.5),
+                                // blurRadius: 1.0,
+                                // spreadRadius: 0.1,
+                              )]
                           ),
-                          onPressed: () {
-                            setState(() {
-                              isCanvasLocked = !isCanvasLocked;
-                            });
-                          })
-                    ],
-                  ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              IconButton(
+                              icon: Icon(
+                                Icons.color_lens,
+                                color: selectedColor,
+                              ),
+                              onPressed: () {
+                                selectColor();
+                              }),
+
+                              Expanded(
+                                child: Slider(
+                                  min: 1.0,
+                                  max: 5.0,
+                                  label: "Stroke $strokeWidth",
+                                  activeColor: selectedColor,
+                                  value: strokeWidth,
+                                  onChanged: (double value) {
+                                    setState(() {
+                                      strokeWidth = value;
+                                    });
+                                  },
+                                ),
+                              ),
+
+                              IconButton(
+                                  icon: const Icon(
+                                    Icons.layers_clear,
+                                    color: Colors.black,
+                                  ),
+                                  onPressed: () {
+                                    setState((){
+                                      // points.clear();
+                                      pointsList.clear();
+                                      paintedPoints.clear();
+                                      squaresList.clear();
+                                      circleList.clear();
+                                    });
+                                  }),
+                              IconButton(
+                                  tooltip: isCanvasLocked
+                                      ? "Click to unlock drawing"
+                                      : "Click to lock drawing",
+                                  icon: Icon(
+                                    isCanvasLocked ? Icons.lock_outline : Icons.lock_open,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      isCanvasLocked = !isCanvasLocked;
+                                    });
+                                  })
+                            ],
+                          ),
+                        ),
+
+                      ]
+                    ),
                 ),
-              ]
-            ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -579,8 +644,9 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
     ToolIconsData(FontAwesomeIcons.eraser, enumToolTypes.eraser),
     ToolIconsData(Icons.crop_square, enumToolTypes.rectangle),
     ToolIconsData(Icons.radio_button_unchecked, enumToolTypes.circle),
-
-    // ToolIconsData(Icons.text_fields, enumToolTypes.text), //TODO
+    ToolIconsData(Icons.text_fields, enumToolTypes.text), //TODO
+    ToolIconsData(Icons.undo_outlined, enumToolTypes.undo),
+    ToolIconsData(Icons.save, enumToolTypes.save),
   ];
   List<Widget> getToolBoxIcons() {
     List<Widget> lstWidgets = [];
@@ -607,6 +673,7 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
     }
     return lstWidgets;
   }
+
 }
 class MenuItem extends StatelessWidget {
   final String itemName;
@@ -619,7 +686,7 @@ class MenuItem extends StatelessWidget {
           child: Text(itemName),
         ),
         const SizedBox(
-          width: 10,
+          width: 5,
         )
       ],
     );
@@ -633,7 +700,7 @@ class ToolIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: EdgeInsets.all(0),
-      elevation: 0.5,
+      elevation: 0.1,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(0)),
       ),
@@ -643,57 +710,4 @@ class ToolIcon extends StatelessWidget {
       ),
     );
   }
-}
-
-
-class MyCustomPainter extends CustomPainter {
-  final List<DrawingArea> points;
-  List<Offset> offsetPoints = [];
-
-  MyCustomPainter({required this.points});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    Rect rect = Rect.fromLTWH(0, 0, size.width, size.height);
-    canvas.clipRect(rect);
-
-    for (int x = 0; x < points.length - 1; x++) {
-      if (points[x] != null && points[x + 1] != null) {
-        canvas.drawLine(points[x].point, points[x + 1].point, points[x].areaPaint);
-      } else if (points[x] != null && points[x + 1] == null) {
-        offsetPoints.clear();
-        offsetPoints.add(points[x].point);
-        offsetPoints.add(Offset(points[x].point.dx + 0.1, points[x].point.dy + 0.1));
-
-        canvas.drawPoints(ui.PointMode.points, offsetPoints, points[x].areaPaint);
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(MyCustomPainter oldDelegate) => true;
-}
-class SignaturePainter extends CustomPainter {
-  final List<Offset> points;
-  final int revision;
-
-  SignaturePainter(this.points, [this.revision = 0]);
-
-  void paint(canvas, Size size) {
-    if (points.length < 2) return;
-
-    Paint paint = new Paint()
-      ..color = Colors.black
-      ..strokeCap = StrokeCap.round
-      ..strokeWidth = 5.0;
-
-    for (int i = 0; i < points.length - 1; i++) {
-      if (points[i] != null && points[i + 1] != null)
-        canvas.drawLine(points[i], points[i + 1], paint);
-    }
-  }
-
-  // simplified this, but if you ever modify points instead of changing length you'll
-  // have to revise.
-  bool shouldRepaint(SignaturePainter other) => other.revision != revision;
 }

@@ -5,8 +5,8 @@
     android:versionName="1.0.0" >
 
     <uses-sdk
-        android:minSdkVersion="21"
-        android:targetSdkVersion="29" />
+        android:minSdkVersion="30"
+        android:targetSdkVersion="30" />
     <!--
          Flutter needs it to communicate with the running application
          to allow setting breakpoints, to provide hot reload, etc.
@@ -19,6 +19,7 @@
     <application
         android:appComponentFactory="androidx.core.app.CoreComponentFactory"
         android:debuggable="true"
+        android:extractNativeLibs="false"
         android:icon="@mipmap/ic_launcher"
         android:label="chat_app" >
         <activity

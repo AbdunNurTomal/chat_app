@@ -289,7 +289,7 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
                                     myBackgroundImage: _myBackgroundImage,
                                     //imageUri: _file,
                                     imageUri: imageUri,
-                                    tag: "generate_a_unique_tag",
+                                    imageName: imageName!,
                                   ),
                                   )
                               );

@@ -1,11 +1,13 @@
-import 'dart:ui';
+import 'dart:io';
 import 'dart:ui' as ui;
-
 import 'package:flutter/material.dart';
+import 'package:uri_to_file/uri_to_file.dart';
 
-typedef ImageSaveCallback = void Function(Picture picture);
+typedef ImageSaveCallback = void Function(ui.Picture picture);
 
 class PainterCanvas extends CustomPainter {
+  String imageUri;
+
   List<PaintedPoints> pointsList;
 
   List<PaintedSquires> squaresList;
@@ -15,11 +17,10 @@ class PainterCanvas extends CustomPainter {
   PaintedCircles unfinishedCircle;
 
   ImageSaveCallback saveCallback;
-
   bool saveImage;
 
-  PainterCanvas(
-      {required this.pointsList,
+  PainterCanvas({required this.imageUri,
+        required this.pointsList,
         required this.squaresList,
         required this.unfinishedSquare,
         required this.circlesList,
@@ -35,47 +36,46 @@ class PainterCanvas extends CustomPainter {
     if (saveImage) {
       canvas = Canvas(recorder);
     }
-    canvas.drawColor(Colors.white, BlendMode.color);
+    // canvas.drawColor(Colors.white, BlendMode.color);
 
     for (int i = 0; i < pointsList.length - 1; i++) {
       if (pointsList[i] != null && pointsList[i + 1] != null) {
-        canvas.drawLine(pointsList[i].points!, pointsList[i + 1].points!, pointsList[i].paint!);
+        canvas.drawLine(pointsList[i].points, pointsList[i + 1].points, pointsList[i].paint);
       } else if (pointsList[i] != null && pointsList[i + 1] == null) {
         offsetPoints.clear();
-        offsetPoints.add(pointsList[i].points!);
-        offsetPoints.add(Offset(pointsList[i].points!.dx + 0.1, pointsList[i].points!.dy + 0.1));
-        canvas.drawPoints(PointMode.points, offsetPoints, pointsList[i].paint!);
+        offsetPoints.add(pointsList[i].points);
+        offsetPoints.add(Offset(pointsList[i].points.dx + 0.1, pointsList[i].points.dy + 0.1));
+        canvas.drawPoints(ui.PointMode.points, offsetPoints, pointsList[i].paint);
       }
     }
 
     for (var i = 0; i < squaresList.length; i++) {
-      squaresList[i].paint!.style = PaintingStyle.stroke;
-      final rect = Rect.fromPoints(squaresList[i].start!, squaresList[i].end!);
-      canvas.drawRect(rect, squaresList[i].paint!);
+      squaresList[i].paint.style = PaintingStyle.stroke;
+      final rect = Rect.fromPoints(squaresList[i].start, squaresList[i].end);
+      canvas.drawRect(rect, squaresList[i].paint);
     }
 
     for (var i = 0; i < circlesList.length; i++) {
-      circlesList[i].paint!.style = PaintingStyle.stroke;
-      double radius = (circlesList[i].end!.dx - circlesList[i].start!.dx) / 2;
-      canvas.drawCircle(circlesList[i].start!, radius, circlesList[i].paint!);
+      circlesList[i].paint.style = PaintingStyle.stroke;
+      double radius = (circlesList[i].end.dx - circlesList[i].start.dx) / 2;
+      canvas.drawCircle(circlesList[i].start, radius, circlesList[i].paint);
     }
 
-    unfinishedSquare.paint!.style = PaintingStyle.stroke;
-    final rect =
-    Rect.fromPoints(unfinishedSquare.start!, unfinishedSquare.end!);
-    canvas.drawRect(rect, unfinishedSquare.paint!);
+    unfinishedSquare.paint.style = PaintingStyle.stroke;
+    final rect = Rect.fromPoints(unfinishedSquare.start, unfinishedSquare.end);
+    canvas.drawRect(rect, unfinishedSquare.paint);
 
-    unfinishedCircle.paint!.style = PaintingStyle.stroke;
+    unfinishedCircle.paint.style = PaintingStyle.stroke;
     double radius = 0;
-    if (unfinishedCircle.start!.dx > unfinishedCircle.end!.dx) {
-      radius = (unfinishedCircle.start!.dx - unfinishedCircle.end!.dx) / 2;
+    if (unfinishedCircle.start.dx > unfinishedCircle.end.dx) {
+      radius = (unfinishedCircle.start.dx - unfinishedCircle.end.dx) / 2;
     } else {
-      radius = (unfinishedCircle.end!.dx - unfinishedCircle.start!.dx) / 2;
+      radius = (unfinishedCircle.end.dx - unfinishedCircle.start.dx) / 2;
     }
-    canvas.drawCircle(unfinishedCircle.start!, radius, unfinishedCircle.paint!);
+    canvas.drawCircle(unfinishedCircle.start, radius, unfinishedCircle.paint);
 
     if (saveImage) {
-      final Picture picture = recorder.endRecording();
+      final ui.Picture picture = recorder.endRecording();
       saveCallback(picture);
     }
   }
@@ -85,21 +85,21 @@ class PainterCanvas extends CustomPainter {
 }
 
 class PaintedPoints {
-  Paint? paint;
-  Offset? points;
-  PaintedPoints({this.points, this.paint});
+  Paint paint;
+  Offset points;
+  PaintedPoints({required this.points, required this.paint});
 }
 
 class PaintedCircles {
-  Paint? paint;
-  Offset? start;
-  Offset? end;
-  PaintedCircles(this.start, this.end, this.paint);
+  Paint paint;
+  Offset start;
+  Offset end;
+  PaintedCircles({required this.start, required this.end, required this.paint});
 }
 
 class PaintedSquires {
-  Paint? paint;
-  Offset? start;
-  Offset? end;
-  PaintedSquires(this.paint, this.start, this.end);
+  Paint paint;
+  Offset start;
+  Offset end;
+  PaintedSquires({required this.paint, required this.start, required this.end});
 }

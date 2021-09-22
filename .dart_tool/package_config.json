@@ -314,6 +314,12 @@
       "languageVersion": "2.12"
     },
     {
+      "name": "image_gallery_saver",
+      "rootUri": "file:///C:/Users/md_to/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/image_gallery_saver-1.7.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "image_picker",
       "rootUri": "file:///C:/Users/md_to/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/image_picker-0.8.4+2",
       "packageUri": "lib/",
@@ -430,6 +436,18 @@
     {
       "name": "pedantic",
       "rootUri": "file:///C:/Users/md_to/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/pedantic-1.11.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "permission_handler",
+      "rootUri": "file:///C:/Users/md_to/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/permission_handler-8.1.6",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "permission_handler_platform_interface",
+      "rootUri": "file:///C:/Users/md_to/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/permission_handler_platform_interface-3.6.1",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
@@ -602,7 +620,7 @@
       "languageVersion": "2.12"
     }
   ],
-  "generated": "2021-09-21T09:19:45.919575Z",
+  "generated": "2021-09-22T10:57:27.674608Z",
   "generator": "pub",
   "generatorVersion": "2.15.0-42.0.dev"
 }
