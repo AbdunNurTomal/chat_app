@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:uri_to_file/uri_to_file.dart';
 
@@ -23,7 +24,7 @@ class ImageDialogOld extends StatefulWidget {
   State<ImageDialogOld> createState() => _ImageDialogOldState();
 }
 
-enum enumToolTypes { pencil, eraser, rectangle, circle, text, undo, save }
+enum enumToolTypes { pencil, eraser, rectangle, circle, text, rotate, zoom, arrow }
 
 class ToolIconsData {
   IconData icon;
@@ -52,6 +53,9 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
 
   bool isCanvasLocked = false;
   bool saveClicked = false;
+
+  List<PaintedArrow> arrowList = [];
+  PaintedArrow unfinishedArrow = PaintedArrow(paint: Paint(),start: Offset(0.0,0.0),end: Offset(0.0,0.0));
 
   List<PaintedSquires> squaresList = [];
   PaintedSquires unfinishedSquare = PaintedSquires(paint: Paint(),start: Offset(0.0,0.0),end: Offset(0.0,0.0));
@@ -146,6 +150,37 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
       appBar: AppBar(
         actions: [
           IconButton(
+              onPressed: (){
+                  setState(() {
+                    if (drawHistory.isNotEmpty) {
+                      enumToolTypes lastAction = drawHistory
+                          .last;
+                      if (lastAction ==
+                          enumToolTypes.eraser ||
+                          lastAction ==
+                              enumToolTypes.pencil) {
+                        if (paintedPoints.isNotEmpty) {
+                          RecordPaints lastPoint = paintedPoints
+                              .last;
+                          pointsList.removeRange(
+                              lastPoint.startIndex!,
+                              lastPoint.endIndex!);
+                          paintedPoints.removeLast();
+                        }
+                      } else if (lastAction ==
+                          enumToolTypes.rectangle) {
+                        squaresList.removeLast();
+                      } else {
+                        circleList.removeLast();
+                      }
+                      drawHistory.removeLast();
+                    }
+                    //pointsListDeleted.;
+                  });
+              },
+              icon: Icon(Icons.undo)
+          ),
+          IconButton(
             onPressed: (){
               setState(() {
                 saveClicked = true;
@@ -175,77 +210,6 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: <Widget>[
-                        // Container(
-                        //   width: width * 0.9,
-                        //   height: height * 0.1,
-                        //   decoration: BoxDecoration(
-                        //       borderRadius: const BorderRadius.all(Radius.circular(5.0)),
-                        //       boxShadow: [
-                        //         BoxShadow(
-                        //           color: Colors.blue.withOpacity(0.3),
-                        //           blurRadius: 1.0,
-                        //           // spreadRadius: 0.1,
-                        //         )
-                        //       ]),
-                        //   child: Row(
-                        //     crossAxisAlignment: CrossAxisAlignment.center,
-                        //     mainAxisAlignment: MainAxisAlignment.start,
-                        //     children: <Widget>[
-                        //       GestureDetector(
-                        //         onTap: () {
-                        //           setState(() {
-                        //             saveClicked = true;
-                        //           });
-                        //         },
-                        //         child: MenuItem("Save"),
-                        //       ),
-                        //       GestureDetector(
-                        //         onTap: () {
-                        //           if (selectedTool == enumToolTypes.undo) {
-                        //             setState(() {
-                        //               if (drawHistory.isNotEmpty) {
-                        //                 enumToolTypes lastAction = drawHistory
-                        //                     .last;
-                        //                 if (lastAction ==
-                        //                     enumToolTypes.eraser ||
-                        //                     lastAction ==
-                        //                         enumToolTypes.pencil) {
-                        //                   if (paintedPoints.isNotEmpty) {
-                        //                     RecordPaints lastPoint = paintedPoints
-                        //                         .last;
-                        //                     pointsList.removeRange(
-                        //                         lastPoint.startIndex!,
-                        //                         lastPoint.endIndex!);
-                        //                     paintedPoints.removeLast();
-                        //                   }
-                        //                 } else if (lastAction ==
-                        //                     enumToolTypes.rectangle) {
-                        //                   squaresList.removeLast();
-                        //                 } else {
-                        //                   circleList.removeLast();
-                        //                 }
-                        //                 drawHistory.removeLast();
-                        //               }
-                        //               //pointsListDeleted.;
-                        //             });
-                        //           }
-                        //         },
-                                // child: MenuItem("Undo"),
-                              // ),
-                        //       GestureDetector(
-                        //         onTap: () {
-                        //           setState(() {
-                        //             pointsList!.clear();
-                        //             paintedPoints.clear();
-                        //             squaresList.clear();
-                        //             circleList.clear();
-                        //           });
-                        //         },
-                        //         child: MenuItem("Clear"),
-                        //       ),
-                        //     ],
-                        //   ),
-                        // ),
                         Container(
                           width: width * 1.0,
                           decoration: BoxDecoration(
@@ -313,6 +277,8 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
                                           paint: getPoint(),
                                         ),
                                       );
+                                    } else if (selectedTool == enumToolTypes.arrow) {
+                                      unfinishedArrow.end = renderBox.globalToLocal(details.globalPosition);
                                     } else if (selectedTool == enumToolTypes.rectangle) {
                                       unfinishedSquare.end = renderBox.globalToLocal(details.globalPosition);
                                     } else if (selectedTool == enumToolTypes.circle) {
@@ -336,6 +302,12 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
                                           paint: getPoint(),
                                         ),
                                       );
+                                    } else if (selectedTool == enumToolTypes.arrow) {
+                                      unfinishedArrow = PaintedArrow(paint: Paint(),start: Offset(0.0,0.0),end: Offset(0.0,0.0));
+                                      Offset os = renderBox.globalToLocal(details.globalPosition);
+                                      unfinishedArrow.start = os;
+                                      unfinishedArrow.end = os;
+                                      unfinishedArrow.paint = getPoint();
                                     } else if (selectedTool == enumToolTypes.rectangle) {
                                       unfinishedSquare = PaintedSquires(paint: Paint(),start: Offset(0.0,0.0),end: Offset(0.0,0.0));
                                       Offset os = renderBox.globalToLocal(details.globalPosition);
@@ -360,6 +332,12 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
                                     if (selectedTool == enumToolTypes.pencil || selectedTool == enumToolTypes.eraser) {
                                       paintedPoints.firstWhere((element) => element.endIndex == null).endIndex = pointsList.length;
                                       // pointsList.add(null);
+                                    } else if (selectedTool == enumToolTypes.arrow) {
+                                      setState(() {
+                                        arrowList.add(unfinishedArrow);
+                                        // unfinishedSquare = null;
+                                        unfinishedArrow = PaintedArrow(paint: Paint(),start: Offset(0.0,0.0),end: Offset(0.0,0.0));
+                                      });
                                     } else if (selectedTool == enumToolTypes.rectangle) {
                                       setState(() {
                                         squaresList.add(unfinishedSquare);
@@ -376,78 +354,57 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
                                     }
                                   });
                                 },
-                                child: SizedBox.expand(
-                                  child: RepaintBoundary(
-                                    child: ClipRRect(
-                                      child: Stack(
-                                        children: [
-                                          Center(
-                                            child: FutureBuilder(
-                                                future: _getLocalFile(widget.imageUri),
-                                                builder: (BuildContext context,
-                                                    AsyncSnapshot<File> snapshot) {
-                                                  return snapshot.data != null
-                                                      ? Image.file(snapshot.data!)
-                                                      : Container();
-                                                }
-                                            ),
-                                          ),
-                                          ClipRect(
-                                            child: CustomPaint(
-                                              size: Size(
-                                                  constraints.widthConstraints().maxWidth,
-                                                  constraints
-                                                      .heightConstraints()
-                                                      .maxHeight),
-                                              painter: PainterCanvas(
-                                                imageUri: widget.imageUri,
-                                                pointsList: pointsList,
-                                                squaresList: squaresList,
-                                                circlesList: circleList,
-                                                unfinishedSquare: unfinishedSquare,
-                                                unfinishedCircle: unfinishedCircle,
-                                                saveImage: saveClicked,
-                                                saveCallback: (Picture picture) async {
-                                                  var status =
-                                                  await Permission.storage.status;
-                                                  if (!status.isGranted) {
-                                                  await Permission.storage.request();
-                                                  }
-                                                  if (status.isGranted) {
-                                                    final img = await picture
-                                                        .toImage(
-                                                        constraints.maxWidth
-                                                            .round(),
-                                                        constraints.maxHeight
-                                                            .round());
-                                                    ByteData? byteData = await img
-                                                        .toByteData(
-                                                        format: ImageByteFormat
-                                                            .png);
-                                                    print(
-                                                        "byteData : $byteData");
-                                                    await ImageGallerySaver
-                                                        .saveImage(
-                                                      Uint8List.fromList(
-                                                          byteData!.buffer
-                                                              .asUint8List()),
-                                                      quality: 100,
-                                                      name: widget.imageName,
-                                                    );
+                                child: CustomPaint(
+                                  size: Size(
+                                      constraints.widthConstraints().maxWidth,
+                                      constraints.heightConstraints().maxHeight),
+                                  painter: PainterCanvas(
+                                    image: widget.myBackgroundImage,
+                                    pointsList: pointsList,
+                                    arrowList: arrowList,
+                                    squaresList: squaresList,
+                                    circlesList: circleList,
+                                    unfinishedArrow: unfinishedArrow,
+                                    unfinishedSquare: unfinishedSquare,
+                                    unfinishedCircle: unfinishedCircle,
+                                    saveImage: saveClicked,
+                                    saveCallback: (Picture picture) async {
+                                      var status =
+                                      await Permission.storage.status;
+                                      if (!status.isGranted) {
+                                      await Permission.storage.request();
+                                      }
+                                      if (status.isGranted) {
+                                        Uri _uri = Uri.parse(widget.imageUri);
+                                        File _file = await toFile(_uri);
+                                        print("file name : $_file");
 
-                                                    showToastMessage(
-                                                        "Image saved to gallery.");
-                                                  }
-                                                  setState(() {
-                                                    saveClicked = false;
-                                                  });
-                                                },
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
+                                        final img = await picture.toImage(
+                                            constraints.maxWidth.round(),
+                                            constraints.maxHeight.round());
+                                        ByteData? byteData = await img.toByteData(format: ImageByteFormat.png);
+                                        Uint8List jpgBytes = byteData!.buffer.asUint8List();
+
+                                        var dir = await getExternalStorageDirectory();
+                                        var testdir = await  Directory('${dir?.path}/images');
+
+                                        File('${testdir.path}/${widget.imageName}').writeAsBytesSync(jpgBytes);
+
+                                        // await ImageGallerySaver
+                                        //     .saveImage(
+                                        //   Uint8List.fromList(
+                                        //       byteData!.buffer
+                                        //           .asUint8List()),
+                                        //   quality: 100,
+                                        //   name: newName[0].trim(),
+                                        // );
+
+                                        showToastMessage("Image saved to gallery.");
+                                      }
+                                      setState(() {
+                                        saveClicked = false;
+                                      });
+                                    },
                                   ),
                                 ),
                                 // child: SizedBox.expand(
@@ -641,12 +598,13 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
   }
   List<ToolIconsData> lstToolIcons = [
     ToolIconsData(Icons.create, enumToolTypes.pencil, isSelected: true),
-    ToolIconsData(FontAwesomeIcons.eraser, enumToolTypes.eraser),
+    ToolIconsData(FontAwesomeIcons.expandAlt, enumToolTypes.arrow),
+    // ToolIconsData(FontAwesomeIcons.eraser, enumToolTypes.eraser),
     ToolIconsData(Icons.crop_square, enumToolTypes.rectangle),
     ToolIconsData(Icons.radio_button_unchecked, enumToolTypes.circle),
     ToolIconsData(Icons.text_fields, enumToolTypes.text), //TODO
-    ToolIconsData(Icons.undo_outlined, enumToolTypes.undo),
-    ToolIconsData(Icons.save, enumToolTypes.save),
+    ToolIconsData(Icons.sync, enumToolTypes.rotate),
+    ToolIconsData(FontAwesomeIcons.expand, enumToolTypes.zoom),
   ];
   List<Widget> getToolBoxIcons() {
     List<Widget> lstWidgets = [];

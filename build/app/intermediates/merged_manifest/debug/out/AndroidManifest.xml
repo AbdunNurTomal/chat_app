@@ -5,23 +5,25 @@
     android:versionName="1.0.0" >
 
     <uses-sdk
-        android:minSdkVersion="30"
-        android:targetSdkVersion="30" />
+        android:minSdkVersion="21"
+        android:targetSdkVersion="29" />
     <!--
          Flutter needs it to communicate with the running application
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!-- Permissions options for the `storage` group -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- Permissions options for the `camera` group -->
+    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:appComponentFactory="androidx.core.app.CoreComponentFactory"
         android:debuggable="true"
-        android:extractNativeLibs="false"
         android:icon="@mipmap/ic_launcher"
-        android:label="chat_app" >
+        android:label="chat_app"
+        android:requestLegacyExternalStorage="true" >
         <activity
             android:name="com.pqcbd.chat.chat_app.MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"

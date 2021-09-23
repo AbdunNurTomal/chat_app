@@ -46,15 +46,7 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> {//with SingleTickerP
   late ListProvider allItem;
 
   late final List<DownloadController> _downloadControllers;
-
-  // Random r = Random();
-  // Uint8List getImage() {
-  //   Uint8List bytes =
-  //   Uint8List.fromList(List<int>.generate(10000, (i) => r.nextInt(255)));
-  //   Bitmap bitmap = Bitmap.fromHeadless(50, 50, bytes); // Not async
-  //   Uint8List headedBitmap = bitmap.buildHeaded();
-  //   return headedBitmap;
-  // }
+  late ListProvider taskItems;
 
   @override
   void initState() {

@@ -8,6 +8,12 @@
       "languageVersion": "2.12"
     },
     {
+      "name": "arrow_path",
+      "rootUri": "file:///C:/Users/md_to/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/arrow_path-2.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "async",
       "rootUri": "file:///C:/Users/md_to/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/async-2.8.2",
       "packageUri": "lib/",
@@ -231,7 +237,7 @@
     },
     {
       "name": "flutter_svg",
-      "rootUri": "file:///C:/Users/md_to/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/flutter_svg-0.21.0+1",
+      "rootUri": "file:///C:/Users/md_to/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/flutter_svg-0.22.0",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
@@ -273,9 +279,9 @@
     },
     {
       "name": "google_sign_in",
-      "rootUri": "file:///C:/Users/md_to/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/google_sign_in-5.1.0",
+      "rootUri": "file:///C:/Users/md_to/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/google_sign_in-5.1.1",
       "packageUri": "lib/",
-      "languageVersion": "2.12"
+      "languageVersion": "2.14"
     },
     {
       "name": "google_sign_in_platform_interface",
@@ -303,7 +309,7 @@
     },
     {
       "name": "image",
-      "rootUri": "file:///C:/Users/md_to/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/image-3.0.4",
+      "rootUri": "file:///C:/Users/md_to/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/image-3.0.5",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
@@ -591,7 +597,7 @@
     },
     {
       "name": "websafe_svg",
-      "rootUri": "file:///C:/Users/md_to/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/websafe_svg-2.0.0",
+      "rootUri": "file:///C:/Users/md_to/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/websafe_svg-2.0.0+1",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
@@ -620,7 +626,7 @@
       "languageVersion": "2.12"
     }
   ],
-  "generated": "2021-09-22T10:57:27.674608Z",
+  "generated": "2021-09-23T09:44:31.118968Z",
   "generator": "pub",
-  "generatorVersion": "2.15.0-42.0.dev"
+  "generatorVersion": "2.15.0-82.0.dev"
 }

@@ -11,12 +11,13 @@ import 'package:chat_app/utils/image_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:multi_image_picker2/multi_image_picker2.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:uri_to_file/uri_to_file.dart';
 
 
 class AddListItemDialogWidget extends StatefulWidget {
-  const AddListItemDialogWidget({Key? key}) : super(key: key);
+  AddListItemDialogWidget({Key? key}) : super(key: key);
 
   @override
   _AddListItemDialogWidgetState createState() => _AddListItemDialogWidgetState();
@@ -27,12 +28,15 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
   String _error = 'No Problem';
 
   List<Asset> images = <Asset>[];
+  List<Asset> newImage = <Asset>[];
+
   File? _file;
   bool _imagePickButton = false;
 
   String ddItemValue = '';
   String ddItem = '';
   late ListProvider _defectProvider;
+  late int listLength;
   final TextEditingController _ddIemController = TextEditingController();
 
   //late List<Defects> updatedDefect=[];
@@ -50,7 +54,7 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
     //   }
     //   _animationController!.addStatusListener(_statusListener);
     _defectProvider = Provider.of<ListProvider>(context,listen: false);
-
+    listLength = _defectProvider.allListItem.length;
     // updatedDefect = _defectProvider.allListDefect;
   }
 
@@ -127,17 +131,33 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
     );
   }
 
-  void _saveItem() {
+  Future<void> _saveItem() async{
     if (_formKey.currentState!.validate()) {
-      //save data to database
+
       _formKey.currentState!.save();
+
+      int countImage=0;
+      int countItem = listLength++;
+
+      var dir = await getExternalStorageDirectory();
+      var testdir = await  Directory('${dir?.path}/images');
+      print("Image : $images");
+
+      for(int i=0;i<images.length;i++){
+          countImage++;
+          String? imageUri = images[i].identifier;
+          ImageUtility.saveImage(imageUri!,countItem,countImage);
+          // images[i] = ImageUtility.loadUiImage('${testdir.path}/$countItem\_$countImage');
+          newImage.add(images[i]);
+      }
+
 
       //print("ddItem >> $ddItem");
       final listItem = ListItem(
         id: DateTime.now().toString(),
         itemValue: ddItemValue,
         item: ddItem,
-        images: images,
+        images: newImage,
         //description: description,
         createdTime: DateTime.now(),
       );
@@ -340,7 +360,7 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
           ),
           materialOptions: const MaterialOptions(
             actionBarColor: "#abcdef",
-            actionBarTitle: "Example App",
+            actionBarTitle: "PQC",
             allViewTitle: "All Photos",
             useDetailsView: false,
             selectCircleStrokeColor: "#000000",

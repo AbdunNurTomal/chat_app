@@ -1,14 +1,16 @@
-import 'dart:io';
 import 'dart:ui' as ui;
+import 'package:arrow_path/arrow_path.dart';
 import 'package:flutter/material.dart';
-import 'package:uri_to_file/uri_to_file.dart';
 
 typedef ImageSaveCallback = void Function(ui.Picture picture);
 
 class PainterCanvas extends CustomPainter {
-  String imageUri;
+  ui.Image image;
 
   List<PaintedPoints> pointsList;
+
+  List<PaintedArrow> arrowList;
+  PaintedArrow unfinishedArrow;
 
   List<PaintedSquires> squaresList;
   PaintedSquires unfinishedSquare;
@@ -19,8 +21,10 @@ class PainterCanvas extends CustomPainter {
   ImageSaveCallback saveCallback;
   bool saveImage;
 
-  PainterCanvas({required this.imageUri,
+  PainterCanvas({required this.image,
         required this.pointsList,
+        required this.arrowList,
+        required this.unfinishedArrow,
         required this.squaresList,
         required this.unfinishedSquare,
         required this.circlesList,
@@ -37,6 +41,12 @@ class PainterCanvas extends CustomPainter {
       canvas = Canvas(recorder);
     }
     // canvas.drawColor(Colors.white, BlendMode.color);
+    paintImage(
+      canvas: canvas,
+      rect: Rect.fromLTWH(0.0, 0.0, size.width, size.height),
+      image: image,
+      fit: BoxFit.cover);
+    // canvas.drawImage(image, Offset.zero, Paint());
 
     for (int i = 0; i < pointsList.length - 1; i++) {
       if (pointsList[i] != null && pointsList[i + 1] != null) {
@@ -47,6 +57,17 @@ class PainterCanvas extends CustomPainter {
         offsetPoints.add(Offset(pointsList[i].points.dx + 0.1, pointsList[i].points.dy + 0.1));
         canvas.drawPoints(ui.PointMode.points, offsetPoints, pointsList[i].paint);
       }
+    }
+
+    Path path = Path();
+    for (var i = 0; i < arrowList.length; i++) {
+      path.moveTo(arrowList[i].end.dx, arrowList[i].end.dx);
+      // path.relativeCubicTo(0, 0, size.width * 0.25, 50, size.width * 0.5, 0);
+      path = ArrowPath.make(path: path);
+
+      arrowList[i].paint.style = PaintingStyle.stroke;
+      canvas.drawPath(path, arrowList[i].paint);
+
     }
 
     for (var i = 0; i < squaresList.length; i++) {
@@ -60,6 +81,14 @@ class PainterCanvas extends CustomPainter {
       double radius = (circlesList[i].end.dx - circlesList[i].start.dx) / 2;
       canvas.drawCircle(circlesList[i].start, radius, circlesList[i].paint);
     }
+
+    unfinishedArrow.paint.style = PaintingStyle.stroke;
+    // Path path = Path();
+    if (unfinishedArrow.start.dx > unfinishedArrow.end.dx) {
+      path.moveTo(unfinishedArrow.start.dx, unfinishedArrow.end.dx);
+      path = ArrowPath.make(path: path);
+    }
+    canvas.drawPath(path, unfinishedArrow.paint);
 
     unfinishedSquare.paint.style = PaintingStyle.stroke;
     final rect = Rect.fromPoints(unfinishedSquare.start, unfinishedSquare.end);
@@ -95,6 +124,13 @@ class PaintedCircles {
   Offset start;
   Offset end;
   PaintedCircles({required this.start, required this.end, required this.paint});
+}
+
+class PaintedArrow {
+  Paint paint;
+  Offset start;
+  Offset end;
+  PaintedArrow({required this.start, required this.end, required this.paint});
 }
 
 class PaintedSquires {

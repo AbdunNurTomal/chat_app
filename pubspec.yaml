@@ -60,6 +60,7 @@ dependencies:
   fluttertoast: ^8.0.8
   image_gallery_saver: ^1.7.0
   permission_handler: ^8.1.6
+  arrow_path: ^2.0.0
 
 dev_dependencies:
   flutter_test:
