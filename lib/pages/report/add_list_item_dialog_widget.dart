@@ -28,9 +28,7 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
   String _error = 'No Problem';
 
   List<Asset> images = <Asset>[];
-  List<Asset> newImage = <Asset>[];
 
-  File? _file;
   bool _imagePickButton = false;
 
   String ddItemValue = '';
@@ -137,33 +135,25 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
       _formKey.currentState!.save();
 
       int countImage=0;
-      int countItem = listLength++;
-
-      var dir = await getExternalStorageDirectory();
-      var testdir = await  Directory('${dir?.path}/images');
-      print("Image : $images");
 
       for(int i=0;i<images.length;i++){
           countImage++;
           String? imageUri = images[i].identifier;
-          ImageUtility.saveImage(imageUri!,countItem,countImage);
-          // images[i] = ImageUtility.loadUiImage('${testdir.path}/$countItem\_$countImage');
-          newImage.add(images[i]);
+          ImageUtility.saveImage(imageUri!,images[i].name!);
       }
-
+// print("new image : $newImage");
 
       //print("ddItem >> $ddItem");
       final listItem = ListItem(
         id: DateTime.now().toString(),
         itemValue: ddItemValue,
         item: ddItem,
-        images: newImage,
+        images: images,
         //description: description,
         createdTime: DateTime.now(),
       );
 
       //print("listItem >> $listItem");
-      //final provider = Provider.of<ListProvider>(context, listen: false);
       _defectProvider.addItem(listItem);
       DefectData.deleteDefectItem(ddItem);
 
@@ -262,50 +252,7 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
                     elevation: 5.0,
                     child: Stack(
                       children: <Widget>[
-                        InkWell(
-                          onTap: ()async {
-                            String? imageName = images[index].name;
-                            String? imageUri = images[index].identifier;
-                            Uri? _uri = Uri.parse(imageUri!);
-                            //print("Uri - $_uri");
-                            _file = await toFile(_uri);
-
-                            //final myImagePath = _getDirectoryPath();
-                            //var kompresimg = File("$myImagePath/$imageName")
-                            //  ..writeAsBytesSync(_file!.encodeJpg(gambarKecilx, quality: 95));
-
-                            //await _file!.copy("$myImagePath/$imageName");
-
-                            //File imageFile = File.fromUri(_uri);
-                            //print("File - $_file");
-                            Uint8List _imageByteslist = await _file!.readAsBytes();
-                            //print("ImageByteslist - $_imageByteslist");
-                            //await _file!.readAsBytes().then((value){
-                            //_imageByteslist = Uint8List.fromList(value);
-                            //print("ImageByteslist - $_imageByteslist");
-                            //}).catchError((onError){
-                            //  print('Exception error reading image file ' + onError.toString());
-                            //});
-
-                            try{
-                              final ui.Image _myBackgroundImage;
-                              _myBackgroundImage = await ImageUtility.loadImage(_imageByteslist);
-
-                              //print("MyBackgroundImage - $_myBackgroundImage");
-                              Navigator.push(context,
-                                  MaterialPageRoute(builder: (context) => ImageDialogOld(
-                                    myBackgroundImage: _myBackgroundImage,
-                                    //imageUri: _file,
-                                    imageUri: imageUri,
-                                    imageName: imageName!,
-                                  ),
-                                  )
-                              );
-                            } catch (e) {
-                              print(e);
-                            }
-                          },
-                          child: Container(
+                          Container(
                             height: MediaQuery.of(context).size.width / 3,
                             width: MediaQuery.of(context).size.width / 3,
                             alignment: Alignment.center,
@@ -316,7 +263,7 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
                               quality: 75,
                             ),
                           ),
-                        ),
+                        // ),
                         Positioned(
                           right: 5,
                           top: 5,

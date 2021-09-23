@@ -104,13 +104,15 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
   @override
   void dispose() {
     super.dispose();
+    pointsList.clear();
+    paintListDeleted.clear();
+    paintedPoints.clear();
+    arrowList.clear();
+    squaresList.clear();
+    circleList.clear();
   }
 
-  Future<File> _getLocalFile(String filename) async {
-    Uri _uri = Uri.parse(filename);
-    File _file = await toFile(_uri);
-    return _file;
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -185,6 +187,7 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
               setState(() {
                 saveClicked = true;
               });
+              Navigator.of(context).pop(context);
             },
             icon: Icon(Icons.save)
           )

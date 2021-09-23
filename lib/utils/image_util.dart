@@ -12,6 +12,19 @@ import 'package:uri_to_file/uri_to_file.dart';
 
 class ImageUtility {
 
+  static Future<File> getImageFile(String filename) async {
+    Uri _uri = Uri.parse(filename);
+    File _file = await toFile(_uri);
+    return _file;
+  }
+
+  static Future<Directory> getImageDirPath() async{
+    var dir = await getExternalStorageDirectory();
+    Directory testdir = await  Directory('${dir?.path}/images');
+
+    return testdir;
+  }
+
   static Future<ui.Image> loadImage(Uint8List bytes) async {
     final Completer<ui.Image> completer = Completer();
     ui.decodeImageFromList(bytes, (ui.Image img) => completer.complete(img));
@@ -25,7 +38,19 @@ class ImageUtility {
     ui.decodeImageFromList(list, completer.complete);
     return completer.future;
   }
+  static Future<void> changeFileNameOnly(String fileName, String newFileName) async{
+    try {
+      var dir = await getExternalStorageDirectory();
+      var testdir = await Directory('${dir?.path}/images');
 
+      await File('${testdir.path}/$fileName').exists().then((_) async {
+        String newFilePath = '${testdir.path}/$newFileName';
+        await File('${testdir.path}/$fileName').renameSync(newFilePath);
+      });
+    }catch(e){
+      print(e);
+    }
+  }
   static Future<void> createImage(String itemName, int fileName) async {
     try {
       var dir = await getExternalStorageDirectory();
@@ -62,16 +87,16 @@ class ImageUtility {
     }
   }
 
-  static Future<bool> saveImage(String file, int itemNumber, int slNo) async {
+  static Future<bool> saveImage(String file, String fileName) async {
     try {
-      String fileName = '$itemNumber\_$slNo.jpg';
-      String itemName = '$itemNumber\_$slNo';
+      // String fileName = '$itemNumber\_$slNo.jpg';
+      // String itemName = '$itemNumber\_$slNo';
 
       Uri _uri = Uri.parse(file);
       File _file = await toFile(_uri);
 
       var dir = await getExternalStorageDirectory();
-      var testdir = await  Directory('${dir?.path}/images').create(recursive: true);
+      var testdir = await Directory('${dir?.path}/images').create(recursive: true);
 
       final bytes = _file.readAsBytesSync();
       String img64 = base64Encode(bytes);
@@ -81,8 +106,8 @@ class ImageUtility {
 
       File('${testdir.path}/$fileName').writeAsBytesSync(decodedBytes);
 
-      final ui.Image _imageBackgroud = await ImageUtility.loadImage(decodedBytes);
-      writeLogoInsideImage('${testdir.path}/$fileName',_imageBackgroud.width,_imageBackgroud.height,itemName);
+      ui.Image _imageBackgroud = await ImageUtility.loadImage(decodedBytes);
+      writeLogoInsideImage('${testdir.path}/$fileName',_imageBackgroud.width,_imageBackgroud.height,fileName);
 
       return true;
     } catch (e) {
@@ -100,13 +125,13 @@ class ImageUtility {
     final bytesPicture = _filePicture.readAsBytesSync();
     String img64Picture = base64Encode(bytesPicture);
     final decodedBytesPicture = base64Decode(img64Picture);
-    final ui.Image originalImage = await ImageUtility.loadImage(
+    ui.Image originalImage = await ImageUtility.loadImage(
         decodedBytesPicture);
     c.drawImage(originalImage, Offset.zero, Paint());
 
-    final ui.Image _logoImage = await ImageUtility.loadUiImage('assets/images/pqc.png');
-    final double positionX = (originalImage.width - _logoImage.width * 1.15).toDouble();
-    final double positionY = (originalImage.height - _logoImage.height * 1.15).toDouble();
+    ui.Image _logoImage = await ImageUtility.loadUiImage('assets/images/pqc.png');
+    double positionX = (originalImage.width - _logoImage.width * 1.15).toDouble();
+    double positionY = (originalImage.height - _logoImage.height * 1.15).toDouble();
     c.drawImage(_logoImage, Offset(positionX,positionY), Paint());
 
     // var rect = Rect.fromLTWH(50.0, 50.0, _width, _height);
@@ -116,16 +141,14 @@ class ImageUtility {
     TextPainter textPainter = TextPainter(text: textSpan,textDirection: TextDirection.ltr);
     textPainter.layout(minWidth: 0,maxWidth: originalImage.width.toDouble());
 
-    print('width : ${originalImage.width}');
-    print('Height : ${originalImage.height}');
-    final double testPositionX = (originalImage.width - 60).toDouble();
-    final double testPositionY = (originalImage.height - (originalImage.height - 50)).toDouble();
-    //Offset offset = Offset(testPositionX,testPositionY);
-    //Offset offset = Offset(10.0, 10.0);
+    // print('width : ${originalImage.width}');
+    // print('Height : ${originalImage.height}');
+    double testPositionX = (originalImage.width - 60).toDouble();
+    double testPositionY = (originalImage.height - (originalImage.height - 50)).toDouble();
     textPainter.paint(c, Offset(testPositionX, testPositionY));
 
     ui.Picture picture = recorder.endRecording();
-    ui.Image img = await picture.toImage(width, height);
+    ui.Image img = await picture.toImage(originalImage.width, originalImage.height);
 
     ByteData? byteData = await img.toByteData(format: ui.ImageByteFormat.png);
     Uint8List jpgBytes = byteData!.buffer.asUint8List();

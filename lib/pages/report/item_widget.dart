@@ -1,17 +1,26 @@
+import 'dart:typed_data';
+import 'dart:io';
+import 'dart:ui' as ui;
+
 import 'package:chat_app/models/defect.dart';
 import 'package:chat_app/models/list_item.dart';
 import 'package:chat_app/provider/list_provider.dart';
+import 'package:chat_app/utils/image_full_screen_wrapper.dart';
+import 'package:chat_app/utils/image_util.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:multi_image_picker2/multi_image_picker2.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:uri_to_file/uri_to_file.dart';
 
 import 'edit_list_item_dialog_widget.dart';
 
 class ItemWidget extends StatelessWidget {
   final ListItem  listItem;
-  const ItemWidget({Key? key, required this.listItem}) : super(key: key);
+  ItemWidget({Key? key, required this.listItem}) : super(key: key);
+
+  File? _file;
 
   @override
   Widget build(BuildContext context) => ClipRRect(
@@ -155,40 +164,76 @@ class ItemWidget extends StatelessWidget {
             topRight: Radius.circular(0)
         ),
       ),
-      child: Stack(
-          children: [
-            Container(
-              color: Colors.black26,
-            ),
-            SizedBox(
-              height: 128.0,
-              child: ListView.builder(
-                shrinkWrap: true,
-                scrollDirection: Axis.horizontal,
-                itemCount: images.length,
-                itemBuilder: (context, index) {
-                  Asset asset = images[index];
-                  //print("name ${asset.name}");
-                  //print("identifier ${asset.identifier}");
-                  return Card(
-                    //clipBehavior: Clip.antiAlias,
-                    elevation: 5.0,
-                    child: Container(
-                      height: MediaQuery.of(context).size.width / 3,
-                      width: MediaQuery.of(context).size.width / 3,
-                      alignment: Alignment.center,
-                      child: AssetThumb(
-                        asset: asset,
-                        width: 300,
-                        height: 300,
-                        quality: 75,
-                      ),
+      child: SizedBox(
+        height: 128.0,
+        child: DecoratedBox(
+          decoration: const BoxDecoration(
+            color: Colors.black26,
+          ),
+          child: ListView.builder(
+            shrinkWrap: true,
+            scrollDirection: Axis.horizontal,
+            itemCount: images.length,
+            itemBuilder: (context, index) {
+              Asset asset = images[index];
+              // print("item widget >> name ${asset.name}");
+              // print("item widget >> identifier ${asset.identifier}");
+              return Card(
+                // clipBehavior: Clip.antiAlias,
+                elevation: 5.0,
+                // child: Container(
+                //   height: MediaQuery.of(context).size.width / 3,
+                //   width: MediaQuery.of(context).size.width / 3,
+                //   alignment: Alignment.center,
+                //   child: AssetThumb(
+                //     asset: asset,
+                //     width: 300,
+                //     height: 300,
+                //     quality: 75,
+                //   ),
+                // ),
+                child: InkWell(
+                  onTap: ()async {
+                    String? imageName = images[index].name;
+                    String? imageUri = images[index].identifier;
+
+                    Uri? _uri = Uri.parse(imageUri!);
+                    _file = await toFile(_uri);
+                    Uint8List _imageByteslist = await _file!.readAsBytes();
+                    try{
+                      final ui.Image _myBackgroundImage;
+                      _myBackgroundImage = await ImageUtility.loadImage(_imageByteslist);
+
+                      //print("MyBackgroundImage - $_myBackgroundImage");
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => ImageDialogOld(
+                            myBackgroundImage: _myBackgroundImage,
+                            //imageUri: _file,
+                            imageUri: imageUri,
+                            imageName: imageName!,
+                          ),
+                          )
+                      );
+                    } catch (e) {
+                      print(e);
+                    }
+                  },
+                  child: SizedBox(
+                    height: MediaQuery.of(context).size.width / 3,
+                    width: MediaQuery.of(context).size.width / 3,
+                    // alignment: Alignment.center,
+                    child: AssetThumb(
+                      asset: asset,
+                      width: 300,
+                      height: 300,
+                      quality: 75,
                     ),
-                  );
-                },
-              ),
-            ),
-          ]
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
       ),
     );//const SizedBox(height: 10.0),
   }
