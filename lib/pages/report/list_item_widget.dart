@@ -1,4 +1,3 @@
-import 'package:chat_app/models/list_item.dart';
 import 'package:chat_app/provider/list_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -21,13 +20,13 @@ class _ListItemWidgetState extends State<ListItemWidget> {
 
   @override
   void didChangeDependencies() {
-
     super.didChangeDependencies();
   }
   @override
   Widget build(BuildContext context) {
     taskItems = Provider.of<ListProvider>(context);
     final listClass = taskItems.allListItem;
+
     return listClass.isEmpty
         ? const Center(
           child: Text(
@@ -47,6 +46,6 @@ class _ListItemWidgetState extends State<ListItemWidget> {
               final listItem = listClass[index];
               return ItemWidget(listItem: listItem);
             },
-        );
+          );
   }
 }

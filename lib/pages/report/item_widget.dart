@@ -10,8 +10,10 @@ import 'package:chat_app/utils/image_util.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:multi_image_picker2/multi_image_picker2.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:step_progress_indicator/step_progress_indicator.dart';
 import 'package:uri_to_file/uri_to_file.dart';
 
 import 'edit_list_item_dialog_widget.dart';
@@ -62,8 +64,33 @@ class ItemWidget extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            buildDDItemHead(listItem.item!),
-            buildGridView(listItem.images),
+            buildDDItemHead(listItem.itemValue!,listItem.item!,listItem.images.length),
+            SizedBox(
+                height: 10,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Colors.black54,
+                    border: Border.all(
+                      color: Colors.black12,
+                      width: 2,
+                    ),
+                    borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(0),
+                        bottomRight: Radius.circular(0),
+                        topLeft: Radius.circular(0),
+                        topRight: Radius.circular(0)
+                    ),
+                  ),
+                  child: StepProgressIndicator(
+                    totalSteps: 20,
+                    currentStep: listItem.images.length,
+                    size: 5,
+                    selectedColor: Colors.orange,
+                    unselectedColor: Colors.white24,
+                  )
+                ),
+            ),
+            buildGridView(context, listItem.images),
             //if (todo.description.isNotEmpty)
             //  Container(
             //    margin: EdgeInsets.only(top: 4),
@@ -87,7 +114,13 @@ class ItemWidget extends StatelessWidget {
             "Are you sure, want to delete this item?"),
         actions: <Widget>[
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
+              var dir = await getExternalStorageDirectory();
+              var testdir = await Directory('${dir?.path}/images');
+
+              for(int i=0;i<listItem.images.length;i++) {
+                await File('${testdir.path}/${listItem.images[i].name}').delete();
+              }
               provider.deleteItem(listItem);
               final deleteToAddItem = Defects(
                 itemNumber: listItem.itemValue!,
@@ -115,10 +148,9 @@ class ItemWidget extends StatelessWidget {
         builder: (context) => EditListItemDialogWidget(listItem: listItem),
       ),
     );
-    print("Edit Page");
   }
 
-  Widget buildDDItemHead(String _ddItem) {
+  Widget buildDDItemHead(String _ddItemValue, String _ddItem, int noOfImages) {
     return Container(
       decoration: BoxDecoration(
         border: Border.all(
@@ -138,8 +170,13 @@ class ItemWidget extends StatelessWidget {
         mainAxisSize: MainAxisSize.max,
         children: <Widget>[
           const SizedBox(width: 5.0),
-          const Icon(FontAwesomeIcons.coins, size: 22.0, color: Colors.white),
+          const Icon(FontAwesomeIcons.layerGroup, size: 22.0, color: Colors.white),
           const SizedBox(width: 10.0),
+          Flexible(
+            child: Text("(${noOfImages.toString()} pic)", style: const TextStyle(color: Colors.black, fontSize: 15)
+            ),
+          ),
+          const SizedBox(width: 5.0),
           Flexible(
             child: Text(_ddItem, style: const TextStyle(color: Colors.black, fontSize: 22)
             ),
@@ -149,28 +186,26 @@ class ItemWidget extends StatelessWidget {
     );
   }
 
-  Widget buildGridView(List<Asset> images) {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: Colors.black12,
-          width: 2,
-        ),
-        color: Colors.black54,
-        borderRadius: const BorderRadius.only(
-            bottomLeft: Radius.circular(3),
-            bottomRight: Radius.circular(3),
-            topLeft: Radius.circular(0),
-            topRight: Radius.circular(0)
-        ),
-      ),
-      child: SizedBox(
-        height: 128.0,
-        child: DecoratedBox(
-          decoration: const BoxDecoration(
-            color: Colors.black26,
+  Widget buildGridView(BuildContext context,List<Asset> images) {
+    final provider = Provider.of<ListProvider>(context, listen: false);
+    return SizedBox(
+      height: 128.0,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: Colors.black54,
+          border: Border.all(
+            color: Colors.black12,
+            width: 2,
           ),
-          child: ListView.builder(
+          borderRadius: const BorderRadius.only(
+              bottomLeft: Radius.circular(3),
+              bottomRight: Radius.circular(3),
+              topLeft: Radius.circular(0),
+              topRight: Radius.circular(0)
+          ),
+        ),
+        // color: Colors.black54,
+      child: ListView.builder(
             shrinkWrap: true,
             scrollDirection: Axis.horizontal,
             itemCount: images.length,
@@ -181,17 +216,6 @@ class ItemWidget extends StatelessWidget {
               return Card(
                 // clipBehavior: Clip.antiAlias,
                 elevation: 5.0,
-                // child: Container(
-                //   height: MediaQuery.of(context).size.width / 3,
-                //   width: MediaQuery.of(context).size.width / 3,
-                //   alignment: Alignment.center,
-                //   child: AssetThumb(
-                //     asset: asset,
-                //     width: 300,
-                //     height: 300,
-                //     quality: 75,
-                //   ),
-                // ),
                 child: InkWell(
                   onTap: ()async {
                     String? imageName = images[index].name;
@@ -233,7 +257,6 @@ class ItemWidget extends StatelessWidget {
               );
             },
           ),
-        ),
       ),
     );//const SizedBox(height: 10.0),
   }

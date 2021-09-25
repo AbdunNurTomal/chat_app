@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:uri_to_file/uri_to_file.dart';
 
@@ -38,6 +39,23 @@ class ImageUtility {
     ui.decodeImageFromList(list, completer.complete);
     return completer.future;
   }
+  static Future<bool> deleteFile(String? fileName) async {
+    try {
+      var dir = await getExternalStorageDirectory();
+      var testdir = await Directory('${dir?.path}/images');
+
+      if(fileName != null) {
+        await File('${testdir.path}/$fileName').delete();
+        return true;
+      }else{
+        return false;
+      }
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
+
   static Future<void> changeFileNameOnly(String fileName, String newFileName) async{
     try {
       var dir = await getExternalStorageDirectory();
