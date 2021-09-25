@@ -6,12 +6,14 @@ import 'dart:ui' as ui;
 import 'package:chat_app/models/defect.dart';
 import 'package:chat_app/models/list_item.dart';
 import 'package:chat_app/provider/list_provider.dart';
+import 'package:chat_app/utils/circular_progress_dialog.dart';
 import 'package:chat_app/utils/image_full_screen_wrapper.dart';
 import 'package:chat_app/utils/image_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:multi_image_picker2/multi_image_picker2.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:uri_to_file/uri_to_file.dart';
 
@@ -97,33 +99,38 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
       body: Builder(
       builder: (context) => Form(
       key: _formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
+      child: Stack(
         children: <Widget>[
-          //title
-          Container(color: Colors.green,child: ddItemFromFirebase()),
-          const SizedBox(height: 8),
-          Container(
-            alignment: Alignment.center,
-            child: ElevatedButton(
-              onPressed: (_imagePickButton) ? loadAssets : null,
-              child: const Text("Pick"),
-              style: ElevatedButton.styleFrom(
-                  primary: Colors.orange, onPrimary: Colors.black),
-            ),
+          Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                //title
+                Container(color: Colors.green,child: ddItemFromFirebase()),
+                const SizedBox(height: 8),
+                Container(
+                  alignment: Alignment.center,
+                  child: ElevatedButton(
+                    onPressed: (_imagePickButton) ? loadAssets : null,
+                    child: const Text("Pick"),
+                    style: ElevatedButton.styleFrom(
+                        primary: Colors.orange, onPrimary: Colors.black),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Expanded(child: buildGridView()),
+                //PicturesFormWidget(
+                //  onChangedDDItemValue: (ddItemValue) =>
+                //      setState(() => this.ddItemValue = ddItemValue),
+                //  onChangedDDItem: (ddItem) =>
+                //      setState(() => this.ddItem = ddItem),
+                //onChangedDescription: (description) => setState(() => this.description = description),
+                //  onSavedItem: addItem,
+                //),
+              ]
           ),
-          const SizedBox(height: 8),
-          Expanded(child: buildGridView()),
-          //PicturesFormWidget(
-          //  onChangedDDItemValue: (ddItemValue) =>
-          //      setState(() => this.ddItemValue = ddItemValue),
-          //  onChangedDDItem: (ddItem) =>
-          //      setState(() => this.ddItem = ddItem),
-          //onChangedDescription: (description) => setState(() => this.description = description),
-          //  onSavedItem: addItem,
-          //),
-        ]
-        ),
+
+        ],
+      ),
     ),
     ),
     );
@@ -131,17 +138,18 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
 
   Future<void> _saveItem() async{
     if (_formKey.currentState!.validate()) {
-
       _formKey.currentState!.save();
 
-      int countImage=0;
+      _defectProvider.showCircularProgress(true);
+      DialogCircularBuilder(context).showLoadingIndicator(value: _defectProvider.circularIndicator, text: '');
+      // print("show circular : ${_defectProvider.circularIndicator}");
 
+      int countImage=0;
       for(int i=0;i<images.length;i++){
           countImage++;
           String? imageUri = images[i].identifier;
-          ImageUtility.saveImage(imageUri!,images[i].name!);
+          await ImageUtility.saveImage(imageUri!,images[i].name!);
       }
-// print("new image : $newImage");
 
       //print("ddItem >> $ddItem");
       final listItem = ListItem(
@@ -157,6 +165,8 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
       _defectProvider.addItem(listItem);
       DefectData.deleteDefectItem(ddItem);
 
+      _defectProvider.showCircularProgress(false);
+      DialogCircularBuilder(context).hideOpenDialog();
       Navigator.of(context).pop();
     }
   }
@@ -180,7 +190,7 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
       suggestionsCallback: getSuggestions,
       itemBuilder: (context, Defects suggestion) {
         return ListTile(
-          //leading: Text(suggestion.itemNumber),
+          // leading: Text(suggestion.itemNumber),
           title: Text(suggestion.itemName),
         );
       },
@@ -204,7 +214,7 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
         ),
       ),
       onSuggestionSelected: (Defects suggestion) {
-        _ddIemController.text = suggestion.itemName;
+        _ddIemController.text = "${suggestion.itemNumber}.${suggestion.itemName}";
         setState((){_imagePickButton = true;});
         //Navigator.of(context).pop(null);
       },
@@ -213,7 +223,11 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
           return 'Please select a defect item';
         }
       },
-      onSaved: (value) => ddItem = value!,
+      onSaved: (value) {
+        var splitValue = value!.split(".");
+        ddItemValue = splitValue[0];
+        ddItem = splitValue[1];
+      },
     );
   }
 

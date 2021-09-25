@@ -1,16 +1,13 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
-import 'dart:ui';
 import 'package:chat_app/utils/painter.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:uri_to_file/uri_to_file.dart';
 
 class ImageDialogOld extends StatefulWidget {
@@ -371,39 +368,24 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
                                     unfinishedSquare: unfinishedSquare,
                                     unfinishedCircle: unfinishedCircle,
                                     saveImage: saveClicked,
-                                    saveCallback: (Picture picture) async {
-                                      var status =
-                                      await Permission.storage.status;
-                                      if (!status.isGranted) {
-                                      await Permission.storage.request();
-                                      }
-                                      if (status.isGranted) {
-                                        Uri _uri = Uri.parse(widget.imageUri);
-                                        File _file = await toFile(_uri);
-                                        print("file name : $_file");
+                                    saveCallback: (ui.Picture picture) async {
+                                      Uri _uri = Uri.parse(widget.imageUri);
+                                      File _file = await toFile(_uri);
+                                      print("file name : $_file");
 
-                                        final img = await picture.toImage(
-                                            constraints.maxWidth.round(),
-                                            constraints.maxHeight.round());
-                                        ByteData? byteData = await img.toByteData(format: ImageByteFormat.png);
-                                        Uint8List jpgBytes = byteData!.buffer.asUint8List();
+                                      final img = await picture.toImage(
+                                          constraints.maxWidth.round(),
+                                          constraints.maxHeight.round());
+                                      ByteData? byteData = await img.toByteData(format: ui.ImageByteFormat.png);
+                                      Uint8List jpgBytes = byteData!.buffer.asUint8List();
 
-                                        var dir = await getExternalStorageDirectory();
-                                        var testdir = await  Directory('${dir?.path}/images');
+                                      var dir = await getExternalStorageDirectory();
+                                      var testdir = await  Directory('${dir?.path}/images');
 
-                                        File('${testdir.path}/${widget.imageName}').writeAsBytesSync(jpgBytes);
+                                      File('${testdir.path}/${widget.imageName}').writeAsBytesSync(jpgBytes);
 
-                                        // await ImageGallerySaver
-                                        //     .saveImage(
-                                        //   Uint8List.fromList(
-                                        //       byteData!.buffer
-                                        //           .asUint8List()),
-                                        //   quality: 100,
-                                        //   name: newName[0].trim(),
-                                        // );
+                                      showToastMessage("Image saved to gallery.");
 
-                                        showToastMessage("Image saved to gallery.");
-                                      }
                                       setState(() {
                                         saveClicked = false;
                                       });

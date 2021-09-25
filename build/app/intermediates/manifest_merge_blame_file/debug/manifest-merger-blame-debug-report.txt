@@ -35,8 +35,8 @@
 23        android:debuggable="true"
 24        android:icon="@mipmap/ic_launcher"
 24-->E:\Flutter\New folder\chat_app\android\app\src\main\AndroidManifest.xml:13:9-43
-25        android:label="chat_app"
-25-->E:\Flutter\New folder\chat_app\android\app\src\main\AndroidManifest.xml:12:9-33
+25        android:label="PQC"
+25-->E:\Flutter\New folder\chat_app\android\app\src\main\AndroidManifest.xml:12:9-28
 26        android:requestLegacyExternalStorage="true" >
 26-->E:\Flutter\New folder\chat_app\android\app\src\main\AndroidManifest.xml:14:9-52
 27        <activity

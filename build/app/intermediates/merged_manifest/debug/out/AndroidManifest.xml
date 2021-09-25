@@ -22,7 +22,7 @@
         android:appComponentFactory="androidx.core.app.CoreComponentFactory"
         android:debuggable="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="chat_app"
+        android:label="PQC"
         android:requestLegacyExternalStorage="true" >
         <activity
             android:name="com.pqcbd.chat.chat_app.MainActivity"

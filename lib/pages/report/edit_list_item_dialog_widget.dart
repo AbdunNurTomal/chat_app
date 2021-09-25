@@ -8,16 +8,19 @@ import 'package:chat_app/models/list_item.dart';
 import 'package:chat_app/provider/list_provider.dart';
 import 'package:chat_app/utils/custom_color.dart';
 import 'package:chat_app/utils/image_full_screen_wrapper.dart';
+import 'package:chat_app/utils/image_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:multi_image_picker2/multi_image_picker2.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:uri_to_file/uri_to_file.dart';
 
 
 class EditListItemDialogWidget extends StatefulWidget {
   final ListItem listItem;
-  const EditListItemDialogWidget({Key? key, required this.listItem}) : super(key: key);
+  EditListItemDialogWidget({Key? key, required this.listItem}) : super(key: key);
 
   @override
   _EditListItemDialogWidgetState createState() => _EditListItemDialogWidgetState();
@@ -27,11 +30,13 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
   final _formKey = GlobalKey<FormState>();
   String _error = 'No Problem';
 
-  List<Asset> images = <Asset>[];
+
   File? _file;
 
   String ddItemValue = '';
   String ddItem = '';
+  List<Asset> images = <Asset>[];
+
   late ListProvider _defectProvider;
   final TextEditingController _ddIemController = TextEditingController();
 
@@ -39,6 +44,7 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
   @override
   void initState() {
     super.initState();
+    print("Edit List Item Dialog Widget");
     //fill countries with objects
     //controller.addListener(() {
     //  setState(() {
@@ -47,6 +53,8 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
     //});
     _ddIemController.text = widget.listItem.item!;
     images = widget.listItem.images;
+    ddItem = widget.listItem.item!;
+    ddItemValue = widget.listItem.itemValue!;
     _defectProvider = Provider.of<ListProvider>(context,listen: false);
   }
 
@@ -58,7 +66,7 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
   @override
   void dispose() {
     super.dispose();
-    _ddIemController.dispose();
+    // _ddIemController.dispose();
   }
 
   List<Defects> getSuggestions(String query) => List.of(DefectData.defect).where((defect) {
@@ -70,14 +78,14 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
 
   @override
   Widget build(BuildContext context) {
-    print("Edit List Item Dialog Widget");
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit Item',
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
         actions: [
           IconButton(
-              onPressed: _saveItem,
+              onPressed: (images.length>0)?_saveItem:null,
               icon: const Icon(Icons.save)
           )
         ],
@@ -88,7 +96,6 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          //title
           Container(color: Colors.green,child: ddItemFromFirebase()),
           const SizedBox(height: 8),
           Container(
@@ -122,9 +129,9 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
       //save data to database
       _formKey.currentState!.save();
 
-      //print("ddItem >> $ddItem");
-      final listItem = ListItem(
-        id: DateTime.now().toString(),
+      // print("ddItemValue >> $ddItemValue");
+      final updateListItem = ListItem(
+        id: widget.listItem.id,
         itemValue: ddItemValue,
         item: ddItem,
         images: images,
@@ -132,9 +139,8 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
         createdTime: DateTime.now(),
       );
 
-      //print("listItem >> $listItem");
       _defectProvider = Provider.of<ListProvider>(context, listen: false);
-      _defectProvider.addItem(listItem);
+      _defectProvider.editItem(widget.listItem,updateListItem);
 
       Navigator.of(context).pop();
     }
@@ -216,11 +222,6 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
        */
   }
 
-  Future<ui.Image> loadImage(Uint8List bytes) async {
-    final Completer<ui.Image> completer = Completer();
-    ui.decodeImageFromList(bytes, (ui.Image img) => completer.complete(img));
-    return completer.future;
-  }
   Widget buildGridView() {
     return Container(
       decoration: BoxDecoration(
@@ -282,7 +283,7 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
 
                             try{
                               final ui.Image _myBackgroundImage;
-                              _myBackgroundImage = await loadImage(_imageByteslist);
+                              _myBackgroundImage = await ImageUtility.loadImage(_imageByteslist);
                               //print("MyBackgroundImage - $_myBackgroundImage");
                               Navigator.push(context,
                                   MaterialPageRoute(builder: (context) => ImageDialogOld(
@@ -318,9 +319,30 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
                               size: 20,
                               color: Colors.red,
                             ),
-                            onTap: () {
+                            onTap: () async {
+                              if(await ImageUtility.deleteFile(images[index].name) == true){
+
+                                Fluttertoast.showToast(
+                                    msg: "Image Deleted",
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    gravity: ToastGravity.CENTER,
+                                    timeInSecForIosWeb: 1,
+                                    backgroundColor: Colors.red,
+                                    textColor: Colors.white,
+                                    fontSize: 16.0
+                                );
+                              }else{
+                                Fluttertoast.showToast(
+                                    msg: "Image can not Delet",
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    gravity: ToastGravity.CENTER,
+                                    timeInSecForIosWeb: 1,
+                                    backgroundColor: Colors.red,
+                                    textColor: Colors.white,
+                                    fontSize: 16.0
+                                );
+                              }
                               setState(() {
-                                //print("Remove");
                                 images.removeAt(index);
                               });
                             },

@@ -20,13 +20,13 @@ import 'package:chat_app/pages/report/process_image_report.dart';
 import 'package:uri_to_file/uri_to_file.dart';
 import 'package:chat_app/utils/image_util.dart';
 
-
 class TeameLeaderPage extends StatefulWidget {
   static const String routeName = "\team_leader";
 
   @override
   _TeameLeaderPageState createState() => _TeameLeaderPageState();
 }
+
 class PopUpMenuConstants{
   static const String ProcessItem = 'Process';
   //static const String SecondItem = 'Second Item';
@@ -287,9 +287,10 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> {//with SingleTickerP
                 //  width: 3,
                 //),
                 //borderRadius: BorderRadius.circular(5),
-              color: Colors.black12,
+              color: Colors.white,
             ),
 
+            // showAlertDialog(context),
             child: ListItemWidget()
         ),
     );
