@@ -11,6 +11,7 @@ import 'package:chat_app/utils/image_full_screen_wrapper.dart';
 import 'package:chat_app/utils/image_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:multi_image_picker2/multi_image_picker2.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
@@ -30,6 +31,7 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
   String _error = 'No Problem';
 
   List<Asset> images = <Asset>[];
+  List<int> editedImage = <int>[];
 
   bool _imagePickButton = false;
 
@@ -83,8 +85,6 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
 
   @override
   Widget build(BuildContext context) {
-    //print("Add List Item Dialog Widget");
-    print("Defect : ${DefectData.defect}");
     return Scaffold(
       appBar: AppBar(
         title: const Text('Add New Pictures Item',
@@ -137,38 +137,48 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
   }
 
   Future<void> _saveItem() async{
+    _defectProvider.showCircularProgress(true);
+    DialogCircularBuilder(context).showLoadingIndicator(value: _defectProvider.circularIndicator, text: '');
+    // print("show circular : ${_defectProvider.circularIndicator}");
+
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
-      _defectProvider.showCircularProgress(true);
-      DialogCircularBuilder(context).showLoadingIndicator(value: _defectProvider.circularIndicator, text: '');
-      // print("show circular : ${_defectProvider.circularIndicator}");
-
-      int countImage=0;
-      for(int i=0;i<images.length;i++){
-          countImage++;
-          String? imageUri = images[i].identifier;
-          await ImageUtility.saveImage(imageUri!,images[i].name!);
+      for (int i = 0; i < images.length; i++) {
+        String? imageUri = images[i].identifier;
+        String? imageName = images[i].name;
+        await ImageUtility.saveImage(imageUri!, imageName!);
       }
-
-      //print("ddItem >> $ddItem");
-      final listItem = ListItem(
-        id: DateTime.now().toString(),
-        itemValue: ddItemValue,
-        item: ddItem,
-        images: images,
-        //description: description,
-        createdTime: DateTime.now(),
+      Fluttertoast.showToast(
+        msg: "Aded Item",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.black,
+        textColor: Colors.white,
+        fontSize: 16.0
       );
 
-      //print("listItem >> $listItem");
-      _defectProvider.addItem(listItem);
-      DefectData.deleteDefectItem(ddItem);
+      if(images.isEmpty){
+        Navigator.of(context).pop();
+      }else {
+        final listItem = ListItem(
+          id: DateTime.now().toString(),
+          itemValue: ddItemValue,
+          item: ddItem,
+          images: images,
+          edited: editedImage,
+          //description: description,
+          createdTime: DateTime.now(),
+        );
 
-      _defectProvider.showCircularProgress(false);
-      DialogCircularBuilder(context).hideOpenDialog();
-      Navigator.of(context).pop();
+        _defectProvider.addItem(listItem);
+        DefectData.deleteDefectItem(ddItem);
+      }
     }
+    _defectProvider.showCircularProgress(false);
+    DialogCircularBuilder(context).hideOpenDialog();
+    Navigator.of(context).pop();
   }
 
   Widget ddItemFromFirebase() {
@@ -204,7 +214,7 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
         //   ),
         // );
       },
-      noItemsFoundBuilder: (context) => Container(
+      noItemsFoundBuilder: (context) => SizedBox(
         height: 40,
         child: const Center(
           child: Text(
@@ -259,14 +269,36 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
                 itemCount: images.length,
                 itemBuilder: (context, index) {
                   Asset asset = images[index];
-                  //print("name ${asset.name}");
-                  //print("identifier ${asset.identifier}");
                   return Card(
                     //clipBehavior: Clip.antiAlias,
                     elevation: 5.0,
                     child: Stack(
                       children: <Widget>[
-                          Container(
+                          InkWell(
+                          onTap: ()async {
+                            String? imageName = images[index].name;
+                            String? imageUri = images[index].identifier;
+                            try{
+                              Uri _uri = Uri.parse(imageUri!);
+                              File _fileBackgroundImage = await toFile(_uri);
+                              Uint8List _imageByteslist = await _fileBackgroundImage.readAsBytes();
+
+                              ui.Image _myBackgroundImage = await ImageUtility.loadImage(_imageByteslist);
+                              Navigator.push(context,
+                                  MaterialPageRoute(builder: (context) => ImageDialogOld(
+                                    backgrounfImage: _myBackgroundImage,
+                                    //imageUri: _file,
+                                    imageUri: imageUri,
+                                    imageName: imageName!,
+                                    imageIndex: index,
+                                  ),
+                                  )
+                              );
+                            } catch (e) {
+                              print(e);
+                            }
+                          },
+                          child: Container(
                             height: MediaQuery.of(context).size.width / 3,
                             width: MediaQuery.of(context).size.width / 3,
                             alignment: Alignment.center,
@@ -277,7 +309,7 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
                               quality: 75,
                             ),
                           ),
-                        // ),
+                        ),
                         Positioned(
                           right: 5,
                           top: 5,

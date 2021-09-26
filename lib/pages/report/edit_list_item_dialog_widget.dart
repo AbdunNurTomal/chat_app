@@ -6,14 +6,12 @@ import 'dart:ui' as ui;
 import 'package:chat_app/models/defect.dart';
 import 'package:chat_app/models/list_item.dart';
 import 'package:chat_app/provider/list_provider.dart';
-import 'package:chat_app/utils/custom_color.dart';
+import 'package:chat_app/utils/circular_progress_dialog.dart';
 import 'package:chat_app/utils/image_full_screen_wrapper.dart';
 import 'package:chat_app/utils/image_util.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:multi_image_picker2/multi_image_picker2.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:uri_to_file/uri_to_file.dart';
 
@@ -30,12 +28,12 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
   final _formKey = GlobalKey<FormState>();
   String _error = 'No Problem';
 
-
   File? _file;
 
   String ddItemValue = '';
   String ddItem = '';
   List<Asset> images = <Asset>[];
+  List<int> editedImage = <int>[];
 
   late ListProvider _defectProvider;
   final TextEditingController _ddIemController = TextEditingController();
@@ -44,35 +42,33 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
   @override
   void initState() {
     super.initState();
-    print("Edit List Item Dialog Widget");
-    //fill countries with objects
-    //controller.addListener(() {
-    //  setState(() {
-    //    filter = controller.text;
-    //  });
-    //});
+    // print("Edit List Item Dialog Widget");
     _ddIemController.text = widget.listItem.item!;
     images = widget.listItem.images;
     ddItem = widget.listItem.item!;
     ddItemValue = widget.listItem.itemValue!;
-    _defectProvider = Provider.of<ListProvider>(context,listen: false);
+
   }
 
   @override
   void didChangeDependencies() {;
     super.didChangeDependencies();
+    _defectProvider = Provider.of<ListProvider>(context,listen: false);
+    if (images.isEmpty) {
+      print("edit page >> ${widget.listItem}");
+      _defectProvider.deleteItem(widget.listItem);
+    }
   }
 
   @override
   void dispose() {
     super.dispose();
-    // _ddIemController.dispose();
+    _ddIemController.dispose();
   }
 
   List<Defects> getSuggestions(String query) => List.of(DefectData.defect).where((defect) {
     final itemLower = defect.itemName.toLowerCase();
     final queryLower = query.toLowerCase();
-
     return itemLower.contains(queryLower);
   }).toList();
 
@@ -85,65 +81,84 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
         actions: [
           IconButton(
-              onPressed: (images.length>0)?_saveItem:null,
+              onPressed: (images.isNotEmpty)?_saveItem:null,
               icon: const Icon(Icons.save)
           )
         ],
       ),
       body: Builder(
-      builder: (context) => Form(
-      key: _formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          Container(color: Colors.green,child: ddItemFromFirebase()),
-          const SizedBox(height: 8),
-          Container(
-            alignment: Alignment.center,
-            child: ElevatedButton(
-              onPressed: loadAssets,
-              child: const Text("Pick"),
-              style: ElevatedButton.styleFrom(
-                  primary: Colors.orange, onPrimary: Colors.black),
+        builder: (context) => Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Container(color: Colors.green,child: ddItemFromFirebase()),
+              const SizedBox(height: 8),
+              Container(
+                alignment: Alignment.center,
+                child: ElevatedButton(
+                  onPressed: loadAssets,
+                  child: const Text("Pick"),
+                  style: ElevatedButton.styleFrom(
+                      primary: Colors.orange, onPrimary: Colors.black),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Expanded(child: buildGridView()),
+              //PicturesFormWidget(
+              //  onChangedDDItemValue: (ddItemValue) =>
+              //      setState(() => this.ddItemValue = ddItemValue),
+              //  onChangedDDItem: (ddItem) =>
+              //      setState(() => this.ddItem = ddItem),
+              //onChangedDescription: (description) => setState(() => this.description = description),
+              //  onSavedItem: addItem,
+              //),
+            ]
             ),
-          ),
-          const SizedBox(height: 8),
-          Expanded(child: buildGridView()),
-          //PicturesFormWidget(
-          //  onChangedDDItemValue: (ddItemValue) =>
-          //      setState(() => this.ddItemValue = ddItemValue),
-          //  onChangedDDItem: (ddItem) =>
-          //      setState(() => this.ddItem = ddItem),
-          //onChangedDescription: (description) => setState(() => this.description = description),
-          //  onSavedItem: addItem,
-          //),
-        ]
         ),
-    ),
-    ),
+      ),
     );
   }
 
-  void _saveItem() {
+  void _saveItem() async{
+    _defectProvider.showCircularProgress(true);
+    DialogCircularBuilder(context).showLoadingIndicator(
+        value: _defectProvider.circularIndicator, text: '');
+    // print("show circular : ${_defectProvider.circularIndicator}");
+
     if (_formKey.currentState!.validate()) {
-      //save data to database
       _formKey.currentState!.save();
 
-      // print("ddItemValue >> $ddItemValue");
+      for (int i = 0; i < images.length; i++) {
+        String? imageUri = images[i].identifier;
+        String? imageName = images[i].name;
+        await ImageUtility.saveImage(imageUri!, imageName!);
+      }
+      Fluttertoast.showToast(
+          msg: "Update Item",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0
+      );
+
       final updateListItem = ListItem(
         id: widget.listItem.id,
         itemValue: ddItemValue,
         item: ddItem,
         images: images,
+        edited: editedImage,
         //description: description,
         createdTime: DateTime.now(),
       );
-
-      _defectProvider = Provider.of<ListProvider>(context, listen: false);
-      _defectProvider.editItem(widget.listItem,updateListItem);
-
-      Navigator.of(context).pop();
+      _defectProvider.editItem(widget.listItem, updateListItem);
     }
+
+    _defectProvider.showCircularProgress(false);
+    DialogCircularBuilder(context).hideOpenDialog();
+    Navigator.of(context).pop();
   }
 
   Widget ddItemFromFirebase() {
@@ -162,15 +177,12 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
             border: InputBorder.none),
         validator: (value) {
           if (value == null || value.isEmpty) {
-            return 'Please provide a valid password.';
+            return 'Please provide item.';
           }
           return null;
         },
       ),
     );
-
-
-
       /*
       TypeAheadFormField(
       //hideSuggestionsOnKeyboardHide: false,
@@ -260,9 +272,9 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
                           onTap: ()async {
                             String? imageName = images[index].name;
                             String? imageUri = images[index].identifier;
-                            Uri? _uri = Uri.parse(imageUri!);
-                            //print("Uri - $_uri");
-                            _file = await toFile(_uri);
+                            // Uri? _uri = Uri.parse(imageUri!);
+                            // //print("Uri - $_uri");
+                            // _file = await toFile(_uri);
 
                             //final myImagePath = _getDirectoryPath();
                             //var kompresimg = File("$myImagePath/$imageName")
@@ -272,7 +284,7 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
 
                             //File imageFile = File.fromUri(_uri);
                             //print("File - $_file");
-                            Uint8List _imageByteslist = await _file!.readAsBytes();
+                            // Uint8List _imageByteslist = await _file!.readAsBytes();
                             //print("ImageByteslist - $_imageByteslist");
                             //await _file!.readAsBytes().then((value){
                             //_imageByteslist = Uint8List.fromList(value);
@@ -282,18 +294,33 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
                             //});
 
                             try{
-                              final ui.Image _myBackgroundImage;
-                              _myBackgroundImage = await ImageUtility.loadImage(_imageByteslist);
-                              //print("MyBackgroundImage - $_myBackgroundImage");
-                              Navigator.push(context,
+                              Uri _uri = Uri.parse(imageUri!);
+                              File _fileBackgroundImage = await toFile(_uri);
+                              Uint8List _imageByteslist = await _fileBackgroundImage.readAsBytes();
+
+                              ui.Image _myBackgroundImage = await ImageUtility.loadImage(_imageByteslist);
+                              // Navigator.push(context,
+                              //     MaterialPageRoute(builder: (context) => ImageDialogOld(
+                              //       backgrounfImage: _myBackgroundImage,
+                              //       //imageUri: _file,
+                              //       imageUri: imageUri,
+                              //       imageName: imageName!,
+                              //       imageIndex: index,
+                              //     ),
+                              //     )
+                              // );
+                              final result = await Navigator.push(context,
                                   MaterialPageRoute(builder: (context) => ImageDialogOld(
-                                    myBackgroundImage: _myBackgroundImage,
+                                    backgrounfImage: _myBackgroundImage,
                                     //imageUri: _file,
                                     imageUri: imageUri,
                                     imageName: imageName!,
+                                    imageIndex: index,
                                   ),
                                   )
                               );
+
+                              print("Image index : $result");
                             } catch (e) {
                               print(e);
                             }
@@ -331,9 +358,10 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
                                     textColor: Colors.white,
                                     fontSize: 16.0
                                 );
+
                               }else{
                                 Fluttertoast.showToast(
-                                    msg: "Image can not Delet",
+                                    msg: "Image can not Delete",
                                     toastLength: Toast.LENGTH_SHORT,
                                     gravity: ToastGravity.CENTER,
                                     timeInSecForIosWeb: 1,
@@ -348,6 +376,14 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
                             },
                           ),
                         ),
+                        // Container(
+                        //   decoration: BoxDecoration(
+                        //     color: Colors.black26,
+                        //   ),
+                        //   child: Center(
+                        //     child: Text("Edited",style: TextStyle(backgroundColor: Colors.white))                            ,
+                        //   ),
+                        // )
                       ],
                     ),
                   );

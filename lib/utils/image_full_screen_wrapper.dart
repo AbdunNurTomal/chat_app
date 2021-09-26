@@ -10,12 +10,15 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:uri_to_file/uri_to_file.dart';
 
+import 'image_util.dart';
+
 class ImageDialogOld extends StatefulWidget {
   final String imageUri;
   final String imageName;
-  final ui.Image myBackgroundImage;
+  final ui.Image backgrounfImage;
+  final int imageIndex;
 
-  const ImageDialogOld({ Key? key, required this.myBackgroundImage, required this.imageUri, required this.imageName}) : super(key: key);
+  const ImageDialogOld({ Key? key, required this.backgrounfImage, required this.imageUri, required this.imageName, required this.imageIndex}) : super(key: key);
 
   @override
   State<ImageDialogOld> createState() => _ImageDialogOldState();
@@ -61,8 +64,8 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
   PaintedCircles unfinishedCircle = PaintedCircles(paint: Paint(),start: Offset(0.0,0.0),end: Offset(0.0,0.0));
 
   StrokeCap strokeType = StrokeCap.square;
-  double strokeWidth = 3.0;
-  Color selectedColor = Colors.black;
+  late double strokeWidth;
+  late Color selectedColor;
 
   Paint getPoint() {
     if (selectedTool == enumToolTypes.eraser) {
@@ -91,12 +94,15 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
 
   double opacity = 1.0;
 
+
   @override
   void initState() {
     super.initState();
-    //selectedColor = Colors.red;
-    //strokeWidth = 3.0;
+    selectedColor = Colors.red;
+    strokeWidth = 3.0;
   }
+
+
 
   @override
   void dispose() {
@@ -108,8 +114,6 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
     squaresList.clear();
     circleList.clear();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -184,9 +188,10 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
               setState(() {
                 saveClicked = true;
               });
-              Navigator.of(context).pop(context);
+              Navigator.of(context).pop(widget.imageIndex);
+              // Navigator.of(context).pop(widget.imageIndex);
             },
-            icon: Icon(Icons.save)
+            icon: const Icon(Icons.save)
           )
         ],
       ),
@@ -359,7 +364,7 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
                                       constraints.widthConstraints().maxWidth,
                                       constraints.heightConstraints().maxHeight),
                                   painter: PainterCanvas(
-                                    image: widget.myBackgroundImage,
+                                    image: widget.backgrounfImage,
                                     pointsList: pointsList,
                                     arrowList: arrowList,
                                     squaresList: squaresList,
@@ -369,10 +374,6 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
                                     unfinishedCircle: unfinishedCircle,
                                     saveImage: saveClicked,
                                     saveCallback: (ui.Picture picture) async {
-                                      Uri _uri = Uri.parse(widget.imageUri);
-                                      File _file = await toFile(_uri);
-                                      print("file name : $_file");
-
                                       final img = await picture.toImage(
                                           constraints.maxWidth.round(),
                                           constraints.maxHeight.round());
@@ -381,13 +382,13 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
 
                                       var dir = await getExternalStorageDirectory();
                                       var testdir = await  Directory('${dir?.path}/images');
-
                                       File('${testdir.path}/${widget.imageName}').writeAsBytesSync(jpgBytes);
 
                                       showToastMessage("Image saved to gallery.");
 
                                       setState(() {
                                         saveClicked = false;
+
                                       });
                                     },
                                   ),
