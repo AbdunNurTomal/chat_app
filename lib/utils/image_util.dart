@@ -7,7 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart' show rootBundle;
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:uri_to_file/uri_to_file.dart';
 
@@ -22,10 +22,33 @@ class ImageUtility {
   static Future<Directory> getImageDirPath() async{
     var dir = await getExternalStorageDirectory();
     Directory testdir = await  Directory('${dir?.path}/images');
-
     return testdir;
   }
 
+  static Future<File> compressAndGetImageFile(File file, String targetPath) async {
+    var result = await FlutterImageCompress.compressAndGetFile(
+      file.absolute.path, targetPath,
+      quality: 100,
+      rotate: 0,
+    );
+
+    // print(file.lengthSync());
+    // print(result!.lengthSync());
+
+    return result!;
+  }
+  static Future<Uint8List> comporessImageList(Uint8List list) async {
+    var result = await FlutterImageCompress.compressWithList(
+      list,
+      minHeight: 1024,
+      minWidth: 768,
+      quality: 90,
+      rotate: 0,
+    );
+    // print(list.length);
+    // print(result.length);
+    return result;
+  }
   static Future<ui.Image> loadImage(Uint8List bytes) async {
     final Completer<ui.Image> completer = Completer();
     ui.decodeImageFromList(bytes, (ui.Image img) => completer.complete(img));
@@ -105,73 +128,116 @@ class ImageUtility {
     }
   }
 
-  static Future<bool> saveImage(String file, String fileName) async {
+  static Future<bool> saveImage(String imageUri, String imageName, String itemName) async {
+    var dir = await getExternalStorageDirectory();
+    var testdir = await Directory('${dir?.path}/images').create(recursive: true);
+
     try {
-      // String fileName = '$itemNumber\_$slNo.jpg';
-      // String itemName = '$itemNumber\_$slNo';
+      // print('${testdir.path}/$imageName');
+      if(await File('${testdir.path}/$imageName').exists()){
+        print("Image exist");
+        return false;
+      }else{
+        print("New Image");
+        Uri _uri = Uri.parse(imageUri);
+        File _file = await toFile(_uri);
 
-      Uri _uri = Uri.parse(file);
-      File _file = await toFile(_uri);
+        Uint8List decodedBytes = await comporessImageList(_file.readAsBytesSync());
+        ui.Image _imageBackground = await ImageUtility.loadImage(decodedBytes);
+        await writeLogoInsideImage('${testdir.path}/$imageName',_imageBackground, itemName);
 
-      var dir = await getExternalStorageDirectory();
-      var testdir = await Directory('${dir?.path}/images').create(recursive: true);
-
-      final bytes = _file.readAsBytesSync();
-      String img64 = base64Encode(bytes);
-      File('${testdir.path}/$fileName').create(recursive: true);
-      File('${testdir.path}/$fileName').exists().then((_) { return false;});
-      final decodedBytes = base64Decode(img64);
-
-      File('${testdir.path}/$fileName').writeAsBytesSync(decodedBytes);
-
-      ui.Image _imageBackgroud = await ImageUtility.loadImage(decodedBytes);
-      writeLogoInsideImage('${testdir.path}/$fileName',_imageBackgroud.width,_imageBackgroud.height,fileName);
-
-      return true;
+        return true;
+      }
     } catch (e) {
       print(e);
       return false;
     }
   }
 
-  static Future<void> writeLogoInsideImage(String imagePath,int width, int height, String itemName) async{
-    ui.PictureRecorder recorder = ui.PictureRecorder();
+  static Future<void> writeLogoInsideImage(String imagePath,ui.Image backgroundImage, String itemName) async{
+    print("Write logo : $itemName");
+    final ui.PictureRecorder recorder = ui.PictureRecorder();
     Canvas c = Canvas(recorder);
 
-    Uri _uriPicture = Uri.parse(imagePath);
-    File _filePicture = await toFile(_uriPicture);
-    final bytesPicture = _filePicture.readAsBytesSync();
-    String img64Picture = base64Encode(bytesPicture);
-    final decodedBytesPicture = base64Decode(img64Picture);
-    ui.Image originalImage = await ImageUtility.loadImage(
-        decodedBytesPicture);
-    c.drawImage(originalImage, Offset.zero, Paint());
+    paintImage(
+      canvas: c,
+      rect: Rect.fromLTWH(0, 0, backgroundImage.width.toDouble(), backgroundImage.height.toDouble()),
+      image: backgroundImage,
+      fit: BoxFit.scaleDown,
+      repeat: ImageRepeat.noRepeat,
+      scale: 1.0,
+      alignment: Alignment.center,
+      flipHorizontally: false,
+      filterQuality: FilterQuality.high,
+      isAntiAlias: false,
+    );
+
+    // paintImage(
+    //     canvas: c,
+    //     rect: Rect.fromLTWH(0.0, 0.0, backgroundImage.width.toDouble(), backgroundImage.height.toDouble()),
+    //     image: backgroundImage,
+    //     fit: BoxFit.cover);
 
     ui.Image _logoImage = await ImageUtility.loadUiImage('assets/images/pqc.png');
-    double positionX = (originalImage.width - _logoImage.width * 1.15).toDouble();
-    double positionY = (originalImage.height - _logoImage.height * 1.15).toDouble();
+    double positionX = (backgroundImage.width - _logoImage.width * 1.15).toDouble();
+    double positionY = (backgroundImage.height - _logoImage.height * 1.15).toDouble();
     c.drawImage(_logoImage, Offset(positionX,positionY), Paint());
 
-    // var rect = Rect.fromLTWH(50.0, 50.0, _width, _height);
-    // c.clipRect(rect);
-    const textStyle = TextStyle(backgroundColor: Colors.white, color: Colors.black, fontSize: 24);
+    const textStyle = TextStyle(backgroundColor: Colors.white, color: Colors.black, fontSize: 25);
     TextSpan textSpan = TextSpan(text: itemName,style: textStyle);
     TextPainter textPainter = TextPainter(text: textSpan,textDirection: TextDirection.ltr);
-    textPainter.layout(minWidth: 0,maxWidth: originalImage.width.toDouble());
+    textPainter.layout(minWidth: 0,maxWidth: backgroundImage.width.toDouble());
 
-    // print('width : ${originalImage.width}');
-    // print('Height : ${originalImage.height}');
-    double testPositionX = (originalImage.width - 60).toDouble();
-    double testPositionY = (originalImage.height - (originalImage.height - 50)).toDouble();
+    double testPositionX = (backgroundImage.width - (backgroundImage.width - 24)).toDouble();
+    double testPositionY = (backgroundImage.height - (backgroundImage.height - 8)).toDouble();
     textPainter.paint(c, Offset(testPositionX, testPositionY));
 
-    ui.Picture picture = recorder.endRecording();
-    ui.Image img = await picture.toImage(originalImage.width, originalImage.height);
+    final ui.Picture picture = recorder.endRecording();
+    final img = await picture.toImage(backgroundImage.width, backgroundImage.height);
 
     ByteData? byteData = await img.toByteData(format: ui.ImageByteFormat.png);
-    Uint8List jpgBytes = byteData!.buffer.asUint8List();
-    File(imagePath).writeAsBytesSync(jpgBytes);
+    Uint8List newJpgBytes = await comporessImageList(byteData!.buffer.asUint8List());
+    File(imagePath).writeAsBytesSync(newJpgBytes);
   }
+
+  // static Future<void> writeLogoInsideImage(String imagePath,int width, int height, String itemName) async{
+  //   ui.PictureRecorder recorder = ui.PictureRecorder();
+  //   Canvas c = Canvas(recorder);
+  //
+  //   Uri _uriPicture = Uri.parse(imagePath);
+  //   File _filePicture = await toFile(_uriPicture);
+  //   final bytesPicture = _filePicture.readAsBytesSync();
+  //   String img64Picture = base64Encode(bytesPicture);
+  //   final decodedBytesPicture = base64Decode(img64Picture);
+  //   ui.Image originalImage = await ImageUtility.loadImage(
+  //       decodedBytesPicture);
+  //   c.drawImage(originalImage, Offset.zero, Paint());
+  //
+  //   ui.Image _logoImage = await ImageUtility.loadUiImage('assets/images/pqc.png');
+  //   double positionX = (originalImage.width - _logoImage.width * 1.15).toDouble();
+  //   double positionY = (originalImage.height - _logoImage.height * 1.15).toDouble();
+  //   c.drawImage(_logoImage, Offset(positionX,positionY), Paint());
+  //
+  //   // var rect = Rect.fromLTWH(50.0, 50.0, _width, _height);
+  //   // c.clipRect(rect);
+  //   const textStyle = TextStyle(backgroundColor: Colors.white, color: Colors.black, fontSize: 24);
+  //   TextSpan textSpan = TextSpan(text: itemName,style: textStyle);
+  //   TextPainter textPainter = TextPainter(text: textSpan,textDirection: TextDirection.ltr);
+  //   textPainter.layout(minWidth: 0,maxWidth: originalImage.width.toDouble());
+  //
+  //   // print('width : ${originalImage.width}');
+  //   // print('Height : ${originalImage.height}');
+  //   double testPositionX = (originalImage.width - 60).toDouble();
+  //   double testPositionY = (originalImage.height - (originalImage.height - 50)).toDouble();
+  //   textPainter.paint(c, Offset(testPositionX, testPositionY));
+  //
+  //   ui.Picture picture = recorder.endRecording();
+  //   ui.Image img = await picture.toImage(originalImage.width, originalImage.height);
+  //
+  //   ByteData? byteData = await img.toByteData(format: ui.ImageByteFormat.png);
+  //   Uint8List jpgBytes = byteData!.buffer.asUint8List();
+  //   File(imagePath).writeAsBytesSync(jpgBytes);
+  // }
 
   Future<String> _getDirectoryPath() async{
     final directory = await getExternalStorageDirectory();

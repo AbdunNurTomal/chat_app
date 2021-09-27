@@ -10,12 +10,16 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:uri_to_file/uri_to_file.dart';
 
+import 'image_util.dart';
+
 class ImageDialogOld extends StatefulWidget {
   final String imageUri;
   final String imageName;
-  final ui.Image myBackgroundImage;
+  final String itemName;
+  final ui.Image backgroundImage;
+  final int imageIndex;
 
-  const ImageDialogOld({ Key? key, required this.myBackgroundImage, required this.imageUri, required this.imageName}) : super(key: key);
+  const ImageDialogOld({ Key? key, required this.backgroundImage, required this.imageUri, required this.imageName, required this.imageIndex, required this.itemName}) : super(key: key);
 
   @override
   State<ImageDialogOld> createState() => _ImageDialogOldState();
@@ -39,6 +43,8 @@ class RecordPaints{
 class _ImageDialogOldState extends State<ImageDialogOld> {
   GlobalKey globalKey = GlobalKey();
 
+  late ui.Image newImage;
+
   List<PaintedPoints> pointsList = [];
   List<PaintedPoints> paintListDeleted = [];
   List<RecordPaints> paintedPoints = [];
@@ -61,8 +67,8 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
   PaintedCircles unfinishedCircle = PaintedCircles(paint: Paint(),start: Offset(0.0,0.0),end: Offset(0.0,0.0));
 
   StrokeCap strokeType = StrokeCap.square;
-  double strokeWidth = 3.0;
-  Color selectedColor = Colors.black;
+  late double strokeWidth;
+  late Color selectedColor;
 
   Paint getPoint() {
     if (selectedTool == enumToolTypes.eraser) {
@@ -91,11 +97,12 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
 
   double opacity = 1.0;
 
+
   @override
   void initState() {
     super.initState();
-    //selectedColor = Colors.red;
-    //strokeWidth = 3.0;
+    selectedColor = Colors.red;
+    strokeWidth = 3.0;
   }
 
   @override
@@ -108,8 +115,6 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
     squaresList.clear();
     circleList.clear();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -180,13 +185,13 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
               icon: Icon(Icons.undo)
           ),
           IconButton(
-            onPressed: (){
+            onPressed: () {
               setState(() {
                 saveClicked = true;
               });
-              Navigator.of(context).pop(context);
+              Navigator.of(context).pop(widget.imageIndex);
             },
-            icon: Icon(Icons.save)
+            icon: const Icon(Icons.save)
           )
         ],
       ),
@@ -203,7 +208,7 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               Expanded(
-                child: Container(
+                child: SizedBox(
                   // color: Color(0xFFC0C0C0),
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -355,11 +360,14 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
                                   });
                                 },
                                 child: CustomPaint(
-                                  size: Size(
-                                      constraints.widthConstraints().maxWidth,
-                                      constraints.heightConstraints().maxHeight),
+                                  // size: Size(
+                                  //     constraints.widthConstraints().maxWidth,
+                                  //     constraints.heightConstraints().maxHeight),
+                                  size: Size(768,1024),
                                   painter: PainterCanvas(
-                                    image: widget.myBackgroundImage,
+                                    image: widget.backgroundImage,
+                                    width: MediaQuery.of(context).size.width,
+                                    height: MediaQuery.of(context).size.height,
                                     pointsList: pointsList,
                                     arrowList: arrowList,
                                     squaresList: squaresList,
@@ -369,21 +377,23 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
                                     unfinishedCircle: unfinishedCircle,
                                     saveImage: saveClicked,
                                     saveCallback: (ui.Picture picture) async {
-                                      Uri _uri = Uri.parse(widget.imageUri);
-                                      File _file = await toFile(_uri);
-                                      print("file name : $_file");
-
-                                      final img = await picture.toImage(
-                                          constraints.maxWidth.round(),
-                                          constraints.maxHeight.round());
-                                      ByteData? byteData = await img.toByteData(format: ui.ImageByteFormat.png);
-                                      Uint8List jpgBytes = byteData!.buffer.asUint8List();
+                                      // final img = await picture.toImage(
+                                      //     constraints.maxWidth.round(),
+                                      //     constraints.maxHeight.round());
+                                      final img = await picture.toImage(1080,1920);
 
                                       var dir = await getExternalStorageDirectory();
                                       var testdir = await  Directory('${dir?.path}/images');
 
-                                      File('${testdir.path}/${widget.imageName}').writeAsBytesSync(jpgBytes);
+                                      // int countImage = widget.imageIndex;
+                                      // ++countImage;
+                                      // String newItemName = "${widget.itemName}\nNo-$countImage";
+                                      // print("New Item Name - $newItemName");
 
+                                      // await ImageUtility.writeLogoInsideImage('${testdir.path}/${widget.imageName}',img, newItemName);
+                                      ByteData? byteData = await img.toByteData(format: ui.ImageByteFormat.png);
+                                      Uint8List newJpgBytes = await ImageUtility.comporessImageList(byteData!.buffer.asUint8List());
+                                      File('${testdir.path}/${widget.imageName}').writeAsBytesSync(newJpgBytes);
                                       showToastMessage("Image saved to gallery.");
 
                                       setState(() {

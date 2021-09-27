@@ -15,16 +15,17 @@ class _ListItemWidgetState extends State<ListItemWidget> {
 
   @override
   void initState() {
+    ListProvider();
     super.initState();
   }
 
   @override
   void didChangeDependencies() {
+    taskItems = Provider.of<ListProvider>(context);
     super.didChangeDependencies();
   }
   @override
   Widget build(BuildContext context) {
-    taskItems = Provider.of<ListProvider>(context);
     final listClass = taskItems.allListItem;
 
     return listClass.isEmpty
@@ -34,18 +35,20 @@ class _ListItemWidgetState extends State<ListItemWidget> {
             style: TextStyle(fontSize: 20),
           ),
         )
-        : ListView.separated(
-            physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.all(10),
-            separatorBuilder: (context, index) => const Divider(
-              height: 6,
-              //color: Colors.black,
+        : Consumer<ListProvider>(
+          builder: (context, provider, child) => ListView.separated(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.all(10),
+              separatorBuilder: (context, index) => const Divider(
+                height: 6,
+                //color: Colors.black,
+              ),
+              itemCount: listClass.length,
+              itemBuilder: (context, index) {
+                final listItem = listClass[index];
+                return ItemWidget(listItem: listItem);
+              },
             ),
-            itemCount: listClass.length,
-            itemBuilder: (context, index) {
-              final listItem = listClass[index];
-              return ItemWidget(listItem: listItem);
-            },
-          );
+        );
   }
 }

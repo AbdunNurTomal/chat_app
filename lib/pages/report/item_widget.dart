@@ -22,14 +22,12 @@ class ItemWidget extends StatelessWidget {
   final ListItem  listItem;
   ItemWidget({Key? key, required this.listItem}) : super(key: key);
 
-  File? _file;
-
   @override
   Widget build(BuildContext context) => ClipRRect(
     borderRadius: BorderRadius.circular(5),
     child: Slidable(
       actionPane: const SlidableDrawerActionPane(),
-      key: Key(listItem.id!),
+      key: Key(listItem.id!.toString()),
       // actions: [
       //   IconSlideAction(
       //     color: Colors.green,
@@ -141,13 +139,14 @@ class ItemWidget extends StatelessWidget {
     );
   }
   void editItem(BuildContext context, ListItem listItem) {
-    DefectData.callDefect();
-    DefectData.deleteDefectItem(listItem.item!);
+    // DefectData.callDefect();
+    // DefectData.deleteDefectItem(listItem.item!);
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => EditListItemDialogWidget(listItem: listItem),
       ),
     );
+    print("listed item >> ${listItem.images.length}");
   }
 
   Widget buildDDItemHead(String _ddItemValue, String _ddItem, int noOfImages) {
@@ -216,33 +215,7 @@ class ItemWidget extends StatelessWidget {
               return Card(
                 // clipBehavior: Clip.antiAlias,
                 elevation: 5.0,
-                child: InkWell(
-                  onTap: ()async {
-                    String? imageName = images[index].name;
-                    String? imageUri = images[index].identifier;
-
-                    Uri? _uri = Uri.parse(imageUri!);
-                    _file = await toFile(_uri);
-                    Uint8List _imageByteslist = await _file!.readAsBytes();
-                    try{
-                      final ui.Image _myBackgroundImage;
-                      _myBackgroundImage = await ImageUtility.loadImage(_imageByteslist);
-
-                      //print("MyBackgroundImage - $_myBackgroundImage");
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => ImageDialogOld(
-                            myBackgroundImage: _myBackgroundImage,
-                            //imageUri: _file,
-                            imageUri: imageUri,
-                            imageName: imageName!,
-                          ),
-                          )
-                      );
-                    } catch (e) {
-                      print(e);
-                    }
-                  },
-                  child: SizedBox(
+                child: SizedBox(
                     height: MediaQuery.of(context).size.width / 3,
                     width: MediaQuery.of(context).size.width / 3,
                     // alignment: Alignment.center,
@@ -253,12 +226,10 @@ class ItemWidget extends StatelessWidget {
                       quality: 75,
                     ),
                   ),
-                ),
               );
             },
           ),
       ),
     );//const SizedBox(height: 10.0),
   }
-
 }

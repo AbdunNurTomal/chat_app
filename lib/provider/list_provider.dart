@@ -35,6 +35,11 @@ class ListProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  bool isEditShadow = false;
+  void showShadowImageEdit(bool checkShadow) {
+    isEditShadow = checkShadow;
+    notifyListeners();
+  }
   void editItem(ListItem oldListItem, ListItem newListItem) {
     // print("edit item : $newListItem");
     if(oldListItem.id == newListItem.id) {
