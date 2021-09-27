@@ -15,10 +15,11 @@ import 'image_util.dart';
 class ImageDialogOld extends StatefulWidget {
   final String imageUri;
   final String imageName;
-  final ui.Image backgrounfImage;
+  final String itemName;
+  final ui.Image backgroundImage;
   final int imageIndex;
 
-  const ImageDialogOld({ Key? key, required this.backgrounfImage, required this.imageUri, required this.imageName, required this.imageIndex}) : super(key: key);
+  const ImageDialogOld({ Key? key, required this.backgroundImage, required this.imageUri, required this.imageName, required this.imageIndex, required this.itemName}) : super(key: key);
 
   @override
   State<ImageDialogOld> createState() => _ImageDialogOldState();
@@ -41,6 +42,8 @@ class RecordPaints{
 
 class _ImageDialogOldState extends State<ImageDialogOld> {
   GlobalKey globalKey = GlobalKey();
+
+  late ui.Image newImage;
 
   List<PaintedPoints> pointsList = [];
   List<PaintedPoints> paintListDeleted = [];
@@ -101,8 +104,6 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
     selectedColor = Colors.red;
     strokeWidth = 3.0;
   }
-
-
 
   @override
   void dispose() {
@@ -184,12 +185,11 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
               icon: Icon(Icons.undo)
           ),
           IconButton(
-            onPressed: (){
+            onPressed: () {
               setState(() {
                 saveClicked = true;
               });
               Navigator.of(context).pop(widget.imageIndex);
-              // Navigator.of(context).pop(widget.imageIndex);
             },
             icon: const Icon(Icons.save)
           )
@@ -208,7 +208,7 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               Expanded(
-                child: Container(
+                child: SizedBox(
                   // color: Color(0xFFC0C0C0),
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -360,11 +360,14 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
                                   });
                                 },
                                 child: CustomPaint(
-                                  size: Size(
-                                      constraints.widthConstraints().maxWidth,
-                                      constraints.heightConstraints().maxHeight),
+                                  // size: Size(
+                                  //     constraints.widthConstraints().maxWidth,
+                                  //     constraints.heightConstraints().maxHeight),
+                                  size: Size(768,1024),
                                   painter: PainterCanvas(
-                                    image: widget.backgrounfImage,
+                                    image: widget.backgroundImage,
+                                    width: MediaQuery.of(context).size.width,
+                                    height: MediaQuery.of(context).size.height,
                                     pointsList: pointsList,
                                     arrowList: arrowList,
                                     squaresList: squaresList,
@@ -374,21 +377,27 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
                                     unfinishedCircle: unfinishedCircle,
                                     saveImage: saveClicked,
                                     saveCallback: (ui.Picture picture) async {
-                                      final img = await picture.toImage(
-                                          constraints.maxWidth.round(),
-                                          constraints.maxHeight.round());
-                                      ByteData? byteData = await img.toByteData(format: ui.ImageByteFormat.png);
-                                      Uint8List jpgBytes = byteData!.buffer.asUint8List();
+                                      // final img = await picture.toImage(
+                                      //     constraints.maxWidth.round(),
+                                      //     constraints.maxHeight.round());
+                                      final img = await picture.toImage(1080,1920);
 
                                       var dir = await getExternalStorageDirectory();
                                       var testdir = await  Directory('${dir?.path}/images');
-                                      File('${testdir.path}/${widget.imageName}').writeAsBytesSync(jpgBytes);
 
+                                      // int countImage = widget.imageIndex;
+                                      // ++countImage;
+                                      // String newItemName = "${widget.itemName}\nNo-$countImage";
+                                      // print("New Item Name - $newItemName");
+
+                                      // await ImageUtility.writeLogoInsideImage('${testdir.path}/${widget.imageName}',img, newItemName);
+                                      ByteData? byteData = await img.toByteData(format: ui.ImageByteFormat.png);
+                                      Uint8List newJpgBytes = await ImageUtility.comporessImageList(byteData!.buffer.asUint8List());
+                                      File('${testdir.path}/${widget.imageName}').writeAsBytesSync(newJpgBytes);
                                       showToastMessage("Image saved to gallery.");
 
                                       setState(() {
                                         saveClicked = false;
-
                                       });
                                     },
                                   ),

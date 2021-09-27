@@ -1,6 +1,7 @@
 import 'dart:ui' as ui;
 import 'package:arrow_path/arrow_path.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 typedef ImageSaveCallback = void Function(ui.Picture picture);
 
@@ -21,7 +22,12 @@ class PainterCanvas extends CustomPainter {
   ImageSaveCallback saveCallback;
   bool saveImage;
 
+  double width;
+  double height;
+
   PainterCanvas({required this.image,
+        required this.width,
+        required this.height,
         required this.pointsList,
         required this.arrowList,
         required this.unfinishedArrow,
@@ -39,14 +45,21 @@ class PainterCanvas extends CustomPainter {
     final recorder = ui.PictureRecorder();
     if (saveImage) {
       canvas = Canvas(recorder);
+      var dpr = ui.window.devicePixelRatio;
+      canvas.scale(dpr, dpr);
     }
-    // canvas.drawColor(Colors.white, BlendMode.color);
     paintImage(
-      canvas: canvas,
-      rect: Rect.fromLTWH(0.0, 0.0, size.width, size.height),
-      image: image,
-      fit: BoxFit.cover);
-    // canvas.drawImage(image, Offset.zero, Paint());
+        canvas: canvas,
+        rect: Rect.fromLTWH(0, 0, size.width, size.height),
+        image: image,
+        fit: BoxFit.scaleDown,
+        repeat: ImageRepeat.noRepeat,
+        scale: 1.0,
+        alignment: Alignment.center,
+        flipHorizontally: false,
+        filterQuality: FilterQuality.high,
+        isAntiAlias: false,
+    );
 
     for (int i = 0; i < pointsList.length - 1; i++) {
       if (pointsList[i] != null && pointsList[i + 1] != null) {
@@ -110,7 +123,7 @@ class PainterCanvas extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(PainterCanvas oldDelegate) => true;
+  bool shouldRepaint(PainterCanvas oldDelegate) => false;
 }
 
 class PaintedPoints {

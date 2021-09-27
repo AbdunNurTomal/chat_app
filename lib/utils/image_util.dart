@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:uri_to_file/uri_to_file.dart';
 
@@ -29,7 +28,7 @@ class ImageUtility {
   static Future<File> compressAndGetImageFile(File file, String targetPath) async {
     var result = await FlutterImageCompress.compressAndGetFile(
       file.absolute.path, targetPath,
-      quality: 90,
+      quality: 100,
       rotate: 0,
     );
 
@@ -41,9 +40,9 @@ class ImageUtility {
   static Future<Uint8List> comporessImageList(Uint8List list) async {
     var result = await FlutterImageCompress.compressWithList(
       list,
-      minHeight: 1920,
-      minWidth: 1080,
-      quality: 96,
+      minHeight: 1024,
+      minWidth: 768,
+      quality: 90,
       rotate: 0,
     );
     // print(list.length);
@@ -129,7 +128,7 @@ class ImageUtility {
     }
   }
 
-  static Future<bool> saveImage(String imageUri, String imageName) async {
+  static Future<bool> saveImage(String imageUri, String imageName, String itemName) async {
     var dir = await getExternalStorageDirectory();
     var testdir = await Directory('${dir?.path}/images').create(recursive: true);
 
@@ -143,9 +142,9 @@ class ImageUtility {
         Uri _uri = Uri.parse(imageUri);
         File _file = await toFile(_uri);
 
-        Uint8List decodedBytes = _file.readAsBytesSync();
+        Uint8List decodedBytes = await comporessImageList(_file.readAsBytesSync());
         ui.Image _imageBackground = await ImageUtility.loadImage(decodedBytes);
-        await writeLogoInsideImage('${testdir.path}/$imageName',_imageBackground,imageName);
+        await writeLogoInsideImage('${testdir.path}/$imageName',_imageBackground, itemName);
 
         return true;
       }
@@ -156,27 +155,41 @@ class ImageUtility {
   }
 
   static Future<void> writeLogoInsideImage(String imagePath,ui.Image backgroundImage, String itemName) async{
+    print("Write logo : $itemName");
     final ui.PictureRecorder recorder = ui.PictureRecorder();
     Canvas c = Canvas(recorder);
 
     paintImage(
-        canvas: c,
-        rect: Rect.fromLTWH(0.0, 0.0, backgroundImage.width.toDouble(), backgroundImage.height.toDouble()),
-        image: backgroundImage,
-        fit: BoxFit.cover);
+      canvas: c,
+      rect: Rect.fromLTWH(0, 0, backgroundImage.width.toDouble(), backgroundImage.height.toDouble()),
+      image: backgroundImage,
+      fit: BoxFit.scaleDown,
+      repeat: ImageRepeat.noRepeat,
+      scale: 1.0,
+      alignment: Alignment.center,
+      flipHorizontally: false,
+      filterQuality: FilterQuality.high,
+      isAntiAlias: false,
+    );
+
+    // paintImage(
+    //     canvas: c,
+    //     rect: Rect.fromLTWH(0.0, 0.0, backgroundImage.width.toDouble(), backgroundImage.height.toDouble()),
+    //     image: backgroundImage,
+    //     fit: BoxFit.cover);
 
     ui.Image _logoImage = await ImageUtility.loadUiImage('assets/images/pqc.png');
     double positionX = (backgroundImage.width - _logoImage.width * 1.15).toDouble();
     double positionY = (backgroundImage.height - _logoImage.height * 1.15).toDouble();
     c.drawImage(_logoImage, Offset(positionX,positionY), Paint());
 
-    const textStyle = TextStyle(backgroundColor: Colors.white, color: Colors.black, fontSize: 30);
+    const textStyle = TextStyle(backgroundColor: Colors.white, color: Colors.black, fontSize: 25);
     TextSpan textSpan = TextSpan(text: itemName,style: textStyle);
     TextPainter textPainter = TextPainter(text: textSpan,textDirection: TextDirection.ltr);
     textPainter.layout(minWidth: 0,maxWidth: backgroundImage.width.toDouble());
 
-    double testPositionX = (backgroundImage.width - 50).toDouble();
-    double testPositionY = (backgroundImage.height - (backgroundImage.height - 50)).toDouble();
+    double testPositionX = (backgroundImage.width - (backgroundImage.width - 24)).toDouble();
+    double testPositionY = (backgroundImage.height - (backgroundImage.height - 8)).toDouble();
     textPainter.paint(c, Offset(testPositionX, testPositionY));
 
     final ui.Picture picture = recorder.endRecording();

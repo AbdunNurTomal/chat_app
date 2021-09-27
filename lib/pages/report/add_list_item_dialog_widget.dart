@@ -31,7 +31,7 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
   String _error = 'No Problem';
 
   List<Asset> images = <Asset>[];
-  List<int> editedImage = <int>[];
+  List<int> editedImage = [];
 
   bool _imagePickButton = false;
 
@@ -143,14 +143,16 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
 
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-
+      int counter =0;
       for (int i = 0; i < images.length; i++) {
+        ++counter;
         String? imageUri = images[i].identifier;
         String? imageName = images[i].name;
-        await ImageUtility.saveImage(imageUri!, imageName!);
+        String? itemName = "$ddItem\nNo-$counter";
+        await ImageUtility.saveImage(imageUri!, imageName!,itemName);
       }
       Fluttertoast.showToast(
-        msg: "Aded Item",
+        msg: "Added Item",
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
         timeInSecForIosWeb: 1,
@@ -274,40 +276,28 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
                     elevation: 5.0,
                     child: Stack(
                       children: <Widget>[
-                          InkWell(
-                          onTap: ()async {
-                            String? imageName = images[index].name;
-                            String? imageUri = images[index].identifier;
-                            try{
-                              Uri _uri = Uri.parse(imageUri!);
-                              File _fileBackgroundImage = await toFile(_uri);
-                              Uint8List _imageByteslist = await _fileBackgroundImage.readAsBytes();
-
-                              ui.Image _myBackgroundImage = await ImageUtility.loadImage(_imageByteslist);
-                              Navigator.push(context,
-                                  MaterialPageRoute(builder: (context) => ImageDialogOld(
-                                    backgrounfImage: _myBackgroundImage,
-                                    //imageUri: _file,
-                                    imageUri: imageUri,
-                                    imageName: imageName!,
-                                    imageIndex: index,
-                                  ),
-                                  )
-                              );
-                            } catch (e) {
-                              print(e);
-                            }
-                          },
-                          child: Container(
-                            height: MediaQuery.of(context).size.width / 3,
-                            width: MediaQuery.of(context).size.width / 3,
-                            alignment: Alignment.center,
-                            child: AssetThumb(
-                              asset: asset,
-                              width: 300,
-                              height: 300,
-                              quality: 75,
-                            ),
+                        Container(
+                          height: MediaQuery.of(context).size.width / 3,
+                          width: MediaQuery.of(context).size.width / 3,
+                          alignment: Alignment.center,
+                          child: Stack(
+                            children: [
+                              AssetThumb(
+                                asset: asset,
+                                width: 300,
+                                height: 300,
+                                quality: 75,
+                              ),
+                              (editedImage.contains(index))?
+                              const DecoratedBox(
+                                decoration: BoxDecoration(
+                                  color: Colors.black26,
+                                ),
+                                child: Center(
+                                  child: Text("Edited",style: TextStyle(backgroundColor: Colors.white))                            ,
+                                ),
+                              ):Container(),
+                            ],
                           ),
                         ),
                         Positioned(
@@ -323,6 +313,7 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
                               setState(() {
                                 //print("Remove");
                                 images.removeAt(index);
+                                editedImage.remove(index);
                               });
                             },
                           ),
