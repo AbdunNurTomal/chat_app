@@ -321,7 +321,7 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
 
                               if(await File('${testdir.path}/$imageName').exists()){
                                 Uint8List _imageBytesList = File('${testdir.path}/$imageName').readAsBytesSync();
-                                Uint8List decodedBytes = await ImageUtility.comporessImageList(_imageBytesList);
+                                Uint8List decodedBytes = await ImageUtility.compressImageList(_imageBytesList,1200,1600,0);
                                 ui.Image _myBackgroundImage = await ImageUtility.loadImage(decodedBytes);
 
                                 final result = await Navigator.push(context,

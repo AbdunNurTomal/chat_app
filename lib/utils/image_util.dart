@@ -28,7 +28,7 @@ class ImageUtility {
   static Future<File> compressAndGetImageFile(File file, String targetPath) async {
     var result = await FlutterImageCompress.compressAndGetFile(
       file.absolute.path, targetPath,
-      quality: 100,
+      quality: 98,
       rotate: 0,
     );
 
@@ -37,16 +37,14 @@ class ImageUtility {
 
     return result!;
   }
-  static Future<Uint8List> comporessImageList(Uint8List list) async {
+  static Future<Uint8List> compressImageList(Uint8List list, int width, int height, int rotation) async {
     var result = await FlutterImageCompress.compressWithList(
-      list,
-      minHeight: 1024,
-      minWidth: 768,
-      quality: 90,
-      rotate: 0,
-    );
-    // print(list.length);
-    // print(result.length);
+        list,
+        minHeight: width,
+        minWidth: height,
+        quality: 98,
+        rotate: rotation,
+      );
     return result;
   }
   static Future<ui.Image> loadImage(Uint8List bytes) async {
@@ -62,6 +60,7 @@ class ImageUtility {
     ui.decodeImageFromList(list, completer.complete);
     return completer.future;
   }
+
   static Future<bool> deleteFile(String? fileName) async {
     try {
       var dir = await getExternalStorageDirectory();
@@ -142,7 +141,7 @@ class ImageUtility {
         Uri _uri = Uri.parse(imageUri);
         File _file = await toFile(_uri);
 
-        Uint8List decodedBytes = await comporessImageList(_file.readAsBytesSync());
+        Uint8List decodedBytes = await compressImageList(_file.readAsBytesSync(),1200,1200,270);
         ui.Image _imageBackground = await ImageUtility.loadImage(decodedBytes);
         await writeLogoInsideImage('${testdir.path}/$imageName',_imageBackground, itemName);
 
@@ -163,7 +162,7 @@ class ImageUtility {
       canvas: c,
       rect: Rect.fromLTWH(0, 0, backgroundImage.width.toDouble(), backgroundImage.height.toDouble()),
       image: backgroundImage,
-      fit: BoxFit.scaleDown,
+      fit: BoxFit.fill,
       repeat: ImageRepeat.noRepeat,
       scale: 1.0,
       alignment: Alignment.center,
@@ -183,7 +182,7 @@ class ImageUtility {
     double positionY = (backgroundImage.height - _logoImage.height * 1.15).toDouble();
     c.drawImage(_logoImage, Offset(positionX,positionY), Paint());
 
-    const textStyle = TextStyle(backgroundColor: Colors.white, color: Colors.black, fontSize: 25);
+    const textStyle = TextStyle(backgroundColor: Colors.white, color: Colors.black, fontSize: 35);
     TextSpan textSpan = TextSpan(text: itemName,style: textStyle);
     TextPainter textPainter = TextPainter(text: textSpan,textDirection: TextDirection.ltr);
     textPainter.layout(minWidth: 0,maxWidth: backgroundImage.width.toDouble());
@@ -196,7 +195,7 @@ class ImageUtility {
     final img = await picture.toImage(backgroundImage.width, backgroundImage.height);
 
     ByteData? byteData = await img.toByteData(format: ui.ImageByteFormat.png);
-    Uint8List newJpgBytes = await comporessImageList(byteData!.buffer.asUint8List());
+    Uint8List newJpgBytes = await compressImageList(byteData!.buffer.asUint8List(),1200,1200,90);
     File(imagePath).writeAsBytesSync(newJpgBytes);
   }
 

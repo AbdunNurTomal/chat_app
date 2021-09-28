@@ -5,8 +5,10 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:chat_app/models/defect.dart';
+import 'package:chat_app/models/list_item.dart';
 import 'package:chat_app/pages/report/add_list_item_dialog_widget.dart';
 import 'package:chat_app/pages/report/list_item_widget.dart';
+import 'package:chat_app/pages/report/pdf_api_image_report.dart';
 import 'package:chat_app/provider/list_provider.dart';
 import 'package:chat_app/utils/global_methods.dart';
 import 'package:flutter/cupertino.dart';
@@ -46,7 +48,7 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> {//with SingleTickerP
   late ListProvider allItem;
 
   late final List<DownloadController> _downloadControllers;
-  late ListProvider taskItems;
+  late List<ListItem> taskItems;
 
   @override
   void initState() {
@@ -56,15 +58,17 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> {//with SingleTickerP
         _openDownload(index);
       }),
     );
+    allItem = Provider.of<ListProvider>(context,listen: false);
+    taskItems = allItem.allListItem;
     super.initState();
   }
 
   void _openDownload(int index) {
-    // ScaffoldMessenger.of(context).showSnackBar(
-    //   SnackBar(
-    //     content: Text('Open App ${index + 1}'),
-    //   ),
-    // );
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Open PDF ${index + 1}'),
+      ),
+    );
   }
 
   void _showProcessDialog(context) {
@@ -227,27 +231,27 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> {//with SingleTickerP
                 //});
                 switch(value){
                   case 'Process':
-                    allItem = Provider.of<ListProvider>(context,listen: false);
-                    //print("Item <<>> ${allItem.allListItem[0].images[0].identifier}");
-                    int countItem=0;
-                    for(int i=0;i<allItem.allListItem.length;i++){
-                      countItem++;
-                      int countImage=0;
-                      String item = '';
-                      //String itemValue = allItem.allListItem[i].itemValue!;
-                      if(allItem.allListItem[i].images.isNotEmpty){
-                        item = '"${allItem.allListItem[i].item!}" \n ${allItem.allListItem[i].images.length} pictures';
-                        ImageUtility.createImage(item,countItem);
-                        for(int j=0;j<allItem.allListItem[i].images.length;j++){
-                          countImage++;
-                          String? imageName = allItem.allListItem[i].images[j].name;
-                          // String? imageUri = allItem.allListItem[i].images[j].identifier;
-                          String newImageName = '$countItem\_$countImage.jpg';
-                          ImageUtility.changeFileNameOnly(imageName!,newImageName);
-                          // ImageUtility.saveImage(imageUri!,countItem,countImage);
-                        }
-                      }
-                    }
+                    // allItem = Provider.of<ListProvider>(context,listen: false);
+                    // //print("Item <<>> ${allItem.allListItem[0].images[0].identifier}");
+                    // int countItem=0;
+                    // for(int i=0;i<allItem.allListItem.length;i++){
+                    //   countItem++;
+                    //   int countImage=0;
+                    //   String item = '';
+                    //   //String itemValue = allItem.allListItem[i].itemValue!;
+                    //   if(allItem.allListItem[i].images.isNotEmpty){
+                    //     item = '"${allItem.allListItem[i].item!}" \n ${allItem.allListItem[i].images.length} pictures';
+                    //     ImageUtility.createImage(item,countItem);
+                    //     for(int j=0;j<allItem.allListItem[i].images.length;j++){
+                    //       countImage++;
+                    //       String? imageName = allItem.allListItem[i].images[j].name;
+                    //       // String? imageUri = allItem.allListItem[i].images[j].identifier;
+                    //       String newImageName = '$countItem\_$countImage.jpg';
+                    //       ImageUtility.changeFileNameOnly(imageName!,newImageName);
+                    //       // ImageUtility.saveImage(imageUri!,countItem,countImage);
+                    //     }
+                    //   }
+                    // }
                     (allItem.allListItem.isNotEmpty) ? _showProcessDialog(context) : GlobalMethod.showAlertDialog(context,"Report Process Operation","No item found!!!");
                     break;
                 }
@@ -570,9 +574,36 @@ abstract class DownloadController implements ChangeNotifier {
   DownloadStatus get downloadStatus;
   double get progress;
 
-  void startDownload();
+  void startDownload() async{
+
+
+
+    // print("Item <<>> ${taskItems[0].images.length}");
+    // int countItem=0;
+    // for(int i=0;i<allItem.allListItem.length;i++){
+    //   countItem++;
+    //   int countImage=0;
+    //   String item = '';
+    //   //String itemValue = allItem.allListItem[i].itemValue!;
+    //   if(allItem.allListItem[i].images.isNotEmpty){
+    //     item = '"${allItem.allListItem[i].item!}" \n ${allItem.allListItem[i].images.length} pictures';
+    //     ImageUtility.createImage(item,countItem);
+    //     for(int j=0;j<allItem.allListItem[i].images.length;j++){
+    //       countImage++;
+    //       String? imageName = allItem.allListItem[i].images[j].name;
+    //       // String? imageUri = allItem.allListItem[i].images[j].identifier;
+    //       String newImageName = '$countItem\_$countImage.jpg';
+    //       ImageUtility.changeFileNameOnly(imageName!,newImageName);
+    //       // ImageUtility.saveImage(imageUri!,countItem,countImage);
+    //     }
+    //   }
+    // }
+    // pdfImageFile = await PdfApiImageReport.generateImage(ListI);
+  }
   void stopDownload();
-  void openDownload();
+  void openDownload(){
+    // PdfApiImageReport.openFile(pdfImageFile);
+  }
 }
 
 class SimulatedDownloadController extends DownloadController
@@ -597,10 +628,13 @@ class SimulatedDownloadController extends DownloadController
 
   bool _isDownloading = false;
 
+  late var pdfImageFile;
+
   @override
   void startDownload() {
     if (downloadStatus == DownloadStatus.notDownloaded) {
       _doSimulatedDownload();
+
     }
   }
 
@@ -637,6 +671,19 @@ class SimulatedDownloadController extends DownloadController
     // Shift to the downloading phase.
     _downloadStatus = DownloadStatus.downloading;
     notifyListeners();
+
+    if(downloadStatus == DownloadStatus.downloading){
+      print("Images <<>>");
+      var dir = await getExternalStorageDirectory();
+      final imageDir = Directory('${dir?.path}/images');
+      List<FileSystemEntity> _images = imageDir.listSync(recursive: true, followLinks: false);
+      print(">>> ${_images[0].path}");
+      pdfImageFile = await PdfApiImageReport.generateImage(_images);
+
+      _downloadStatus = DownloadStatus.downloaded;
+      _isDownloading = false;
+      notifyListeners();
+    }
 
     const downloadProgressStops = [0.0, 0.15, 0.45, 0.80, 1.0];
     for (final stop in downloadProgressStops) {
