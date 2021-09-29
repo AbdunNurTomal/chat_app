@@ -25,16 +25,22 @@ class ImageUtility {
     return testdir;
   }
 
+  static Future<Uint8List> compressFile(File file, int width, int height, int rotation) async {
+    var result = await FlutterImageCompress.compressWithFile(
+      file.absolute.path,
+      minWidth: width,
+      minHeight: height,
+      quality: 94,
+      rotate: rotation,
+    );
+    return result!;
+  }
   static Future<File> compressAndGetImageFile(File file, String targetPath) async {
     var result = await FlutterImageCompress.compressAndGetFile(
       file.absolute.path, targetPath,
       quality: 98,
       rotate: 0,
     );
-
-    // print(file.lengthSync());
-    // print(result!.lengthSync());
-
     return result!;
   }
   static Future<Uint8List> compressImageList(Uint8List list, int width, int height, int rotation) async {
@@ -85,7 +91,11 @@ class ImageUtility {
 
       await File('${testdir.path}/$fileName').exists().then((_) async {
         String newFilePath = '${testdir.path}/$newFileName';
-        await File('${testdir.path}/$fileName').renameSync(newFilePath);
+        File('${testdir.path}/$fileName').renameSync(newFilePath);
+
+
+        Uint8List decodedBytes = await compressFile(File('${testdir.path}/$newFileName'),1024,768,270);
+        File('${testdir.path}/$newFileName').writeAsBytesSync(decodedBytes);
       });
     }catch(e){
       print(e);
@@ -143,7 +153,7 @@ class ImageUtility {
 
         Uint8List decodedBytes = await compressImageList(_file.readAsBytesSync(),1200,1200,270);
         ui.Image _imageBackground = await ImageUtility.loadImage(decodedBytes);
-        await writeLogoInsideImage('${testdir.path}/$imageName',_imageBackground, itemName);
+        await writeLogoInsideImage('${testdir.path}/$imageName',_imageBackground, itemName, _file);
 
         return true;
       }
@@ -153,8 +163,13 @@ class ImageUtility {
     }
   }
 
-  static Future<void> writeLogoInsideImage(String imagePath,ui.Image backgroundImage, String itemName) async{
-    print("Write logo : $itemName");
+  static Future<void> writeLogoInsideImage(String imagePath,ui.Image backgroundImage, String itemName, File imageFile) async{
+    // print("Write logo : $itemName");
+    // int rotation;
+    // if(backgroundImage.width<backgroundImage.height){
+    //   Uint8List decodedBytes = await compressImageList(imageFile.readAsBytesSync(),1200,1200,360);
+    //   backgroundImage = await ImageUtility.loadImage(decodedBytes);
+    // }
     final ui.PictureRecorder recorder = ui.PictureRecorder();
     Canvas c = Canvas(recorder);
 
@@ -170,12 +185,6 @@ class ImageUtility {
       filterQuality: FilterQuality.high,
       isAntiAlias: false,
     );
-
-    // paintImage(
-    //     canvas: c,
-    //     rect: Rect.fromLTWH(0.0, 0.0, backgroundImage.width.toDouble(), backgroundImage.height.toDouble()),
-    //     image: backgroundImage,
-    //     fit: BoxFit.cover);
 
     ui.Image _logoImage = await ImageUtility.loadUiImage('assets/images/pqc.png');
     double positionX = (backgroundImage.width - _logoImage.width * 1.15).toDouble();
@@ -195,6 +204,7 @@ class ImageUtility {
     final img = await picture.toImage(backgroundImage.width, backgroundImage.height);
 
     ByteData? byteData = await img.toByteData(format: ui.ImageByteFormat.png);
+    // (img.width<img.height)?rotation = 90 : rotation = 0;
     Uint8List newJpgBytes = await compressImageList(byteData!.buffer.asUint8List(),1200,1200,90);
     File(imagePath).writeAsBytesSync(newJpgBytes);
   }

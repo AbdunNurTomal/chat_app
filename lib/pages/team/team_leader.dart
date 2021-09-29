@@ -231,27 +231,27 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> {//with SingleTickerP
                 //});
                 switch(value){
                   case 'Process':
-                    // allItem = Provider.of<ListProvider>(context,listen: false);
-                    // //print("Item <<>> ${allItem.allListItem[0].images[0].identifier}");
-                    // int countItem=0;
-                    // for(int i=0;i<allItem.allListItem.length;i++){
-                    //   countItem++;
-                    //   int countImage=0;
-                    //   String item = '';
-                    //   //String itemValue = allItem.allListItem[i].itemValue!;
-                    //   if(allItem.allListItem[i].images.isNotEmpty){
-                    //     item = '"${allItem.allListItem[i].item!}" \n ${allItem.allListItem[i].images.length} pictures';
-                    //     ImageUtility.createImage(item,countItem);
-                    //     for(int j=0;j<allItem.allListItem[i].images.length;j++){
-                    //       countImage++;
-                    //       String? imageName = allItem.allListItem[i].images[j].name;
-                    //       // String? imageUri = allItem.allListItem[i].images[j].identifier;
-                    //       String newImageName = '$countItem\_$countImage.jpg';
-                    //       ImageUtility.changeFileNameOnly(imageName!,newImageName);
-                    //       // ImageUtility.saveImage(imageUri!,countItem,countImage);
-                    //     }
-                    //   }
-                    // }
+                    allItem = Provider.of<ListProvider>(context,listen: false);
+                    //print("Item <<>> ${allItem.allListItem[0].images[0].identifier}");
+                    int countItem=0;
+                    for(int i=0;i<allItem.allListItem.length;i++){
+                      countItem++;
+                      int countImage=0;
+                      // String item = '';
+                      //String itemValue = allItem.allListItem[i].itemValue!;
+                      if(allItem.allListItem[i].images.isNotEmpty){
+                        // item = '"${allItem.allListItem[i].item!}" \n ${allItem.allListItem[i].images.length} pictures';
+                        // ImageUtility.createImage(item,countItem);
+                        for(int j=0;j<allItem.allListItem[i].images.length;j++){
+                          countImage++;
+                          String? imageName = allItem.allListItem[i].images[j].name;
+                          // String? imageUri = allItem.allListItem[i].images[j].identifier;
+                          String newImageName = '$countItem\_$countImage.jpg';
+                          ImageUtility.changeFileNameOnly(imageName!,newImageName);
+                          // ImageUtility.saveImage(imageUri!,countItem,countImage);
+                        }
+                      }
+                    }
                     (allItem.allListItem.isNotEmpty) ? _showProcessDialog(context) : GlobalMethod.showAlertDialog(context,"Report Process Operation","No item found!!!");
                     break;
                 }
@@ -574,32 +574,7 @@ abstract class DownloadController implements ChangeNotifier {
   DownloadStatus get downloadStatus;
   double get progress;
 
-  void startDownload() async{
-
-
-
-    // print("Item <<>> ${taskItems[0].images.length}");
-    // int countItem=0;
-    // for(int i=0;i<allItem.allListItem.length;i++){
-    //   countItem++;
-    //   int countImage=0;
-    //   String item = '';
-    //   //String itemValue = allItem.allListItem[i].itemValue!;
-    //   if(allItem.allListItem[i].images.isNotEmpty){
-    //     item = '"${allItem.allListItem[i].item!}" \n ${allItem.allListItem[i].images.length} pictures';
-    //     ImageUtility.createImage(item,countItem);
-    //     for(int j=0;j<allItem.allListItem[i].images.length;j++){
-    //       countImage++;
-    //       String? imageName = allItem.allListItem[i].images[j].name;
-    //       // String? imageUri = allItem.allListItem[i].images[j].identifier;
-    //       String newImageName = '$countItem\_$countImage.jpg';
-    //       ImageUtility.changeFileNameOnly(imageName!,newImageName);
-    //       // ImageUtility.saveImage(imageUri!,countItem,countImage);
-    //     }
-    //   }
-    // }
-    // pdfImageFile = await PdfApiImageReport.generateImage(ListI);
-  }
+  void startDownload();
   void stopDownload();
   void openDownload(){
     // PdfApiImageReport.openFile(pdfImageFile);
@@ -677,7 +652,7 @@ class SimulatedDownloadController extends DownloadController
       var dir = await getExternalStorageDirectory();
       final imageDir = Directory('${dir?.path}/images');
       List<FileSystemEntity> _images = imageDir.listSync(recursive: true, followLinks: false);
-      print(">>> ${_images[0].path}");
+
       pdfImageFile = await PdfApiImageReport.generateImage(_images);
 
       _downloadStatus = DownloadStatus.downloaded;

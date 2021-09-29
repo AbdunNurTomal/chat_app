@@ -216,9 +216,9 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
         //   ),
         // );
       },
-      noItemsFoundBuilder: (context) => SizedBox(
+      noItemsFoundBuilder: (context) => const SizedBox(
         height: 40,
-        child: const Center(
+        child: Center(
           child: Text(
             'No Defects Found.',
             style: TextStyle(fontSize: 20),

@@ -13,12 +13,9 @@ class PdfApiImageReport{
   static Future getImageBytes(String assetImage) async {
     final Uint8List byteList = File(assetImage).readAsBytesSync();
     imagesUint8list.add(byteList);
-    print(imagesUint8list.length);
+    // print(imagesUint8list.length);
   }
 
-  static Future createPdfFile() async {
-
-  }
   // static Future savePdfFile() async {
   //   Directory documentDirectory = await getApplicationDocumentsDirectory();
   //
@@ -39,7 +36,10 @@ class PdfApiImageReport{
     final pdf = pw.Document();
     List<String> assetImage = [];
 
+    print("PDF >> ${allImages.length}");
+
     for(var i=0;i<allImages.length;i++){
+      print(">>> ${allImages[i].path}");
       assetImage.add(allImages[i].path);
     }
     //convert each image to Uint8List
@@ -53,31 +53,39 @@ class PdfApiImageReport{
       //     crossAxisAlignment: pw.CrossAxisAlignment.center,
       //     mainAxisSize: pw.MainAxisSize.max,
       //     children: [
-      //       // pw.Text(
-      //       //     'Image'
-      //       //         ' ' +
-      //       //         (imagesUint8list
-      //       //             .indexWhere((element) => element == image) +
-      //       //             1)
-      //       //             .toString(),
-      //       //     style: pw.TextStyle(fontSize: 22)),
-      //       // pw.SizedBox(height: 10),
       //       pw.Image(
-      //           pw.MemoryImage(image,),
-      //           // height: 400,
-      //           fit: pw.BoxFit.cover)
+      //           pw.MemoryImage(image),
+      //           fit: pw.BoxFit.contain)
       //     ]);
-      return pw.FullPage(
-        ignoreMargins: true,
-        child: pw.Image(pw.MemoryImage(image), fit: pw.BoxFit.cover),
-      );
+      return pw.Wrap(
+          children: [
+            // pw.Text(
+            //     'Image'
+            //         ' ' +
+            //         (imagesUint8list
+            //             .indexWhere((element) => element == image) +
+            //             1)
+            //             .toString(),
+            //     style: pw.TextStyle(fontSize: 22)),
+            // pw.SizedBox(height: 10),
+            pw.Image(
+                pw.MemoryImage(image),
+                // height: 400,
+                fit: pw.BoxFit.contain),
+            // pw.SizedBox(height: 5),
+          ]);
+      // return pw.FullPage(
+      //   ignoreMargins: true,
+      //   child: pw.Image(pw.MemoryImage(image), fit: pw.BoxFit.cover),
+      // );
 
     }).toList();
 
     //create PDF
     pdf.addPage(pw.MultiPage(
-        // margin: pw.EdgeInsets.all(10),
-        pageFormat: PdfPageFormat.legal,
+        margin: pw.EdgeInsets.all(0),
+        // pageFormat: PdfPageFormat(15*PdfPageFormat.inch,11.27*PdfPageFormat.inch).landscape,
+        pageFormat: PdfPageFormat(15*PdfPageFormat.inch,11.27*PdfPageFormat.inch).landscape,
         build: (pw.Context context) {
           return <pw.Widget>[
             // pw.Column(
@@ -89,7 +97,8 @@ class PdfApiImageReport{
             //           style: pw.TextStyle(fontSize: 26)),
             //       pw.Divider(),
             //     ]),
-            pw.Column(children: pdfImages),
+            // pw.Column(children: pdfImages),
+            pw.Wrap(children: pdfImages),
           ];
         }));
     // await savePdfFile();
