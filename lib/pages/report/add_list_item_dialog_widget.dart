@@ -43,7 +43,7 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
 
   //late List<Defects> updatedDefect=[];
 
-  static AnimationController? _animationController;
+  // static AnimationController? _animationController;
   // void Function(AnimationStatus) _statusListener;
 
   @override
@@ -91,7 +91,7 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
         actions: [
           IconButton(
-              onPressed: _saveItem,
+              onPressed: (images.isNotEmpty)?_saveItem:null,
               icon: const Icon(Icons.save)
           )
         ],

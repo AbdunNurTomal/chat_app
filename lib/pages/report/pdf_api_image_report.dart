@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
-
+import 'dart:ui' as ui;
+import 'package:chat_app/utils/image_util.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
@@ -9,9 +10,13 @@ import 'package:pdf/widgets.dart' as pw;
 class PdfApiImageReport{
   // final pdf = Document();
   static List<Uint8List> imagesUint8list = [];
+  static int counter =0;
 
   static Future getImageBytes(String assetImage) async {
     final Uint8List byteList = File(assetImage).readAsBytesSync();
+    if(counter ==0) {
+      ui.Image _myBackgroundImage = await ImageUtility.loadImage(byteList);
+    }
     imagesUint8list.add(byteList);
     // print(imagesUint8list.length);
   }
@@ -85,7 +90,8 @@ class PdfApiImageReport{
     pdf.addPage(pw.MultiPage(
         margin: pw.EdgeInsets.all(0),
         // pageFormat: PdfPageFormat(15*PdfPageFormat.inch,11.27*PdfPageFormat.inch).landscape,
-        pageFormat: PdfPageFormat(15*PdfPageFormat.inch,11.27*PdfPageFormat.inch).landscape,
+        // pageFormat: const PdfPageFormat(14.25*PdfPageFormat.inch,10.67*PdfPageFormat.inch).landscape,
+        pageFormat: const PdfPageFormat(14.23*PdfPageFormat.inch,10.67*PdfPageFormat.inch).landscape,
         build: (pw.Context context) {
           return <pw.Widget>[
             // pw.Column(

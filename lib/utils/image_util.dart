@@ -19,10 +19,15 @@ class ImageUtility {
     return _file;
   }
 
-  static Future<Directory> getImageDirPath() async{
-    var dir = await getExternalStorageDirectory();
-    Directory testdir = await  Directory('${dir?.path}/images');
-    return testdir;
+  static Future<String> getImageDirPath() async{
+    final directory = await getExternalStorageDirectory();
+    final myImagePath = '${directory?.path}/images';
+    final myImgDir = await Directory(myImagePath).create();
+
+    return myImagePath;
+    // var dir = await getExternalStorageDirectory();
+    // Directory testdir = await  Directory('${dir?.path}/images');
+    // return testdir;
   }
 
   static Future<Uint8List> compressFile(File file, int width, int height, int rotation) async {
@@ -53,12 +58,12 @@ class ImageUtility {
       );
     return result;
   }
+
   static Future<ui.Image> loadImage(Uint8List bytes) async {
     final Completer<ui.Image> completer = Completer();
     ui.decodeImageFromList(bytes, (ui.Image img) => completer.complete(img));
     return completer.future;
   }
-
   static Future<ui.Image> loadUiImage(String assetPath) async {
     final data = await rootBundle.load(assetPath);
     final list = Uint8List.view(data.buffer);
@@ -69,11 +74,10 @@ class ImageUtility {
 
   static Future<bool> deleteFile(String? fileName) async {
     try {
-      var dir = await getExternalStorageDirectory();
-      var testdir = await Directory('${dir?.path}/images');
+      String imageDir = await getImageDirPath();
 
       if(fileName != null) {
-        await File('${testdir.path}/$fileName').delete();
+        await File('$imageDir/$fileName').delete();
         return true;
       }else{
         return false;
@@ -83,27 +87,30 @@ class ImageUtility {
       return false;
     }
   }
-
-  static Future<void> changeFileNameOnly(String fileName, String newFileName) async{
+  static Future<void> changeFileNameOnly(String fileName, String newFileName, var dpi) async{
     try {
-      var dir = await getExternalStorageDirectory();
-      var testdir = await Directory('${dir?.path}/images');
+      String imageDir = await getImageDirPath();
 
-      await File('${testdir.path}/$fileName').exists().then((_) async {
-        String newFilePath = '${testdir.path}/$newFileName';
-        File('${testdir.path}/$fileName').renameSync(newFilePath);
+      await File('$imageDir/$fileName').exists().then((_) async {
+        String newFilePath = '$imageDir/$newFileName';
+        File('$imageDir/$fileName').renameSync(newFilePath);
+        Uint8List decodedBytes = await compressFile(File('$imageDir/$newFileName'),1024,768,0);
+        decodedBytes[13] = 1;
+        decodedBytes[14] = (dpi >> 8);
+        decodedBytes[15] = (dpi & 0xff);
+        decodedBytes[16] = (dpi >> 8);
+        decodedBytes[17] = (dpi & 0xff);
 
-
-        Uint8List decodedBytes = await compressFile(File('${testdir.path}/$newFileName'),1024,768,270);
-        File('${testdir.path}/$newFileName').writeAsBytesSync(decodedBytes);
+        File('$imageDir/$newFileName').writeAsBytesSync(decodedBytes);
       });
     }catch(e){
       print(e);
     }
   }
+
   static Future<void> createImage(String itemName, int fileName) async {
     try {
-      var dir = await getExternalStorageDirectory();
+      String imageDir = await getImageDirPath();
 
       ui.PictureRecorder recorder = ui.PictureRecorder();
       Canvas c = Canvas(recorder);
@@ -127,10 +134,8 @@ class ImageUtility {
 // print("byteData $byteData");
       Uint8List jpgBytes = byteData!.buffer.asUint8List();
 // print("jpgBytes $jpgBytes");
-      var testdir = await Directory('${dir?.path}/images').create(recursive: true);
-      File('${testdir.path}/$fileName\_0.jpg').create(recursive: true);
-
-      File('${testdir.path}/$fileName\_0.jpg').writeAsBytesSync(jpgBytes);
+      File('$imageDir/$fileName\_0.jpg').create(recursive: true);
+      File('$imageDir/$fileName\_0.jpg').writeAsBytesSync(jpgBytes);
 
     } catch (e) {
       print(e);
@@ -138,12 +143,9 @@ class ImageUtility {
   }
 
   static Future<bool> saveImage(String imageUri, String imageName, String itemName) async {
-    var dir = await getExternalStorageDirectory();
-    var testdir = await Directory('${dir?.path}/images').create(recursive: true);
-
     try {
-      // print('${testdir.path}/$imageName');
-      if(await File('${testdir.path}/$imageName').exists()){
+      String imageDir = await getImageDirPath();
+      if(await File('$imageDir/$imageName').exists()){
         print("Image exist");
         return false;
       }else{
@@ -151,9 +153,9 @@ class ImageUtility {
         Uri _uri = Uri.parse(imageUri);
         File _file = await toFile(_uri);
 
-        Uint8List decodedBytes = await compressImageList(_file.readAsBytesSync(),1200,1200,270);
+        Uint8List decodedBytes = await compressFile(_file,1600,1200,0);
         ui.Image _imageBackground = await ImageUtility.loadImage(decodedBytes);
-        await writeLogoInsideImage('${testdir.path}/$imageName',_imageBackground, itemName, _file);
+        await writeLogoInsideImage('$imageDir/$imageName',_imageBackground, itemName);
 
         return true;
       }
@@ -163,13 +165,8 @@ class ImageUtility {
     }
   }
 
-  static Future<void> writeLogoInsideImage(String imagePath,ui.Image backgroundImage, String itemName, File imageFile) async{
-    // print("Write logo : $itemName");
-    // int rotation;
-    // if(backgroundImage.width<backgroundImage.height){
-    //   Uint8List decodedBytes = await compressImageList(imageFile.readAsBytesSync(),1200,1200,360);
-    //   backgroundImage = await ImageUtility.loadImage(decodedBytes);
-    // }
+  static Future<void> writeLogoInsideImage(String imagePath,ui.Image backgroundImage, String itemName) async{
+    print("Write logo : $itemName");
     final ui.PictureRecorder recorder = ui.PictureRecorder();
     Canvas c = Canvas(recorder);
 
@@ -186,7 +183,7 @@ class ImageUtility {
       isAntiAlias: false,
     );
 
-    ui.Image _logoImage = await ImageUtility.loadUiImage('assets/images/pqc.png');
+    final ui.Image _logoImage = await ImageUtility.loadUiImage('assets/images/pqc.png');
     double positionX = (backgroundImage.width - _logoImage.width * 1.15).toDouble();
     double positionY = (backgroundImage.height - _logoImage.height * 1.15).toDouble();
     c.drawImage(_logoImage, Offset(positionX,positionY), Paint());
@@ -201,11 +198,11 @@ class ImageUtility {
     textPainter.paint(c, Offset(testPositionX, testPositionY));
 
     final ui.Picture picture = recorder.endRecording();
+
     final img = await picture.toImage(backgroundImage.width, backgroundImage.height);
 
     ByteData? byteData = await img.toByteData(format: ui.ImageByteFormat.png);
-    // (img.width<img.height)?rotation = 90 : rotation = 0;
-    Uint8List newJpgBytes = await compressImageList(byteData!.buffer.asUint8List(),1200,1200,90);
+    Uint8List newJpgBytes = await compressImageList(byteData!.buffer.asUint8List(),1600,1200,0);
     File(imagePath).writeAsBytesSync(newJpgBytes);
   }
 
@@ -247,14 +244,6 @@ class ImageUtility {
   //   Uint8List jpgBytes = byteData!.buffer.asUint8List();
   //   File(imagePath).writeAsBytesSync(jpgBytes);
   // }
-
-  Future<String> _getDirectoryPath() async{
-    final directory = await getExternalStorageDirectory();
-    final myImagePath = '${directory?.path}/MyImages';
-    final myImgDir = await Directory(myImagePath).create();
-
-    return myImagePath;
-  }
   // Future<void> _capturePng() async {
   //   RenderRepaintBoundary boundary = globalKey.currentContext
   //       ?.findRenderObject() as RenderRepaintBoundary;

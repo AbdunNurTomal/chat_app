@@ -156,43 +156,43 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
         actions: [
           IconButton(
               onPressed: (){
-                  setState(() {
-                    if (drawHistory.isNotEmpty) {
-                      enumToolTypes lastAction = drawHistory
-                          .last;
-                      if (lastAction ==
-                          enumToolTypes.eraser ||
-                          lastAction ==
-                              enumToolTypes.pencil) {
-                        if (paintedPoints.isNotEmpty) {
-                          RecordPaints lastPoint = paintedPoints
-                              .last;
-                          pointsList.removeRange(
-                              lastPoint.startIndex!,
-                              lastPoint.endIndex!);
-                          paintedPoints.removeLast();
-                        }
-                      } else if (lastAction ==
-                          enumToolTypes.rectangle) {
-                        squaresList.removeLast();
-                      } else {
-                        circleList.removeLast();
+                setState(() {
+                  if (drawHistory.isNotEmpty) {
+                    enumToolTypes lastAction = drawHistory
+                        .last;
+                    if (lastAction ==
+                        enumToolTypes.eraser ||
+                        lastAction ==
+                            enumToolTypes.pencil) {
+                      if (paintedPoints.isNotEmpty) {
+                        RecordPaints lastPoint = paintedPoints
+                            .last;
+                        pointsList.removeRange(
+                            lastPoint.startIndex!,
+                            lastPoint.endIndex!);
+                        paintedPoints.removeLast();
                       }
-                      drawHistory.removeLast();
+                    } else if (lastAction ==
+                        enumToolTypes.rectangle) {
+                      squaresList.removeLast();
+                    } else {
+                      circleList.removeLast();
                     }
-                    //pointsListDeleted.;
-                  });
+                    drawHistory.removeLast();
+                  }
+                  //pointsListDeleted.;
+                });
               },
               icon: Icon(Icons.undo)
           ),
           IconButton(
-            onPressed: () {
-              setState(() {
-                saveClicked = true;
-              });
-              Navigator.of(context).pop(widget.imageIndex);
-            },
-            icon: const Icon(Icons.save)
+              onPressed: () {
+                setState(() {
+                  saveClicked = true;
+                });
+                Navigator.of(context).pop(widget.imageIndex);
+              },
+              icon: const Icon(Icons.save)
           )
         ],
       ),
@@ -251,7 +251,7 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
                   ),
                 ),
                 Container(
-                  height: constraints.maxHeight * 0.82,
+                  height: constraints.maxHeight * 0.8,
                   width: constraints.maxWidth * 1.0,
                   // width: constraints.widthConstraints().maxWidth,
                   // height: constraints.heightConstraints().maxHeight,
@@ -271,7 +271,7 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
                     onPanUpdate: (details) {
                       if (isCanvasLocked) return;
                       setState(() {
-                        final renderBox = context.findRenderObject() as RenderBox;
+                        final renderBox = globalKey.currentContext!.findRenderObject() as RenderBox;
                         if (selectedTool == enumToolTypes.pencil || selectedTool == enumToolTypes.eraser) {
                           pointsList.add(
                             PaintedPoints(
@@ -291,7 +291,7 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
                     onPanStart: (details) {
                       if (isCanvasLocked) return;
                       setState(() {
-                        final renderBox = context.findRenderObject() as RenderBox;
+                        final renderBox = globalKey.currentContext!.findRenderObject() as RenderBox;
                         if (selectedTool == enumToolTypes.pencil || selectedTool == enumToolTypes.eraser) {
                           if (pointsList.isNotEmpty) {
                             paintedPoints.add(RecordPaints(startIndex: pointsList.length, endIndex: null));
@@ -357,9 +357,10 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
                       });
                     },
                     child: CustomPaint(
+                      key: globalKey,
                       size: Size(
-                          constraints.widthConstraints().minWidth,
-                          constraints.heightConstraints().minHeight),
+                          constraints.widthConstraints().maxWidth,
+                          constraints.heightConstraints().maxHeight),
                       painter: PainterCanvas(
                         image: widget.backgroundImage,
                         width: MediaQuery.of(context).size.width,
@@ -373,19 +374,17 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
                         unfinishedCircle: unfinishedCircle,
                         saveImage: saveClicked,
                         saveCallback: (ui.Picture picture) async {
-                          // final img = await picture.toImage(
-                          //     constraints.minWidth.round(),
-                          //     constraints.minHeight.round());
+                          String imageDir = await ImageUtility.getImageDirPath();
+                          final img = await picture.toImage(
+                              constraints.maxWidth.round(),
+                              constraints.maxHeight.round());
                           // print("width >> screen ${MediaQuery.of(context).size.width} and contraints ${constraints.maxWidth.round()}");
                           // print("height >> screen ${MediaQuery.of(context).size.height} and contraints ${constraints.maxHeight.round()}");
                           //
                           // double width = MediaQuery.of(context).size.width * 0.5;
                           // double height = MediaQuery.of(context).size.height * 0.5;
 
-                          final img = await picture.toImage(1024,1600);
-
-                          var dir = await getExternalStorageDirectory();
-                          var testdir = await Directory('${dir?.path}/images');
+                          // final img = await picture.toImage(1400,1800);
 
                           // int countImage = widget.imageIndex;
                           // ++countImage;
@@ -394,8 +393,8 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
 
                           // await ImageUtility.writeLogoInsideImage('${testdir.path}/${widget.imageName}',img, newItemName);
                           ByteData? byteData = await img.toByteData(format: ui.ImageByteFormat.png);
-                          Uint8List newJpgBytes = await ImageUtility.compressImageList(byteData!.buffer.asUint8List(),1200,1200,0);
-                          File('${testdir.path}/${widget.imageName}').writeAsBytesSync(newJpgBytes);
+                          Uint8List newJpgBytes = await ImageUtility.compressImageList(byteData!.buffer.asUint8List(),1600,1200,270);
+                          File('$imageDir/${widget.imageName}').writeAsBytesSync(newJpgBytes);
                           showToastMessage("Image saved to gallery.");
 
                           setState(() {
@@ -403,6 +402,7 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
                           });
                         },
                       ),
+                      child: ConstrainedBox(constraints: const BoxConstraints.expand()),
                     ),
                     // child: SizedBox.expand(
                     //   child: RepaintBoundary(
@@ -559,7 +559,7 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
               ],
             );
           }),
-          ),
+        ),
       ),
     );
   }

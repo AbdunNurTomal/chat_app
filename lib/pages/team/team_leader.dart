@@ -237,7 +237,7 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> {//with SingleTickerP
                     for(int i=0;i<allItem.allListItem.length;i++){
                       countItem++;
                       int countImage=0;
-                      // String item = '';
+                      //String item = '';
                       //String itemValue = allItem.allListItem[i].itemValue!;
                       if(allItem.allListItem[i].images.isNotEmpty){
                         // item = '"${allItem.allListItem[i].item!}" \n ${allItem.allListItem[i].images.length} pictures';
@@ -247,7 +247,7 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> {//with SingleTickerP
                           String? imageName = allItem.allListItem[i].images[j].name;
                           // String? imageUri = allItem.allListItem[i].images[j].identifier;
                           String newImageName = '$countItem\_$countImage.jpg';
-                          ImageUtility.changeFileNameOnly(imageName!,newImageName);
+                          ImageUtility.changeFileNameOnly(imageName!,newImageName,300);
                           // ImageUtility.saveImage(imageUri!,countItem,countImage);
                         }
                       }

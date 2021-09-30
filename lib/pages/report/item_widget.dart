@@ -113,11 +113,10 @@ class ItemWidget extends StatelessWidget {
         actions: <Widget>[
           ElevatedButton(
             onPressed: () async {
-              var dir = await getExternalStorageDirectory();
-              var testdir = await Directory('${dir?.path}/images');
+              String imageDir = await ImageUtility.getImageDirPath();
 
               for(int i=0;i<listItem.images.length;i++) {
-                await File('${testdir.path}/${listItem.images[i].name}').delete();
+                await File('$imageDir/${listItem.images[i].name}').delete();
               }
               provider.deleteItem(listItem);
               final deleteToAddItem = Defects(
