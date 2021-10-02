@@ -114,7 +114,7 @@ class ImageUtility {
 
       ui.PictureRecorder recorder = ui.PictureRecorder();
       Canvas c = Canvas(recorder);
-      var rect = Rect.fromLTWH(0.0, 0.0, 300.0, 300.0);
+      var rect = const Rect.fromLTWH(0.0, 0.0, 300.0, 300.0);
       c.clipRect(rect);
 
       final textStyle = TextStyle(color: Colors.white, fontSize: 24);
@@ -122,7 +122,7 @@ class ImageUtility {
       TextPainter textPainter = TextPainter(text: textSpan,textDirection: TextDirection.ltr);
       textPainter.layout(minWidth: 0,maxWidth: 300);
 
-      Offset offset = Offset(10.0, 10.0);
+      Offset offset = const Offset(10.0, 10.0);
       textPainter.paint(c, offset);
 
       // c.drawPaint(paint);

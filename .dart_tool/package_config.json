@@ -230,6 +230,12 @@
       "languageVersion": "2.12"
     },
     {
+      "name": "flutter_painter",
+      "rootUri": "file:///C:/Users/md_to/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/flutter_painter-0.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "flutter_plugin_android_lifecycle",
       "rootUri": "file:///C:/Users/md_to/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/flutter_plugin_android_lifecycle-2.0.3",
       "packageUri": "lib/",
@@ -638,7 +644,7 @@
       "languageVersion": "2.12"
     }
   ],
-  "generated": "2021-09-29T06:23:39.452432Z",
+  "generated": "2021-10-02T09:00:35.440940Z",
   "generator": "pub",
   "generatorVersion": "2.15.0-82.0.dev"
 }
