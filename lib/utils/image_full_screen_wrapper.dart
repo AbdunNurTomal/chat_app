@@ -5,10 +5,9 @@ import 'package:chat_app/utils/painter.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_painter/flutter_painter.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:uri_to_file/uri_to_file.dart';
 
 import 'image_util.dart';
 
@@ -18,14 +17,14 @@ class ImageDialogOld extends StatefulWidget {
   final String itemName;
   final ui.Image backgroundImage;
   final int imageIndex;
+  final String editedName;
 
-  const ImageDialogOld({ Key? key, required this.backgroundImage, required this.imageUri, required this.imageName, required this.imageIndex, required this.itemName}) : super(key: key);
+  const ImageDialogOld({ Key? key, required this.backgroundImage, required this.imageUri, required this.imageName, required this.imageIndex, required this.itemName, required this.editedName}) : super(key: key);
 
   @override
   State<ImageDialogOld> createState() => _ImageDialogOldState();
 }
 
-// enum enumToolTypes { pencil, eraser, rectangle, circle, text, rotate, zoom, arrow }
 enum enumToolTypes { pencil, eraser, rectangle, circle, text, arrow }
 
 class ToolIconsData {
@@ -44,155 +43,74 @@ class RecordPaints{
 class _ImageDialogOldState extends State<ImageDialogOld> {
   GlobalKey globalKey = GlobalKey();
 
-  late ui.Image newImage;
-
-  List<PaintedPoints> pointsList = [];
-  List<PaintedPoints> paintListDeleted = [];
-  List<RecordPaints> paintedPoints = [];
-  // late RecordPaints? recordPaints;
-  //List<DrawingArea> points = [];
-
-  enumToolTypes selectedTool = enumToolTypes.pencil;
-  List<enumToolTypes> drawHistory = [];
-
   bool isCanvasLocked = false;
   bool saveClicked = false;
-
-  List<PaintedArrow> arrowList = [];
-  PaintedArrow unfinishedArrow = PaintedArrow(paint: Paint(),start: Offset(0.0,0.0),end: Offset(0.0,0.0));
-
-  List<PaintedSquires> squaresList = [];
-  PaintedSquires unfinishedSquare = PaintedSquires(paint: Paint(),start: Offset(0.0,0.0),end: Offset(0.0,0.0));
-
-  List<PaintedCircles> circleList = [];
-  PaintedCircles unfinishedCircle = PaintedCircles(paint: Paint(),start: Offset(0.0,0.0),end: Offset(0.0,0.0));
-
   StrokeCap strokeType = StrokeCap.square;
-  late double strokeWidth;
-  late Color selectedColor;
+  // late double strokeWidth;
+  // late Color selectedColor;
 
-  Paint getPoint() {
-    if (selectedTool == enumToolTypes.eraser) {
-      return Paint()
-        ..strokeCap = strokeType
-        ..isAntiAlias = true
-        ..strokeWidth = 10.0
-        ..color = Colors.white;
-    } else {
-      return Paint()
-        ..strokeCap = strokeType
-        ..isAntiAlias = true
-        ..strokeWidth = strokeWidth
-        ..color = selectedColor;
-    }
-  }
-  void showToastMessage(String message) {
-    Fluttertoast.showToast(
-        msg: message,
-        toastLength: Toast.LENGTH_LONG,
-        gravity: ToastGravity.BOTTOM,
-        backgroundColor: Colors.black87,
-        textColor: Colors.white,
-        fontSize: 16.0);
-  }
+  enumToolTypes selectedTool = enumToolTypes.pencil;
 
-  double opacity = 1.0;
-
+  static const Color selectedColor = Color(0xFFFF0000);
+  FocusNode textFocusNode = FocusNode();
+  late PainterController controller;
+  ui.Image? backgroundImage;
 
   @override
   void initState() {
     super.initState();
-    selectedColor = Colors.red;
-    strokeWidth = 3.0;
+    controller = PainterController(
+      settings: PainterSettings(
+        text: TextSettings(
+          focusNode: textFocusNode,
+          textStyle: TextStyle(
+            fontWeight: FontWeight.bold, color: selectedColor, fontSize: 18),
+        ),
+        freeStyle: FreeStyleSettings(
+          enabled: false,
+          color: selectedColor,
+          strokeWidth: 5,
+        )));
+    textFocusNode.addListener(onFocus);
+    initBackground();
+  }
+
+  void initBackground() async {
+    setState(() {
+      backgroundImage = widget.backgroundImage;
+      controller.background = widget.backgroundImage.backgroundDrawable;
+    });
+  }
+
+  void onFocus() {
+    setState(() {});
   }
 
   @override
   void dispose() {
     super.dispose();
-    pointsList.clear();
-    paintListDeleted.clear();
-    paintedPoints.clear();
-    arrowList.clear();
-    squaresList.clear();
-    circleList.clear();
+
   }
 
   @override
   Widget build(BuildContext context) {
-    // final width = MediaQuery.of(context).size.width;
-    // final height = MediaQuery.of(context).size.height;
-
-    void selectColor() {
-      showDialog(
-        context: context,
-        builder: (context){
-          return AlertDialog(
-            title: const Text('Color Chooser'),
-            content: SingleChildScrollView(
-              child: BlockPicker(
-                pickerColor: selectedColor,
-                onColorChanged: (color) {
-                  setState(() {
-                    selectedColor = color;
-                  });
-                },
-              ),
-            ),
-            actions: <Widget>[
-              TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text("Close"))
-            ],
-          );
-        },
-      );
-    }
-
     return Scaffold(
-      backgroundColor: Color(0xFFC0C0C0),
+      backgroundColor: const Color(0xFFC0C0C0),
       appBar: AppBar(
+        // title: Text("Flutter Painter Example"),
         actions: [
           IconButton(
-              onPressed: (){
-                setState(() {
-                  if (drawHistory.isNotEmpty) {
-                    enumToolTypes lastAction = drawHistory
-                        .last;
-                    if (lastAction ==
-                        enumToolTypes.eraser ||
-                        lastAction ==
-                            enumToolTypes.pencil) {
-                      if (paintedPoints.isNotEmpty) {
-                        RecordPaints lastPoint = paintedPoints
-                            .last;
-                        pointsList.removeRange(
-                            lastPoint.startIndex!,
-                            lastPoint.endIndex!);
-                        paintedPoints.removeLast();
-                      }
-                    } else if (lastAction ==
-                        enumToolTypes.rectangle) {
-                      squaresList.removeLast();
-                    } else {
-                      circleList.removeLast();
-                    }
-                    drawHistory.removeLast();
-                  }
-                  //pointsListDeleted.;
-                });
-              },
-              icon: Icon(Icons.undo)
+            icon: Icon(
+              Icons.undo,
+            ),
+            onPressed: removeLastDrawable,
           ),
           IconButton(
-              onPressed: () {
-                setState(() {
-                  saveClicked = true;
-                });
-                Navigator.of(context).pop(widget.imageIndex);
-              },
-              icon: const Icon(Icons.save)
+            onPressed: () {
+              renderAndDisplayImage();
+              Navigator.of(context).pop(widget.imageIndex);
+            },
+            icon: const Icon(Icons.save)
           )
         ],
       ),
@@ -207,387 +125,189 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
           padding: const EdgeInsets.all(4.0),
           child: LayoutBuilder(builder: (context, constraints) {
             return Column(
-              // crossAxisAlignment: CrossAxisAlignment.start,
-              // mainAxisSize: MainAxisSize.max,
-              // mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Container(
-                  height: constraints.maxHeight * 0.1,
-                  width: constraints.maxWidth * 1.0,
-                  decoration: BoxDecoration(
-                    // color: Colors.black,
-                    //   borderRadius: const BorderRadius.all(Radius.circular(5.0)),
-                      boxShadow: [
-                        BoxShadow(
-                          // color: Colors.black45.withOpacity(0.1),
-                          color: Colors.white.withOpacity(0.5),
-                          // blurRadius: 1.0,
-                          // spreadRadius: 0.1,
-                        )]
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Wrap(children: getToolBoxIcons()),
-                      // const SizedBox(height: 20),
-                      // Container(
-                      //   width: 80,
-                      //   height: 90,
-                      //   decoration: BoxDecoration(
-                      //     border: Border.all(color: Colors.grey, width: 2),
-                      //   ),
-                      //   child: Column(
-                      //     mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      //     mainAxisSize: MainAxisSize.min,
-                      //     children: <Widget>[
-                      //       strokeWidthWidget(3),
-                      //       strokeWidthWidget(5),
-                      //       strokeWidthWidget(7),
-                      //     ],
-                      //   ),
-                      // ),
-
-                    ],
+            children: [
+              Container(
+                height: constraints.maxHeight * 0.1,
+                width: constraints.maxWidth * 1.0,
+                decoration: BoxDecoration(
+                  // color: Colors.black,
+                  //   borderRadius: const BorderRadius.all(Radius.circular(5.0)),
+                    boxShadow: [
+                      BoxShadow(
+                        // color: Colors.black45.withOpacity(0.1),
+                        color: Colors.white.withOpacity(0.5),
+                        // blurRadius: 1.0,
+                        // spreadRadius: 0.1,
+                      )]
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Wrap(children: getToolBoxIcons()),
+                  ],
+                ),
+              ),
+              if (backgroundImage != null)
+              // Enforces constraints
+                AspectRatio(
+                  aspectRatio: backgroundImage!.width / backgroundImage!.height,
+                  child: FlutterPainter(
+                    controller: controller,
                   ),
                 ),
-                Container(
-                  height: constraints.maxHeight * 0.8,
-                  width: constraints.maxWidth * 1.0,
-                  // width: constraints.widthConstraints().maxWidth,
-                  // height: constraints.heightConstraints().maxHeight,
-                  color: Colors.red.withOpacity(0.7),
-                  // height: height * 0.5,
-                  // decoration: BoxDecoration(
-                  //     // borderRadius: const BorderRadius.all(Radius.circular(5.0)),
-                  //     boxShadow: [
-                  //       BoxShadow(
-                  //         color: Colors.yellowAccent.withOpacity(0.3),
-                  //         // blurRadius: 1.0,
-                  //         // spreadRadius: 0.1,
-                  //       )
-                  //     ]),
-                  child: GestureDetector(
-                    key: globalKey,
-                    onPanUpdate: (details) {
-                      if (isCanvasLocked) return;
-                      setState(() {
-                        final renderBox = globalKey.currentContext!.findRenderObject() as RenderBox;
-                        if (selectedTool == enumToolTypes.pencil || selectedTool == enumToolTypes.eraser) {
-                          pointsList.add(
-                            PaintedPoints(
-                              points: renderBox.globalToLocal(details.globalPosition),
-                              paint: getPoint(),
-                            ),
-                          );
-                        } else if (selectedTool == enumToolTypes.arrow) {
-                          unfinishedArrow.end = renderBox.globalToLocal(details.globalPosition);
-                        } else if (selectedTool == enumToolTypes.rectangle) {
-                          unfinishedSquare.end = renderBox.globalToLocal(details.globalPosition);
-                        } else if (selectedTool == enumToolTypes.circle) {
-                          unfinishedCircle.end = renderBox.globalToLocal(details.globalPosition);
-                        }
-                      });
-                    },
-                    onPanStart: (details) {
-                      if (isCanvasLocked) return;
-                      setState(() {
-                        final renderBox = globalKey.currentContext!.findRenderObject() as RenderBox;
-                        if (selectedTool == enumToolTypes.pencil || selectedTool == enumToolTypes.eraser) {
-                          if (pointsList.isNotEmpty) {
-                            paintedPoints.add(RecordPaints(startIndex: pointsList.length, endIndex: null));
-                          } else {
-                            paintedPoints.add(RecordPaints(startIndex: null, endIndex: null));
-                          }
-                          pointsList.add(
-                            PaintedPoints(
-                              points: renderBox.globalToLocal(details.globalPosition),
-                              paint: getPoint(),
-                            ),
-                          );
-                        } else if (selectedTool == enumToolTypes.arrow) {
-                          unfinishedArrow = PaintedArrow(paint: Paint(),start: Offset(0.0,0.0),end: Offset(0.0,0.0));
-                          Offset os = renderBox.globalToLocal(details.globalPosition);
-                          unfinishedArrow.start = os;
-                          unfinishedArrow.end = os;
-                          unfinishedArrow.paint = getPoint();
-                        } else if (selectedTool == enumToolTypes.rectangle) {
-                          unfinishedSquare = PaintedSquires(paint: Paint(),start: Offset(0.0,0.0),end: Offset(0.0,0.0));
-                          Offset os = renderBox.globalToLocal(details.globalPosition);
-                          unfinishedSquare.start = os;
-                          unfinishedSquare.end = os;
-                          unfinishedSquare.paint = getPoint();
-                        } else if (selectedTool == enumToolTypes.circle) {
-                          unfinishedCircle = PaintedCircles(paint: Paint(),start: Offset(0.0,0.0),end: Offset(0.0,0.0));
-                          Offset os = renderBox.globalToLocal(details.globalPosition);
-                          //print("offset : $os");
-                          unfinishedCircle.start = os;
-                          unfinishedCircle.end = os;
-                          unfinishedCircle.paint = getPoint();
-                          //print("unfinishedCircle : ${unfinishedCircle.paint.color}");
-                        }
-                      });
-                    },
-                    onPanEnd: (details) {
-                      if (isCanvasLocked) return;
-                      setState(() {
-                        drawHistory.add(selectedTool);
-                        if (selectedTool == enumToolTypes.pencil || selectedTool == enumToolTypes.eraser) {
-                          paintedPoints.firstWhere((element) => element.endIndex == null).endIndex = pointsList.length;
-                          // pointsList.add(null);
-                        } else if (selectedTool == enumToolTypes.arrow) {
-                          setState(() {
-                            arrowList.add(unfinishedArrow);
-                            // unfinishedSquare = null;
-                            unfinishedArrow = PaintedArrow(paint: Paint(),start: Offset(0.0,0.0),end: Offset(0.0,0.0));
-                          });
-                        } else if (selectedTool == enumToolTypes.rectangle) {
-                          setState(() {
-                            squaresList.add(unfinishedSquare);
-                            // unfinishedSquare = null;
-                            unfinishedSquare = PaintedSquires(paint: Paint(),start: Offset(0.0,0.0),end: Offset(0.0,0.0));
-                          });
-                        } else if (selectedTool == enumToolTypes.circle) {
-                          setState(() {
-                            circleList.add(unfinishedCircle);
-                            // unfinishedCircle = null;
-                            unfinishedCircle = PaintedCircles(paint: Paint(),start: Offset(0.0,0.0),end: Offset(0.0,0.0));
-                          });
-                          print("circleList : ${circleList[0].paint},${circleList[0].start},${circleList[0].end}");
-                        }
-                      });
-                    },
-                    child: CustomPaint(
-                      key: globalKey,
-                      size: Size(
-                          constraints.widthConstraints().maxWidth,
-                          constraints.heightConstraints().maxHeight),
-                      painter: PainterCanvas(
-                        image: widget.backgroundImage,
-                        width: MediaQuery.of(context).size.width,
-                        height: MediaQuery.of(context).size.height,
-                        pointsList: pointsList,
-                        arrowList: arrowList,
-                        squaresList: squaresList,
-                        circlesList: circleList,
-                        unfinishedArrow: unfinishedArrow,
-                        unfinishedSquare: unfinishedSquare,
-                        unfinishedCircle: unfinishedCircle,
-                        saveImage: saveClicked,
-                        saveCallback: (ui.Picture picture) async {
-                          String imageDir = await ImageUtility.getImageDirPath();
-                          final img = await picture.toImage(
-                              constraints.maxWidth.round(),
-                              constraints.maxHeight.round());
-                          // print("width >> screen ${MediaQuery.of(context).size.width} and contraints ${constraints.maxWidth.round()}");
-                          // print("height >> screen ${MediaQuery.of(context).size.height} and contraints ${constraints.maxHeight.round()}");
-                          //
-                          // double width = MediaQuery.of(context).size.width * 0.5;
-                          // double height = MediaQuery.of(context).size.height * 0.5;
+              if (controller.freeStyleSettings.enabled) ...[
+                // Control free style stroke width
+                Slider.adaptive(
+                    min: 3,
+                    max: 15,
+                    value: controller.freeStyleSettings.strokeWidth,
+                    onChanged: setFreeStyleStrokeWidth),
 
-                          // final img = await picture.toImage(1400,1800);
-
-                          // int countImage = widget.imageIndex;
-                          // ++countImage;
-                          // String newItemName = "${widget.itemName}\nNo-$countImage";
-                          // print("New Item Name - $newItemName");
-
-                          // await ImageUtility.writeLogoInsideImage('${testdir.path}/${widget.imageName}',img, newItemName);
-                          ByteData? byteData = await img.toByteData(format: ui.ImageByteFormat.png);
-                          Uint8List newJpgBytes = await ImageUtility.compressImageList(byteData!.buffer.asUint8List(),1600,1200,270);
-                          File('$imageDir/${widget.imageName}').writeAsBytesSync(newJpgBytes);
-                          showToastMessage("Image saved to gallery.");
-
-                          setState(() {
-                            saveClicked = false;
-                          });
-                        },
-                      ),
-                      child: ConstrainedBox(constraints: const BoxConstraints.expand()),
-                    ),
-                    // child: SizedBox.expand(
-                    //   child: RepaintBoundary(
-                    //     key: globalKey,
-                    //     child: ClipRRect(
-                    //       // borderRadius: const BorderRadius.all(
-                    //       //     Radius.circular(10.0)),
-                    //       //child: Hero(
-                    //       //  tag: widget.tag,
-                    //       child: Stack(
-                    //         children: [
-                    //           ClipRect(
-                    //             child: Container(
-                    //               //Canvas
-                    //               color: Colors.white,
-                    //               //margin: EdgeInsets.only(bottom: 50, right: 80),
-                    //               child: CustomPaint(
-                    //                 size: Size(
-                    //                     constraints.widthConstraints().maxWidth,
-                    //                     constraints
-                    //                         .heightConstraints()
-                    //                         .maxHeight),
-                    //                 // painter: PainterCanvas(
-                    //                 //   pointsList: paintList,
-                    //                 //   squaresList: squaresList,
-                    //                 //   circlesList: circleList,
-                    //                 //   unfinishedSquare: unfinishedSquare,
-                    //                 //   unfinishedCircle: unfinishedCircle,
-                    //                 //   saveImage: saveClicked,
-                    //                 //   // saveCallback: (Picture picture) async {
-                    //                 //   //   var status =
-                    //                 //   //   await Permission.storage.status;
-                    //                 //   //   if (!status.isGranted) {
-                    //                 //   //     await Permission.storage.request();
-                    //                 //   //   }
-                    //                 //   //   if (status.isGranted) {
-                    //                 //   //     final img = await picture.toImage(
-                    //                 //   //         constraints.maxWidth.round(),
-                    //                 //   //         constraints.maxHeight.round());
-                    //                 //   //     final bytes = await img.toByteData(
-                    //                 //   //         format: ImageByteFormat.png);
-                    //                 //   //     await ImageGallerySaver.saveImage(
-                    //                 //   //       Uint8List.fromList(
-                    //                 //   //           bytes.buffer.asUint8List()),
-                    //                 //   //       quality: 100,
-                    //                 //   //       name:
-                    //                 //   //       DateTime.now().toIso8601String(),
-                    //                 //   //     );
-                    //                 //   //     showToastMessage(
-                    //                 //   //         "Image saved to gallery.");
-                    //                 //   //   }
-                    //                 //   //   setState(() {
-                    //                 //   //     saveClicked = false;
-                    //                 //   //   });
-                    //                 //   // },
-                    //                 // ),
-                    //               ),
-                    //             ),
-                    //           ),
-                    //           Center(
-                    //             child: FutureBuilder(
-                    //                 future: _getLocalFile(widget.imageUri),
-                    //                 builder: (BuildContext context,
-                    //                     AsyncSnapshot<File> snapshot) {
-                    //                   return snapshot.data != null
-                    //                       ? Image.file(snapshot.data!)
-                    //                       : Container();
-                    //                 }
-                    //             ),
-                    //           ),
-                    //           // CustomPaint(
-                    //           //   size: Size.infinite,
-                    //           //   painter: MyCustomPainter(
-                    //           //     //points: points,
-                    //           //   ),
-                    //           // ),
-                    //         ],
-                    //       ),
-                    //       //),
-                    //     ),
-                    //   ),
-                    // ),
-                  ),
-                ),
-                Container(
-                  height: constraints.maxHeight * 0.08,
-                  width: constraints.maxWidth * 1.0,
-                  decoration: BoxDecoration(
-                    // color: Colors.black,
-                      borderRadius: const BorderRadius.all(Radius.circular(5.0)),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.white.withOpacity(0.5),
-                          // blurRadius: 1.0,
-                          // spreadRadius: 0.1,
-                        )]
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      IconButton(
-                          icon: Icon(
-                            Icons.color_lens,
-                            color: selectedColor,
-                          ),
-                          onPressed: () {
-                            selectColor();
-                          }),
-
-                      Expanded(
-                        child: Slider(
-                          min: 1.0,
-                          max: 5.0,
-                          label: "Stroke $strokeWidth",
-                          activeColor: selectedColor,
-                          value: strokeWidth,
-                          onChanged: (double value) {
-                            setState(() {
-                              strokeWidth = value;
-                            });
-                          },
-                        ),
-                      ),
-
-                      IconButton(
-                          icon: const Icon(
-                            Icons.layers_clear,
-                            color: Colors.black,
-                          ),
-                          onPressed: () {
-                            setState((){
-                              // points.clear();
-                              pointsList.clear();
-                              paintedPoints.clear();
-                              squaresList.clear();
-                              circleList.clear();
-                            });
-                          }),
-                      IconButton(
-                          tooltip: isCanvasLocked
-                              ? "Click to unlock drawing"
-                              : "Click to lock drawing",
-                          icon: Icon(
-                            isCanvasLocked ? Icons.lock_outline : Icons.lock_open,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              isCanvasLocked = !isCanvasLocked;
-                            });
-                          })
-                    ],
-                  ),
-                ),
+                // Control free style color hue
+                Slider.adaptive(
+                    min: 0,
+                    max: 359.99,
+                    value:
+                    HSVColor.fromColor(controller.freeStyleSettings.color).hue,
+                    activeColor: controller.freeStyleSettings.color,
+                    onChanged: setFreeStyleColor),
               ],
-            );
+              if (textFocusNode.hasFocus) ...[
+                // Control text font size
+                Slider.adaptive(
+                    min: 12,
+                    max: 48,
+                    value: controller.textSettings.textStyle.fontSize ?? 14,
+                    onChanged: setTextFontSize),
+
+                // Control text color hue
+                Slider.adaptive(
+                    min: 0,
+                    max: 359.99,
+                    value: HSVColor.fromColor(
+                        controller.textSettings.textStyle.color ?? selectedColor)
+                        .hue,
+                    activeColor: controller.textSettings.textStyle.color,
+                    onChanged: setTextColor),
+              ]
+            ],
+          );
           }),
         ),
       ),
     );
   }
-  Widget strokeWidthWidget(double width) {
-    bool isSelected = strokeWidth == width ? true : false;
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: (10 - width), horizontal: 2),
-      decoration: BoxDecoration(
-        border: Border.all(
-            width: 1, color: isSelected ? Colors.black : Colors.grey),
-      ),
-      child: Material(
-        elevation: isSelected ? 1 : 0,
-        child: InkWell(
-          onTap: () {
-            setState(() {
-              strokeWidth = width;
-            });
-          },
-          child: Container(
-            width: 50,
-            height: width,
-            color: Colors.black,
-          ),
-        ),
-      ),
-    );
+  void setFreeStyleColor(double hue) {
+    setState(() {
+      controller.freeStyleSettings = controller.freeStyleSettings.copyWith(
+        color: HSVColor.fromAHSV(1, hue, 1, 1).toColor(),
+      );
+    });
   }
+  // void selectColor() {
+  //   showDialog(
+  //     context: context,
+  //     builder: (context){
+  //       return AlertDialog(
+  //         title: const Text('Color Chooser'),
+  //         content: SingleChildScrollView(
+  //           child: BlockPicker(
+  //             pickerColor: selectedColor,
+  //             onColorChanged: (color) {
+  //               setState(() {
+  //                 selectedColor = color;
+  //                 controller.freeStyleSettings = controller.freeStyleSettings.copyWith(
+  //                   color: Colors.red,
+  //                 );
+  //               });
+  //             },
+  //           ),
+  //         ),
+  //         actions: <Widget>[
+  //           TextButton(
+  //               onPressed: () {
+  //                 Navigator.of(context).pop();
+  //               },
+  //               child: const Text("Close"))
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
+  void removeLastDrawable() {
+    controller.removeLastDrawable();
+  }
+
+  void toggleFreeStyle() {
+    setState(() {
+      controller.freeStyleSettings = controller.freeStyleSettings
+          .copyWith(enabled: !controller.freeStyleSettings.enabled);
+    });
+  }
+  void addText() {
+    if (controller.freeStyleSettings.enabled) toggleFreeStyle();
+    controller.addText();
+  }
+  void setFreeStyleStrokeWidth(double value) {
+    setState(() {
+      controller.freeStyleSettings =
+          controller.freeStyleSettings.copyWith(strokeWidth: value);
+    });
+  }
+
+  void setTextFontSize(double size) {
+    // Set state is just to update the current UI, the [FlutterPainter] UI updates without it
+    setState(() {
+      controller.textSettings = controller.textSettings.copyWith(
+          textStyle:
+          controller.textSettings.textStyle.copyWith(fontSize: size));
+    });
+  }
+  void setTextColor(double hue) {
+    // Set state is just to update the current UI, the [FlutterPainter] UI updates without it
+    setState(() {
+      controller.textSettings = controller.textSettings.copyWith(
+          textStyle: controller.textSettings.textStyle.copyWith(
+            color: HSVColor.fromAHSV(1, hue, 1, 1).toColor(),
+          ));
+    });
+  }
+
+  Future<void> renderAndDisplayImage() async{
+    String imageDir = await ImageUtility.getImageDirPath();
+    if (backgroundImage == null) return;
+
+    final backgroundImageSize = Size(
+        backgroundImage!.width.toDouble(), backgroundImage!.height.toDouble());
+
+    // Render the image
+    // Returns a [ui.Image] object, convert to to byte data and then to Uint8List
+    final imageFuture = controller
+        .renderImage(backgroundImageSize)
+        .then<Uint8List?>((ui.Image image) async{
+          ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+          Uint8List newJpgBytes = await ImageUtility.compressImageList(byteData!.buffer.asUint8List(),1600,1200,270);
+          File(widget.editedName).writeAsBytesSync(newJpgBytes);
+        });
+
+
+    // From here, you can write the PNG image data a file or do whatever you want with it
+    // For example:
+    // dart
+    // final file = File('${(await getTemporaryDirectory()).path}/img.png');
+    // await file.writeAsBytes(byteData.buffer.asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
+    //
+    // I am going to display it using Image.memory
+
+    // print("Render $imageFuture");
+    showDialog(
+        context: context,
+        builder: (context) {
+          return RenderedImageDialog(imageFuture: imageFuture);
+        });
+    Navigator.pop(context);
+  }
+
   List<ToolIconsData> lstToolIcons = [
     ToolIconsData(Icons.create, enumToolTypes.pencil, isSelected: true),
     ToolIconsData(FontAwesomeIcons.expandAlt, enumToolTypes.arrow),
@@ -612,10 +332,21 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
               lstToolIcons
                   .firstWhere((element) => element.icon == item.icon)
                   .isSelected = true;
+
+              if(selectedTool == enumToolTypes.pencil){
+                toggleFreeStyle();
+              }else{
+                controller.freeStyleSettings = controller.freeStyleSettings
+                    .copyWith(enabled: false);
+              }
+              if(selectedTool == enumToolTypes.text){
+                addText();
+              }
             });
           },
           child: ToolIcon(
             item.icon,
+            controller,
             isActive: item.isSelected,
           ),
         ),
@@ -625,38 +356,52 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
   }
 
 }
-class MenuItem extends StatelessWidget {
-  final String itemName;
-  MenuItem(this.itemName);
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: <Widget>[
-        InkWell(
-          child: Text(itemName),
-        ),
-        const SizedBox(
-          width: 5,
-        )
-      ],
-    );
-  }
-}
 class ToolIcon extends StatelessWidget {
   final IconData iconData;
   final bool isActive;
-  ToolIcon(this.iconData, {this.isActive = false});
+  final PainterController controller;
+  ToolIcon(this.iconData, this.controller, {this.isActive = false});
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: EdgeInsets.all(0),
+      margin: const EdgeInsets.all(0),
       elevation: 0.1,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(0)),
       ),
       color: isActive ? Colors.white24 : Colors.white,
       child: Container(
-        child: IconButton(icon: Icon(iconData), onPressed: null),
+        child: IconButton(
+            icon: Icon(iconData),
+            onPressed: null),
+      ),
+    );
+  }
+}
+class RenderedImageDialog extends StatelessWidget {
+  final Future<Uint8List?> imageFuture;
+
+  const RenderedImageDialog({Key? key, required this.imageFuture})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text("Rendered Image"),
+      content: FutureBuilder<Uint8List?>(
+        future: imageFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState != ConnectionState.done) {
+            return const SizedBox(
+              height: 50,
+              child: Center(child: CircularProgressIndicator.adaptive()),
+            );
+          }
+          // if (!snapshot.hasData || snapshot.data == null)
+            return const SizedBox();
+          // return InteractiveViewer(
+          //     maxScale: 10, child: Image.memory(snapshot.data!));
+        },
       ),
     );
   }

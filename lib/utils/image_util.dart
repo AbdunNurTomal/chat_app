@@ -72,12 +72,22 @@ class ImageUtility {
     return completer.future;
   }
 
-  static Future<bool> deleteFile(String? fileName) async {
+  static Future<bool> deleteFile(String? fileName, int counter, String itemValue) async {
+    ++counter;
+    String itemSuffix = "$itemValue\_$counter.jpg";
+    // print("delete file : $itemSuffix");
     try {
       String imageDir = await getImageDirPath();
-
-      if(fileName != null) {
-        await File('$imageDir/$fileName').delete();
+      if((await File('$imageDir/$fileName').exists())||(await File('$imageDir/$itemSuffix').exists())){
+        try{
+          await File('$imageDir/$fileName').delete();
+        }catch(e){
+          try{
+            await File('$imageDir/$itemSuffix').delete();
+          }catch(e){
+            print("delete check file : $e");
+          }
+        }
         return true;
       }else{
         return false;
@@ -114,7 +124,7 @@ class ImageUtility {
 
       ui.PictureRecorder recorder = ui.PictureRecorder();
       Canvas c = Canvas(recorder);
-      var rect = Rect.fromLTWH(0.0, 0.0, 300.0, 300.0);
+      var rect = const Rect.fromLTWH(0.0, 0.0, 300.0, 300.0);
       c.clipRect(rect);
 
       final textStyle = TextStyle(color: Colors.white, fontSize: 24);
@@ -122,7 +132,7 @@ class ImageUtility {
       TextPainter textPainter = TextPainter(text: textSpan,textDirection: TextDirection.ltr);
       textPainter.layout(minWidth: 0,maxWidth: 300);
 
-      Offset offset = Offset(10.0, 10.0);
+      Offset offset = const Offset(10.0, 10.0);
       textPainter.paint(c, offset);
 
       // c.drawPaint(paint);
@@ -142,10 +152,11 @@ class ImageUtility {
     }
   }
 
-  static Future<bool> saveImage(String imageUri, String imageName, String itemName) async {
+  static Future<bool> saveImage(String imageUri, String imageName, String itemName, String itemSuffix) async {
+    print("itemSuffix $itemSuffix");
     try {
       String imageDir = await getImageDirPath();
-      if(await File('$imageDir/$imageName').exists()){
+      if((await File('$imageDir/$imageName').exists())||(await File('$imageDir/$itemSuffix').exists())){
         print("Image exist");
         return false;
       }else{
@@ -188,7 +199,7 @@ class ImageUtility {
     double positionY = (backgroundImage.height - _logoImage.height * 1.15).toDouble();
     c.drawImage(_logoImage, Offset(positionX,positionY), Paint());
 
-    const textStyle = TextStyle(backgroundColor: Colors.white, color: Colors.black, fontSize: 35);
+    const textStyle = TextStyle(backgroundColor: Colors.white, color: Colors.black, fontSize: 45);
     TextSpan textSpan = TextSpan(text: itemName,style: textStyle);
     TextPainter textPainter = TextPainter(text: textSpan,textDirection: TextDirection.ltr);
     textPainter.layout(minWidth: 0,maxWidth: backgroundImage.width.toDouble());

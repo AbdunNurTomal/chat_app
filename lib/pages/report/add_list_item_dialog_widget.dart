@@ -149,7 +149,9 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
         String? imageUri = images[i].identifier;
         String? imageName = images[i].name;
         String? itemName = "$ddItem\nNo-$counter";
-        await ImageUtility.saveImage(imageUri!, imageName!,itemName);
+
+        String itemSuffix = "$ddItemValue\_$counter.jpg";
+        await ImageUtility.saveImage(imageUri!, imageName!, itemName, itemSuffix);
       }
       Fluttertoast.showToast(
         msg: "Added Item",
