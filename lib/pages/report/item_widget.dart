@@ -114,9 +114,18 @@ class ItemWidget extends StatelessWidget {
           ElevatedButton(
             onPressed: () async {
               String imageDir = await ImageUtility.getImageDirPath();
+              int counter = 0;
 
               for(int i=0;i<listItem.images.length;i++) {
-                await File('$imageDir/${listItem.images[i].name}').delete();
+                ++counter;
+                if(await File('$imageDir/${listItem.images[i].name}').exists()){
+                  await File('$imageDir/${listItem.images[i].name}').delete();
+                }
+
+                String? itemSuffix = "${listItem.itemValue}\_$counter.jpg";
+                if(await File('$imageDir/$itemSuffix').exists()){
+                  await File('$imageDir/$itemSuffix').delete();
+                }
               }
               provider.deleteItem(listItem);
               final deleteToAddItem = Defects(

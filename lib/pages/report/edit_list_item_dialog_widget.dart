@@ -147,7 +147,9 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
         String? imageUri = images[i].identifier;
         String? imageName = images[i].name;
         String? itemName = "$ddItem\nNo-$counter";
-        await ImageUtility.saveImage(imageUri!, imageName!,itemName);
+
+        String itemSuffix = "$ddItemValue\_$counter.jpg";
+        await ImageUtility.saveImage(imageUri!, imageName!, itemName, itemSuffix);
       }
       Fluttertoast.showToast(
           msg: "Updated Item",
@@ -288,6 +290,8 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
                           onTap: ()async {
                             String? imageName = images[index].name;
                             String? imageUri = images[index].identifier;
+                            int counter = index+1;
+                            String itemSuffix = "$ddItemValue\_$counter.jpg";
                             // Uri? _uri = Uri.parse(imageUri!);
                             // //print("Uri - $_uri");
                             // _file = await toFile(_uri);
@@ -314,12 +318,19 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
                               // File _fileBackgroundImage = await toFile(_uri);
                               // Uint8List _imageByteslist = await _fileBackgroundImage.readAsBytes();
 
-                              var dir = await getExternalStorageDirectory();
-                              var testdir = await Directory('${dir?.path}/images').create(recursive: true);
+                              String imageDir = await ImageUtility.getImageDirPath();
+                              Uint8List? _imageBytesList;
+                              String editedFileName='';
+                              if(await File('$imageDir/$imageName').exists()){
+                                _imageBytesList = File('$imageDir/$imageName').readAsBytesSync();
+                                editedFileName = '$imageDir/$imageName';
+                              }else if(await File('$imageDir/$itemSuffix').exists()){
+                                _imageBytesList = File('$imageDir/$itemSuffix').readAsBytesSync();
+                                editedFileName = '$imageDir/$itemSuffix';
+                              }
 
-                              if(await File('${testdir.path}/$imageName').exists()){
-                                Uint8List _imageBytesList = File('${testdir.path}/$imageName').readAsBytesSync();
-                                Uint8List decodedBytes = await ImageUtility.compressImageList(_imageBytesList,1200,1600,90);
+                              if((await File('$imageDir/$imageName').exists())||(await File('$imageDir/$itemSuffix').exists())){
+                                Uint8List decodedBytes = await ImageUtility.compressImageList(_imageBytesList!,1200,1600,90);
                                 ui.Image _myBackgroundImage = await ImageUtility.loadImage(decodedBytes);
 
                                 final result = await Navigator.push(context,
@@ -330,6 +341,7 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
                                       imageName: imageName!,
                                       imageIndex: index,
                                       itemName: _ddIemController.text,
+                                      editedName: editedFileName,
                                     ),
                                     )
                                 );
@@ -390,7 +402,7 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
                               color: Colors.red,
                             ),
                             onTap: () async {
-                              if(await ImageUtility.deleteFile(images[index].name) == true){
+                              if(await ImageUtility.deleteFile(images[index].name, index, ddItemValue) == true){
 
                                 Fluttertoast.showToast(
                                     msg: "Image Deleted",

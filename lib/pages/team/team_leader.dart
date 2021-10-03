@@ -10,6 +10,7 @@ import 'package:chat_app/pages/report/add_list_item_dialog_widget.dart';
 import 'package:chat_app/pages/report/list_item_widget.dart';
 import 'package:chat_app/pages/report/pdf_api_image_report.dart';
 import 'package:chat_app/provider/list_provider.dart';
+import 'package:chat_app/utils/circular_progress_dialog.dart';
 import 'package:chat_app/utils/global_methods.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -41,7 +42,7 @@ class PopUpMenuConstants{
   ];
 
 }
-class _TeameLeaderPageState extends State<TeameLeaderPage> {//with SingleTickerProviderStateMixin {
+class _TeameLeaderPageState extends State<TeameLeaderPage> with SingleTickerProviderStateMixin {
   int counter = 0;
   //bool processButton = false;
   //String _error = 'No Problem';
@@ -49,6 +50,8 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> {//with SingleTickerP
 
   late final List<DownloadController> _downloadControllers;
   late List<ListItem> taskItems;
+
+  int progressIndicator=0;
 
   @override
   void initState() {
@@ -79,35 +82,13 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> {//with SingleTickerP
         return AlertDialog(
           insetPadding: const EdgeInsets.all(8.0),
           title: const Center(child: Text('Precess Report File')),
-          content: Container(
+          content: SizedBox(
             width: MediaQuery.of(context).size.width*0.8,
-            height: 250,
+            height: 180,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                StepProgressIndicator(
-                  totalSteps: 6,
-                  currentStep: 4,
-                  size: 36,
-                  selectedColor: Colors.black,
-                  unselectedColor: Colors.grey,
-                  customStep: (index, color, _) => color == Colors.black
-                      ? Container(
-                    color: color,
-                    child: const Icon(
-                      Icons.check,
-                      color: Colors.white,
-                    ),
-                  )
-                      : Container(
-                    color: color,
-                    child: const Icon(
-                      Icons.remove,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 40.0),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
@@ -225,35 +206,49 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> {//with SingleTickerP
             PopupMenuButton<String>(
               elevation: 20,
               enabled: true,
-              onSelected: (value) {
+              onSelected: (value) async {
                 //setState(() {
                 //  _value = value;
                 //});
                 switch(value){
                   case 'Process':
-                    allItem = Provider.of<ListProvider>(context,listen: false);
-                    //print("Item <<>> ${allItem.allListItem[0].images[0].identifier}");
-                    int countItem=0;
-                    for(int i=0;i<allItem.allListItem.length;i++){
-                      countItem++;
-                      int countImage=0;
-                      //String item = '';
-                      //String itemValue = allItem.allListItem[i].itemValue!;
-                      if(allItem.allListItem[i].images.isNotEmpty){
-                        // item = '"${allItem.allListItem[i].item!}" \n ${allItem.allListItem[i].images.length} pictures';
-                        // ImageUtility.createImage(item,countItem);
-                        for(int j=0;j<allItem.allListItem[i].images.length;j++){
-                          countImage++;
-                          String? imageName = allItem.allListItem[i].images[j].name;
-                          // String? imageUri = allItem.allListItem[i].images[j].identifier;
-                          String newImageName = '$countItem\_$countImage.jpg';
-                          ImageUtility.changeFileNameOnly(imageName!,newImageName,300);
-                          // ImageUtility.saveImage(imageUri!,countItem,countImage);
+                    if(allItem.allListItem.isNotEmpty){
+                      allItem.showCircularProgress(true);
+                      DialogCircularBuilder(context).showLoadingIndicator(value: allItem.circularIndicator, text: '');
+
+                      allItem = Provider.of<ListProvider>(context,listen: false);
+                      //print("Item <<>> ${allItem.allListItem[0].images[0].identifier}");
+
+                      int countItem=0;
+                      for(int i=0;i<allItem.allListItem.length;i++){
+                        countItem++;
+                        int countImage=0;
+
+                        //String item = '';
+                        //String itemValue = allItem.allListItem[i].itemValue!;
+                        if(allItem.allListItem[i].images.isNotEmpty){
+                          String? itemSuffix = allItem.allListItem[i].itemValue;
+                          // item = '"${allItem.allListItem[i].item!}" \n ${allItem.allListItem[i].images.length} pictures';
+                          // ImageUtility.createImage(item,countItem);
+                          for(int j=0;j<allItem.allListItem[i].images.length;j++){
+                            setState((){
+                              progressIndicator++;
+                            });
+                            countImage++;
+                            String? imageName = allItem.allListItem[i].images[j].name;
+                            // String? imageUri = allItem.allListItem[i].images[j].identifier;
+                            String newImageName = '$itemSuffix\_$countImage.jpg';
+                            await ImageUtility.changeFileNameOnly(imageName!,newImageName,300);
+                            // ImageUtility.saveImage(imageUri!,countItem,countImage);
+                          }
                         }
                       }
-                    }
-                    (allItem.allListItem.isNotEmpty) ? _showProcessDialog(context) : GlobalMethod.showAlertDialog(context,"Report Process Operation","No item found!!!");
-                    break;
+                      allItem.showCircularProgress(false);
+                      DialogCircularBuilder(context).hideOpenDialog();
+
+                      _showProcessDialog(context);
+                    }else{GlobalMethod.showAlertDialog(context,"Report Process Operation","No item found!!!");}
+                  break;
                 }
               },
               itemBuilder: (BuildContext context) {

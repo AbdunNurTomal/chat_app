@@ -17,8 +17,9 @@ class ImageDialogOld extends StatefulWidget {
   final String itemName;
   final ui.Image backgroundImage;
   final int imageIndex;
+  final String editedName;
 
-  const ImageDialogOld({ Key? key, required this.backgroundImage, required this.imageUri, required this.imageName, required this.imageIndex, required this.itemName}) : super(key: key);
+  const ImageDialogOld({ Key? key, required this.backgroundImage, required this.imageUri, required this.imageName, required this.imageIndex, required this.itemName, required this.editedName}) : super(key: key);
 
   @override
   State<ImageDialogOld> createState() => _ImageDialogOldState();
@@ -286,7 +287,7 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
         .then<Uint8List?>((ui.Image image) async{
           ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
           Uint8List newJpgBytes = await ImageUtility.compressImageList(byteData!.buffer.asUint8List(),1600,1200,270);
-          File('$imageDir/${widget.imageName}').writeAsBytesSync(newJpgBytes);
+          File(widget.editedName).writeAsBytesSync(newJpgBytes);
         });
 
 
@@ -298,12 +299,13 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
     //
     // I am going to display it using Image.memory
 
-    print("Render $imageFuture");
-
-    // Show a dialog with the image
+    // print("Render $imageFuture");
     showDialog(
         context: context,
-        builder: (context) => RenderedImageDialog(imageFuture: imageFuture));
+        builder: (context) {
+          return RenderedImageDialog(imageFuture: imageFuture);
+        });
+    Navigator.pop(context);
   }
 
   List<ToolIconsData> lstToolIcons = [
@@ -385,18 +387,20 @@ class RenderedImageDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text("Rendered Image"),
+      title: const Text("Rendered Image"),
       content: FutureBuilder<Uint8List?>(
         future: imageFuture,
         builder: (context, snapshot) {
-          if (snapshot.connectionState != ConnectionState.done)
-            return SizedBox(
+          if (snapshot.connectionState != ConnectionState.done) {
+            return const SizedBox(
               height: 50,
               child: Center(child: CircularProgressIndicator.adaptive()),
             );
-          if (!snapshot.hasData || snapshot.data == null) return SizedBox();
-          return InteractiveViewer(
-              maxScale: 10, child: Image.memory(snapshot.data!));
+          }
+          // if (!snapshot.hasData || snapshot.data == null)
+            return const SizedBox();
+          // return InteractiveViewer(
+          //     maxScale: 10, child: Image.memory(snapshot.data!));
         },
       ),
     );
