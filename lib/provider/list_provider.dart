@@ -12,6 +12,8 @@ class ListProvider with ChangeNotifier {
 
   bool isLoading = false;
   int circularIndicator = 0;
+
+  bool generateReportPDF = false;
   // void indicator() {
   //   Timer.periodic(Duration(milliseconds:1000),(_){
   //     if(circularIndicator<101){
@@ -22,6 +24,11 @@ class ListProvider with ChangeNotifier {
   //     notifyListeners();
   //   });
   // }
+
+  void showBtnDownloadPDF(bool generatePDF) {
+    generateReportPDF = generatePDF;
+    notifyListeners();
+  }
 
   void showCircularProgress(bool checkLoading) {
     //print("item : $item");

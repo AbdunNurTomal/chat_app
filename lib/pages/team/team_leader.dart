@@ -56,13 +56,13 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> with SingleTickerProv
   @override
   void initState() {
     DefectData.callDefect();
+    allItem = Provider.of<ListProvider>(context,listen: false);
+    taskItems = allItem.allListItem;
     _downloadControllers = List<DownloadController>.generate(
         2, (index) => SimulatedDownloadController(onOpenDownload: () {
         _openDownload(index);
       }),
     );
-    allItem = Provider.of<ListProvider>(context,listen: false);
-    taskItems = allItem.allListItem;
     super.initState();
   }
 
@@ -159,15 +159,6 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> with SingleTickerProv
                     ),
                   ),
                 ),
-                // Row(
-                //   children: const <Widget>[
-                //     Icon(Icons.toys),
-                //     Padding(
-                //       padding: EdgeInsets.only(left: 8.0),
-                //       child: Text('Third Item'),
-                //     ),
-                //   ],
-                // ),
               ],
             ),
           ),
@@ -216,33 +207,22 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> with SingleTickerProv
                       allItem.showCircularProgress(true);
                       DialogCircularBuilder(context).showLoadingIndicator(value: allItem.circularIndicator, text: '');
 
-                      allItem = Provider.of<ListProvider>(context,listen: false);
+                      // allItem = Provider.of<ListProvider>(context,listen: false);
                       //print("Item <<>> ${allItem.allListItem[0].images[0].identifier}");
 
-                      int countItem=0;
                       for(int i=0;i<allItem.allListItem.length;i++){
-                        countItem++;
                         int countImage=0;
-
-                        //String item = '';
-                        //String itemValue = allItem.allListItem[i].itemValue!;
                         if(allItem.allListItem[i].images.isNotEmpty){
                           String? itemSuffix = allItem.allListItem[i].itemValue;
-                          // item = '"${allItem.allListItem[i].item!}" \n ${allItem.allListItem[i].images.length} pictures';
-                          // ImageUtility.createImage(item,countItem);
                           for(int j=0;j<allItem.allListItem[i].images.length;j++){
-                            setState((){
-                              progressIndicator++;
-                            });
                             countImage++;
                             String? imageName = allItem.allListItem[i].images[j].name;
-                            // String? imageUri = allItem.allListItem[i].images[j].identifier;
                             String newImageName = '$itemSuffix\_$countImage.jpg';
                             await ImageUtility.changeFileNameOnly(imageName!,newImageName,300);
-                            // ImageUtility.saveImage(imageUri!,countItem,countImage);
                           }
                         }
                       }
+                      allItem.showBtnDownloadPDF(true);
                       allItem.showCircularProgress(false);
                       DialogCircularBuilder(context).hideOpenDialog();
 
@@ -550,34 +530,19 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> with SingleTickerProv
   }
 */
 }
-/*
-class Item {
-  const Item(this.name,this.icon);
-  final String name;
-  final Icon icon;
-}
-*/
 
-enum DownloadStatus {
-  notDownloaded,
-  fetchingDownload,
-  downloading,
-  downloaded,
-}
+enum DownloadStatus { notDownloaded, fetchingDownload, downloading, downloaded }
 
 abstract class DownloadController implements ChangeNotifier {
   DownloadStatus get downloadStatus;
   double get progress;
-
   void startDownload();
   void stopDownload();
-  void openDownload(){
-    // PdfApiImageReport.openFile(pdfImageFile);
-  }
+  void openDownload();
 }
 
-class SimulatedDownloadController extends DownloadController
-    with ChangeNotifier {
+class SimulatedDownloadController extends DownloadController with ChangeNotifier {
+
   SimulatedDownloadController({
     DownloadStatus downloadStatus = DownloadStatus.notDownloaded,
     double progress = 0.0,
@@ -604,7 +569,6 @@ class SimulatedDownloadController extends DownloadController
   void startDownload() {
     if (downloadStatus == DownloadStatus.notDownloaded) {
       _doSimulatedDownload();
-
     }
   }
 
@@ -642,17 +606,24 @@ class SimulatedDownloadController extends DownloadController
     _downloadStatus = DownloadStatus.downloading;
     notifyListeners();
 
-    if(downloadStatus == DownloadStatus.downloading){
-      print("Images <<>>");
+    if(_downloadStatus == DownloadStatus.downloading){
+      // print("Images <<>>");
       var dir = await getExternalStorageDirectory();
       final imageDir = Directory('${dir?.path}/images');
       List<FileSystemEntity> _images = imageDir.listSync(recursive: true, followLinks: false);
 
       pdfImageFile = await PdfApiImageReport.generateImage(_images);
 
-      _downloadStatus = DownloadStatus.downloaded;
-      _isDownloading = false;
-      notifyListeners();
+      // print("generateReportPDF : $generateReportPDF");
+      // if(generateReportPDF){
+      //   downloadStatus == DownloadStatus.notDownloaded;
+      //   _isDownloading = false;
+      //   notifyListeners();
+      // }else {
+        _downloadStatus = DownloadStatus.downloaded;
+        _isDownloading = false;
+        notifyListeners();
+      // }
     }
 
     const downloadProgressStops = [0.0, 0.15, 0.45, 0.80, 1.0];

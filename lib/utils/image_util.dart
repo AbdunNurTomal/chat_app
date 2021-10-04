@@ -18,7 +18,13 @@ class ImageUtility {
     File _file = await toFile(_uri);
     return _file;
   }
+  static Future<Directory> getImageDir() async{
+    final directory = await getExternalStorageDirectory();
+    final myImagePath = '${directory?.path}/images';
+    final myImgDir = await Directory(myImagePath).create();
 
+    return myImgDir;
+  }
   static Future<String> getImageDirPath() async{
     final directory = await getExternalStorageDirectory();
     final myImagePath = '${directory?.path}/images';
@@ -72,9 +78,7 @@ class ImageUtility {
     return completer.future;
   }
 
-  static Future<bool> deleteFile(String? fileName, int counter, String itemValue) async {
-    ++counter;
-    String itemSuffix = "$itemValue\_$counter.jpg";
+  static Future<bool> deleteFile(String? fileName, String itemSuffix) async {
     // print("delete file : $itemSuffix");
     try {
       String imageDir = await getImageDirPath();
@@ -96,6 +100,12 @@ class ImageUtility {
       print(e);
       return false;
     }
+  }
+  static Future<File> changeFileName(File file, String newFileName) {
+    var path = file.path;
+    var lastSeparator = path.lastIndexOf(Platform.pathSeparator);
+    var newPath = path.substring(0, lastSeparator + 1) + newFileName;
+    return file.rename(newPath);
   }
   static Future<void> changeFileNameOnly(String fileName, String newFileName, var dpi) async{
     try {
