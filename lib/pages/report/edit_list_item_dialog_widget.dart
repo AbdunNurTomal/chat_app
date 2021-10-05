@@ -402,8 +402,31 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
                               color: Colors.red,
                             ),
                             onTap: () async {
-                              if(await ImageUtility.deleteFile(images[index].name, index, ddItemValue) == true){
+                              int counter = index+1;
+                              String itemSuffix = "$ddItemValue\_$counter.jpg";
 
+                              if(await ImageUtility.deleteFile(images[index].name, itemSuffix) == true){
+                                // print("delete file : $itemSuffix");
+                                try {
+                                  Directory imageDir = await ImageUtility.getImageDir();
+                                  List<FileSystemEntity> entries = imageDir.listSync(recursive: false).toList();
+                                  // print("file count : ${entries.length}");
+                                  int newCounter = 0;
+                                  for(var i=0;i<entries.length;i++){
+                                    var fileName = (entries[i].path.split('/').last);
+                                    // print("file Name : $fileName");
+                                    var checkFile = fileName.split('_').first;
+                                    // print("check Name : $checkFile");
+                                    if((fileName.split('_').first)==ddItemValue){
+                                      ++newCounter;
+                                      String newName = "$ddItemValue\_$newCounter.jpg";
+                                      // print("new Name : $newName");
+                                      await ImageUtility.changeFileNameOnly(fileName,newName,300);
+                                    }
+                                  }
+                                } catch (e) {
+                                  print(e);
+                                }
                                 Fluttertoast.showToast(
                                     msg: "Image Deleted",
                                     toastLength: Toast.LENGTH_SHORT,

@@ -95,12 +95,13 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: const Color(0xFFC0C0C0),
       appBar: AppBar(
         // title: Text("Flutter Painter Example"),
         actions: [
           IconButton(
-            icon: Icon(
+            icon: const Icon(
               Icons.undo,
             ),
             onPressed: removeLastDrawable,
@@ -149,12 +150,6 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
               ),
               if (backgroundImage != null)
               // Enforces constraints
-                AspectRatio(
-                  aspectRatio: backgroundImage!.width / backgroundImage!.height,
-                  child: FlutterPainter(
-                    controller: controller,
-                  ),
-                ),
               if (controller.freeStyleSettings.enabled) ...[
                 // Control free style stroke width
                 Slider.adaptive(
@@ -189,7 +184,13 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
                         .hue,
                     activeColor: controller.textSettings.textStyle.color,
                     onChanged: setTextColor),
-              ]
+              ],
+              AspectRatio(
+                aspectRatio: backgroundImage!.width / backgroundImage!.height,
+                child: FlutterPainter(
+                  controller: controller,
+                ),
+              ),
             ],
           );
           }),
@@ -280,8 +281,6 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
     final backgroundImageSize = Size(
         backgroundImage!.width.toDouble(), backgroundImage!.height.toDouble());
 
-    // Render the image
-    // Returns a [ui.Image] object, convert to to byte data and then to Uint8List
     final imageFuture = controller
         .renderImage(backgroundImageSize)
         .then<Uint8List?>((ui.Image image) async{
@@ -290,16 +289,6 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
           File(widget.editedName).writeAsBytesSync(newJpgBytes);
         });
 
-
-    // From here, you can write the PNG image data a file or do whatever you want with it
-    // For example:
-    // dart
-    // final file = File('${(await getTemporaryDirectory()).path}/img.png');
-    // await file.writeAsBytes(byteData.buffer.asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
-    //
-    // I am going to display it using Image.memory
-
-    // print("Render $imageFuture");
     showDialog(
         context: context,
         builder: (context) {
