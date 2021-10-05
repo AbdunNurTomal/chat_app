@@ -1,5 +1,6 @@
 import 'package:chat_app/pages/report/add_list_item_dialog_widget.dart';
 import 'package:chat_app/provider/list_provider.dart';
+import 'package:chat_app/provider/merge_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -31,6 +32,8 @@ void main() async {
           create: (context) => ListProvider(), child: TeameLeaderPage()),
       ChangeNotifierProvider<ListProvider>(
           create: (context) => ListProvider(), child: AddListItemDialogWidget()),
+      ChangeNotifierProvider<VideoProvider>(
+          create: (context) => VideoProvider(), child: TeameLeaderPage()),
       //ChangeNotifierProvider(create: (_) => ProductDetail()),
     ], child: MyApp()),
   );

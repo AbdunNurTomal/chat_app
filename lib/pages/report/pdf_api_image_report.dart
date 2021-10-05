@@ -9,17 +9,17 @@ import 'package:pdf/widgets.dart' as pw;
 
 class PdfApiImageReport{
   // final pdf = Document();
-  static List<Uint8List> imagesUint8list = [];
-  static int counter =0;
-
-  static Future getImageBytes(String assetImage) async {
-    final Uint8List byteList = File(assetImage).readAsBytesSync();
-    if(counter ==0) {
-      ui.Image _myBackgroundImage = await ImageUtility.loadImage(byteList);
-    }
-    imagesUint8list.add(byteList);
-    // print(imagesUint8list.length);
-  }
+  // static List<Uint8List> imagesUint8list = [];
+  // static int counter =0;
+  //
+  // static Future getImageBytes(String assetImage) async {
+  //   final Uint8List byteList = File(assetImage).readAsBytesSync();
+  //   if(counter ==0) {
+  //     ui.Image _myBackgroundImage = await ImageUtility.loadImage(byteList);
+  //   }
+  //   imagesUint8list.add(byteList);
+  //   // print(imagesUint8list.length);
+  // }
 
   // static Future savePdfFile() async {
   //   Directory documentDirectory = await getApplicationDocumentsDirectory();
@@ -40,16 +40,26 @@ class PdfApiImageReport{
   static Future<File> generateImage(List<FileSystemEntity> allImages) async {
     final pdf = pw.Document();
     List<String> assetImage = [];
+    List<Uint8List> imagesUint8list = [];
+    int counter =0;
 
-    print("PDF >> ${allImages.length}");
+    // print("PDF >> ${allImages.length}");
 
     for(var i=0;i<allImages.length;i++){
       print(">>> ${allImages[i].path}");
       assetImage.add(allImages[i].path);
     }
+
     //convert each image to Uint8List
     for (String image in assetImage) {
-      await getImageBytes(image);
+      // await getImageBytes(image);
+
+      final Uint8List byteList = File(image).readAsBytesSync();
+      if(counter ==0) {
+        ui.Image _myBackgroundImage = await ImageUtility.loadImage(byteList);
+      }
+      imagesUint8list.add(byteList);
+      // print(imagesUint8list.length);
     }
 
     //create a list of images
