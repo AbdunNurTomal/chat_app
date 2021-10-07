@@ -1,19 +1,18 @@
 import 'dart:async';
 
-import 'package:chat_app/auth/firebase_auth_service.dart';
-import 'package:chat_app/models/defect.dart';
+import 'package:chat_app/models/list_image_item.dart';
 import 'package:chat_app/models/list_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 
 class ListProvider with ChangeNotifier {
-  List<ListItem> _listItem = [];
+  final List<ListItem> _listItem = [];
   List<ListItem> get allListItem => _listItem;
 
   bool isLoading = false;
+  bool generateReportPDF = false;
   int circularIndicator = 0;
 
-  bool generateReportPDF = false;
   // void indicator() {
   //   Timer.periodic(Duration(milliseconds:1000),(_){
   //     if(circularIndicator<101){
@@ -24,7 +23,6 @@ class ListProvider with ChangeNotifier {
   //     notifyListeners();
   //   });
   // }
-
   void showBtnDownloadPDF(bool generatePDF) {
     generateReportPDF = generatePDF;
     notifyListeners();
@@ -42,17 +40,18 @@ class ListProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  bool isEditShadow = false;
-  void showShadowImageEdit(bool checkShadow) {
-    isEditShadow = checkShadow;
-    notifyListeners();
-  }
+
+  // bool isEditShadow = false;
+  // void showShadowImageEdit(bool checkShadow) {
+  //   isEditShadow = checkShadow;
+  //   notifyListeners();
+  // }
   void editItem(ListItem oldListItem, ListItem newListItem) {
-    // print("edit item : $newListItem");
     if(oldListItem.id == newListItem.id) {
-      // oldListItem.itemValue = newListItem.itemValue;
-      // oldListItem.item = newListItem.item;
+      oldListItem.itemValue = newListItem.itemValue;
+      oldListItem.item = newListItem.item;
       oldListItem.images = newListItem.images;
+      oldListItem.edited = newListItem.edited;
       oldListItem.createdTime = newListItem.createdTime;
     }
     notifyListeners();

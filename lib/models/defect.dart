@@ -1,5 +1,8 @@
 
+import 'dart:io';
 import 'package:chat_app/auth/firebase_auth_service.dart';
+
+import 'list_image_item.dart';
 
 class Defects {
   String itemNumber;
@@ -59,5 +62,39 @@ class DefectData{
     //print("All Defect items $filter : $defect");
     defect.removeWhere((item) => item.itemName == filter);
     //print("After deleted : $defect");
+  }
+}
+
+class DefectImageData{
+  static final List<ListImagesItem> _listImagesItem = [];
+  static List<ListImagesItem> get allListImagesItem => _listImagesItem;
+
+  static void addImageItem(ListImagesItem item) {
+    _listImagesItem.add(item);
+  }
+
+  static void updateImageItem(String item) {
+
+    print("need to update >>>>> $item");
+    for (var element in allListImagesItem) {
+      if(element.newImgName == item){
+        element.isImgEdited = true;
+      }
+      print(">>>>> ${element.newImgName}");
+    }
+  }
+
+  // static void callDefect() async{
+  //   FirebaseAuthService.getAllMessages().listen((snapshot) {
+  //     defect = List.generate(
+  //         snapshot.docs.length, (index) =>
+  //         Defects.fromMap(snapshot.docs[index].data())
+  //     );
+  //   });
+  // }
+
+
+  void deleteImageItem(String filter) {
+    _listImagesItem.removeWhere((item) => item.newImgName == filter);
   }
 }

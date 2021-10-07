@@ -66,18 +66,35 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> with SingleTickerProv
     super.initState();
   }
 
+  // Future<void> processChangeFileName() async{
+  //   for(int i=0;i<allItem.allListItem.length;i++){
+  //     int countImage=0;
+  //     if(allItem.allListItem[i].images.isNotEmpty){
+  //       String? itemSuffix = allItem.allListItem[i].itemValue;
+  //       for(int j=0;j<allItem.allListItem[i].images.length;j++){
+  //         countImage++;
+  //         String? imageName = allItem.allListItem[i].images[j].name;
+  //         String newImageName = '$itemSuffix\_$countImage.jpg';
+  //         await ImageUtility.changeFileNameOnly(imageName!,newImageName,300);
+  //       }
+  //     }
+  //   }
+  // }
   Future<void> processChangeFileName() async{
-    for(int i=0;i<allItem.allListItem.length;i++){
-      int countImage=0;
-      if(allItem.allListItem[i].images.isNotEmpty){
-        String? itemSuffix = allItem.allListItem[i].itemValue;
-        for(int j=0;j<allItem.allListItem[i].images.length;j++){
-          countImage++;
-          String? imageName = allItem.allListItem[i].images[j].name;
-          String newImageName = '$itemSuffix\_$countImage.jpg';
-          await ImageUtility.changeFileNameOnly(imageName!,newImageName,300);
-        }
-      }
+    int countImage=0;
+    for(int i=0;i<DefectImageData.allListImagesItem.length;i++){
+      ++countImage;
+      DefectImageData.allListImagesItem.sort((a,b) => a.newImgName!.compareTo(b.newImgName!));
+
+      String imageName = DefectImageData.allListImagesItem[i].newImgPath!.split('/').last;
+      String newImageName = '$countImage.jpg';
+
+
+      await ImageUtility.changeFileNameOnly(imageName,newImageName,300);
+
+    }
+    for (var element in DefectImageData.allListImagesItem) {
+      print("element >>> ${element.oldImgName} & newImageName >>> ${element.newImgName} & proImageName >>> ${element.proImgName}");
     }
   }
   void openPDF(BuildContext context, File file) => Navigator.of(context).push(

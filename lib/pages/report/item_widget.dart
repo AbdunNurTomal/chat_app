@@ -118,15 +118,22 @@ class ItemWidget extends StatelessWidget {
 
               for(int i=0;i<listItem.images.length;i++) {
                 ++counter;
-                if(await File('$imageDir/${listItem.images[i].name}').exists()){
-                  await File('$imageDir/${listItem.images[i].name}').delete();
-                }
+                // if(await File('$imageDir/${listItem.images[i].name}').exists()){
+                //   await File('$imageDir/${listItem.images[i].name}').delete();
+                // }
 
                 String? itemSuffix = "${listItem.itemValue}\_$counter.jpg";
                 if(await File('$imageDir/$itemSuffix').exists()){
                   await File('$imageDir/$itemSuffix').delete();
                 }
+
+                DefectImageData.allListImagesItem.removeWhere((element) => element.newImgName == itemSuffix);
+
               }
+              for (var element in DefectImageData.allListImagesItem) {
+                print("element >>> ${element.oldImgName} & newImageName >>> ${element.newImgName} & proImageName >>> ${element.proImgName}");
+              }
+
               provider.deleteItem(listItem);
               final deleteToAddItem = Defects(
                 itemNumber: listItem.itemValue!,

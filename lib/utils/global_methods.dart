@@ -182,4 +182,14 @@ class GlobalMethod {
       ],
     );
   }
+
+  /// Letter 'a' appears 6 times
+  static int countOccurrencesUsingWhereMethod(List<String> list, String element) {
+    if (list == null || list.isEmpty) {
+      return 0;
+    }
+
+    var foundElements = list.where((e) => e == element);
+    return foundElements.length;
+  }
 }

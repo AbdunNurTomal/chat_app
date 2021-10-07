@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:chat_app/models/defect.dart';
+import 'package:chat_app/models/list_image_item.dart';
 import 'package:chat_app/models/list_item.dart';
 import 'package:chat_app/provider/list_provider.dart';
 import 'package:chat_app/utils/circular_progress_dialog.dart';
@@ -41,7 +42,7 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
   @override
   void initState() {
     super.initState();
-    // print("Edit List Item Dialog Widget");
+    _defectProvider = Provider.of<ListProvider>(context,listen: false);
     _ddIemController.text = widget.listItem.item!;
     images = widget.listItem.images;
     ddItem = widget.listItem.item!;
@@ -52,11 +53,11 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
   @override
   void didChangeDependencies() {;
     super.didChangeDependencies();
-    _defectProvider = Provider.of<ListProvider>(context,listen: false);
-    if (images.isEmpty) {
-      print("edit page >> ${widget.listItem}");
-      _defectProvider.deleteItem(widget.listItem);
-    }
+    // _defectProvider = Provider.of<ListProvider>(context,listen: false);
+    // if (images.isEmpty) {
+    //   print("edit page >> ${widget.listItem}");
+    //   _defectProvider.deleteItem(widget.listItem);
+    // }
   }
 
   @override
@@ -137,22 +138,33 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
     _defectProvider.showCircularProgress(true);
     DialogCircularBuilder(context).showLoadingIndicator(
         value: _defectProvider.circularIndicator, text: '');
-    // print("show circular : ${_defectProvider.circularIndicator}");
 
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      int counter =0;
+      int counter = 0;
+      int addCounter = 0;
+      final ui.Image _logoImage = await ImageUtility.loadUiImage('assets/images/pqc.png');
+
       for (int i = 0; i < images.length; i++) {
         ++counter;
         String? imageUri = images[i].identifier;
-        String? imageName = images[i].name;
-        String? itemName = "$ddItem\nNo-$counter";
+        String? _imageName = images[i].name;
+        String? _itemName = "$ddItem\nNo-$counter";
 
-        String itemSuffix = "$ddItemValue\_$counter.jpg";
-        await ImageUtility.saveImage(imageUri!, imageName!, itemName, itemSuffix);
+        var foundName = DefectImageData.allListImagesItem.where((element) => (element.oldImgName == _imageName)).toList().length;
+        if(foundName<=0){
+          Uri _imageUri = Uri.parse(imageUri!);
+          File _imageFile = await toFile(_imageUri);
+          String _newImageName = "$ddItemValue\_$counter.jpg";
+          int itemValue = int.parse(ddItemValue);
+
+          if(await ImageUtility.saveImage(_imageFile, _imageName!, _itemName, _newImageName, _logoImage, itemValue)){
+            ++addCounter;
+          }
+        }
       }
       Fluttertoast.showToast(
-          msg: "Updated Item",
+          msg: (addCounter>0)?"Added $addCounter Item":"Updated Item",
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
           timeInSecForIosWeb: 1,
@@ -160,6 +172,7 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
           textColor: Colors.white,
           fontSize: 16.0
       );
+
 
       final updateListItem = ListItem(
         id: widget.listItem.id,
@@ -252,6 +265,7 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
   }
 
   Widget buildGridView() {
+    ListProvider _listProvider;
     return Container(
       decoration: BoxDecoration(
         border: Border.all(
@@ -280,7 +294,7 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
                   Asset asset = images[index];
                   //print("name ${asset.name}");
                   //print("identifier ${asset.identifier}");
-                  print("List edit item : $editedImage");
+                  // print("List edit item : $editedImage");
                   return Card(
                     //clipBehavior: Clip.antiAlias,
                     elevation: 5.0,
@@ -290,46 +304,24 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
                           onTap: ()async {
                             String? imageName = images[index].name;
                             String? imageUri = images[index].identifier;
-                            int counter = index+1;
-                            String itemSuffix = "$ddItemValue\_$counter.jpg";
-                            // Uri? _uri = Uri.parse(imageUri!);
-                            // //print("Uri - $_uri");
-                            // _file = await toFile(_uri);
-
-                            //final myImagePath = _getDirectoryPath();
-                            //var kompresimg = File("$myImagePath/$imageName")
-                            //  ..writeAsBytesSync(_file!.encodeJpg(gambarKecilx, quality: 95));
-
-                            //await _file!.copy("$myImagePath/$imageName");
-
-                            //File imageFile = File.fromUri(_uri);
-                            //print("File - $_file");
-                            // Uint8List _imageByteslist = await _file!.readAsBytes();
-                            //print("ImageByteslist - $_imageByteslist");
-                            //await _file!.readAsBytes().then((value){
-                            //_imageByteslist = Uint8List.fromList(value);
-                            //print("ImageByteslist - $_imageByteslist");
-                            //}).catchError((onError){
-                            //  print('Exception error reading image file ' + onError.toString());
-                            //});
+                            String imageNameSuffix = '$ddItemValue\_${index+1}.jpg';
+                            String? imageNameSuffixPro = DefectImageData.allListImagesItem[index].proImgName;
 
                             try{
-                              // Uri _uri = Uri.parse(imageUri!);
-                              // File _fileBackgroundImage = await toFile(_uri);
-                              // Uint8List _imageByteslist = await _fileBackgroundImage.readAsBytes();
-
                               String imageDir = await ImageUtility.getImageDirPath();
                               Uint8List? _imageBytesList;
-                              String editedFileName='';
+
                               if(await File('$imageDir/$imageName').exists()){
                                 _imageBytesList = File('$imageDir/$imageName').readAsBytesSync();
-                                editedFileName = '$imageDir/$imageName';
-                              }else if(await File('$imageDir/$itemSuffix').exists()){
-                                _imageBytesList = File('$imageDir/$itemSuffix').readAsBytesSync();
-                                editedFileName = '$imageDir/$itemSuffix';
+                              }else if(await File('$imageDir/$imageNameSuffix').exists()){
+                                _imageBytesList = File('$imageDir/$imageNameSuffix').readAsBytesSync();
+                              }else if(await File('$imageDir/$imageNameSuffixPro').exists()){
+                                _imageBytesList = File('$imageDir/$imageNameSuffixPro').readAsBytesSync();
                               }
+                              String editedFileName = '$imageDir/$imageNameSuffix';
 
-                              if((await File('$imageDir/$imageName').exists())||(await File('$imageDir/$itemSuffix').exists())){
+                              var foundName = DefectImageData.allListImagesItem.where((element) => (element.oldImgName == imageName)).toList().length;
+                              if(foundName>0){
                                 Uint8List decodedBytes = await ImageUtility.compressImageList(_imageBytesList!,1200,1600,90);
                                 ui.Image _myBackgroundImage = await ImageUtility.loadImage(decodedBytes);
 
@@ -347,6 +339,7 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
                                 );
                                 if(result!=null){
                                   editedImage.add(result);
+                                  print("editedImage $editedImage");
                                   setState((){
                                     editedImage = Set.of(editedImage).toList();
                                   });
@@ -405,48 +398,51 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
                               int counter = index+1;
                               String itemSuffix = "$ddItemValue\_$counter.jpg";
 
-                              if(await ImageUtility.deleteFile(images[index].name, itemSuffix) == true){
-                                // print("delete file : $itemSuffix");
-                                try {
-                                  Directory imageDir = await ImageUtility.getImageDir();
-                                  List<FileSystemEntity> entries = imageDir.listSync(recursive: false).toList();
-                                  // print("file count : ${entries.length}");
-                                  int newCounter = 0;
-                                  for(var i=0;i<entries.length;i++){
-                                    var fileName = (entries[i].path.split('/').last);
-                                    // print("file Name : $fileName");
-                                    var checkFile = fileName.split('_').first;
-                                    // print("check Name : $checkFile");
-                                    if((fileName.split('_').first)==ddItemValue){
-                                      ++newCounter;
-                                      String newName = "$ddItemValue\_$newCounter.jpg";
-                                      // print("new Name : $newName");
-                                      await ImageUtility.changeFileNameOnly(fileName,newName,300);
+                              var foundName = DefectImageData.allListImagesItem.where((element) => (element.newImgName == itemSuffix)).toList().length;
+                              if(foundName>0) {
+                                if (await ImageUtility.deleteFile(
+                                    images[index].name, itemSuffix) == true) {
+                                  DefectImageData.allListImagesItem.removeWhere((element) => element.newImgName == itemSuffix);
+                                  try {
+                                    Directory imageDir = await ImageUtility.getImageDir();
+                                    List<FileSystemEntity> entries = imageDir.listSync(recursive: false).toList();
+                                    int newCounter = 0;
+                                    for (var i = 0; i < entries.length; i++) {
+                                      var fileName = (entries[i].path.split('/').last);
+                                      if ((fileName.split('_').first) == ddItemValue) {
+                                        ++newCounter;
+                                        String newName = "$ddItemValue\_$newCounter.jpg";
+                                        await ImageUtility.changeFileNameOnly(fileName, newName, 300);
+                                      }
                                     }
+                                    for (var element in DefectImageData.allListImagesItem) {
+                                      print("element >>> ${element.oldImgName} & newImageName >>> ${element.newImgName} & proImageName >>> ${element.proImgName}");
+                                    }
+
+                                  } catch (e) {
+                                    print(e);
                                   }
-                                } catch (e) {
-                                  print(e);
+                                  Fluttertoast.showToast(
+                                      msg: "Image Deleted",
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.CENTER,
+                                      timeInSecForIosWeb: 1,
+                                      backgroundColor: Colors.red,
+                                      textColor: Colors.white,
+                                      fontSize: 16.0
+                                  );
+                                  editedImage.remove(index);
+                                } else {
+                                  Fluttertoast.showToast(
+                                      msg: "Image can not Delete",
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.CENTER,
+                                      timeInSecForIosWeb: 1,
+                                      backgroundColor: Colors.red,
+                                      textColor: Colors.white,
+                                      fontSize: 16.0
+                                  );
                                 }
-                                Fluttertoast.showToast(
-                                    msg: "Image Deleted",
-                                    toastLength: Toast.LENGTH_SHORT,
-                                    gravity: ToastGravity.CENTER,
-                                    timeInSecForIosWeb: 1,
-                                    backgroundColor: Colors.red,
-                                    textColor: Colors.white,
-                                    fontSize: 16.0
-                                );
-                                editedImage.remove(index);
-                              }else{
-                                Fluttertoast.showToast(
-                                    msg: "Image can not Delete",
-                                    toastLength: Toast.LENGTH_SHORT,
-                                    gravity: ToastGravity.CENTER,
-                                    timeInSecForIosWeb: 1,
-                                    backgroundColor: Colors.red,
-                                    textColor: Colors.white,
-                                    fontSize: 16.0
-                                );
                               }
                               setState(() {
                                 images.removeAt(index);

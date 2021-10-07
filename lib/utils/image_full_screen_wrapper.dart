@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
+import 'package:chat_app/models/defect.dart';
+import 'package:chat_app/models/list_image_item.dart';
 import 'package:chat_app/utils/painter.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
@@ -275,7 +277,7 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
   }
 
   Future<void> renderAndDisplayImage() async{
-    String imageDir = await ImageUtility.getImageDirPath();
+    // String imageDir = await ImageUtility.getImageDirPath();
     if (backgroundImage == null) return;
 
     final backgroundImageSize = Size(
@@ -294,6 +296,13 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
         builder: (context) {
           return RenderedImageDialog(imageFuture: imageFuture);
         });
+
+    // print("widget.editedName ${DefectImageData.allListImagesItem[0].newImgName}");
+    final indexData = DefectImageData.allListImagesItem.indexWhere((element) =>
+      element.newImgName == widget.editedName.split('/').last
+    );
+    DefectImageData.updateImageItem(widget.editedName.split('/').last);
+
     Navigator.pop(context);
   }
 
