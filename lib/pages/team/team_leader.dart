@@ -10,6 +10,7 @@ import 'package:chat_app/pages/report/add_list_item_dialog_widget.dart';
 import 'package:chat_app/pages/report/list_item_widget.dart';
 import 'package:chat_app/pages/report/pdf_api_image_report.dart';
 import 'package:chat_app/pages/report/pdf_viewer_page.dart';
+import 'package:chat_app/pages/report/video_viewer_page.dart';
 import 'package:chat_app/provider/list_provider.dart';
 import 'package:chat_app/provider/merge_provider.dart';
 import 'package:chat_app/utils/circular_progress_dialog.dart';
@@ -17,6 +18,8 @@ import 'package:chat_app/utils/global_methods.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image/image.dart' as IMG;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -56,6 +59,10 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> with SingleTickerProv
 
   int progressIndicator=0;
   late var pdfImageFile;
+  List<String> allImagePath = [];
+  late var videoImageFile;
+
+  bool videoLoading = false;
 
   @override
   void initState() {
@@ -66,22 +73,63 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> with SingleTickerProv
     super.initState();
   }
 
+  // Future<void> processChangeFileName() async{
+  //   for(int i=0;i<allItem.allListItem.length;i++){
+  //     int countImage=0;
+  //     if(allItem.allListItem[i].images.isNotEmpty){
+  //       String? itemSuffix = allItem.allListItem[i].itemValue;
+  //       for(int j=0;j<allItem.allListItem[i].images.length;j++){
+  //         countImage++;
+  //         String? imageName = allItem.allListItem[i].images[j].name;
+  //         String newImageName = '$itemSuffix\_$countImage.jpg';
+  //         await ImageUtility.changeFileNameOnly(imageName!,newImageName,300);
+  //       }
+  //     }
+  //   }
+  // }
   Future<void> processChangeFileName() async{
-    for(int i=0;i<allItem.allListItem.length;i++){
-      int countImage=0;
-      if(allItem.allListItem[i].images.isNotEmpty){
-        String? itemSuffix = allItem.allListItem[i].itemValue;
-        for(int j=0;j<allItem.allListItem[i].images.length;j++){
-          countImage++;
-          String? imageName = allItem.allListItem[i].images[j].name;
-          String newImageName = '$itemSuffix\_$countImage.jpg';
-          await ImageUtility.changeFileNameOnly(imageName!,newImageName,300);
-        }
+    int countImg = 1;
+    String imageDir = await ImageUtility.getImageDirPath();
+    DefectImageData.allListImagesItem.sort((a,b) => a.newImgName!.compareTo(b.newImgName!));
+
+    for (var element in DefectImageData.allListImagesItem) {
+      if(await(File('$imageDir/${element.proImgName}').exists())){
+        File('$imageDir/${element.proImgName}').renameSync('$imageDir/${element.newImgName}');
       }
+      element.proImgName = element.newImgName;
+      countImg++;
+    }
+
+    Directory imgDir = await ImageUtility.getImageDir();
+    List<FileSystemEntity> fileList = await ImageUtility.dirContents(imgDir);
+    fileList.sort((a,b) => a.path.compareTo(b.path));
+
+    int countNewImage=1;
+    int count =0;
+    for (var f in fileList) {
+      String proImgName = '$countNewImage.jpg';
+      String proImgPath = '$imageDir/$proImgName';
+      f.renameSync(proImgPath);
+      DefectImageData.allListImagesItem[count].proImgName = proImgName;
+      count++;
+
+      Uint8List decodedBytes = await ImageUtility.compressFile(File(proImgPath),1024,768,0);
+      decodedBytes[13] = 1;
+      decodedBytes[14] = (300 >> 8);
+      decodedBytes[15] = (300 & 0xff);
+      decodedBytes[16] = (300 >> 8);
+      decodedBytes[17] = (300 & 0xff);
+
+      File(proImgPath).writeAsBytesSync(decodedBytes);
+      allImagePath.add(proImgPath);
+      countNewImage++;
     }
   }
   void openPDF(BuildContext context, File file) => Navigator.of(context).push(
     MaterialPageRoute(builder: (context) => PDFViewerPage(file: file)),
+  );
+  void openVideo(BuildContext context, File file) => Navigator.of(context).push(
+    MaterialPageRoute(builder: (context) => VideoViewerPage(file: file)),
   );
   // void _showProcessDialog(context) {
   //   // allItem.showCircularProgress(true);
@@ -207,7 +255,7 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> with SingleTickerProv
   // }
   void _showProcessDialog(context){
     showDialog(
-      barrierDismissible: false,
+      barrierDismissible: true,
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -240,16 +288,15 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> with SingleTickerProv
                       style: TextButton.styleFrom(backgroundColor: isBtnPDFPressed ? Colors.greenAccent : Colors.orangeAccent ),
                       onPressed: () async{
                         setState(() => isBtnPDFPressed = !isBtnPDFPressed);
+                        String pdfReport = 'pdf_report.pdf';
+
                         var dir = await getExternalStorageDirectory();
-                        String pdfPath = '${dir?.path}/my_example.pdf';
+                        String pdfPath = '${dir?.path}/$pdfReport';
                         if(await File(pdfPath).exists()){
                           await File(pdfPath).delete();
                         }
-                        final imageDir = Directory('${dir?.path}/images');
-                        List<FileSystemEntity> _images = imageDir.listSync(recursive: true, followLinks: false);
 
-                        pdfImageFile = await PdfApiImageReport.generateImage(_images);
-                        print("pdfImageFile $pdfImageFile");
+                        pdfImageFile = await PdfApiImageReport.generateImage(allImagePath, pdfReport);
 
                         if(pdfImageFile == null) return;
                         openPDF(context,pdfImageFile);
@@ -257,15 +304,6 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> with SingleTickerProv
                     )
                   ),
                   const SizedBox(height: 20.0),
-
-                  videoItem.loading ? Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      CircularProgressIndicator(color: Colors.red),
-                      Text('Processing...', style: TextStyle(color: Colors.black))
-                    ],
-                  ) : Container(),
-                  const SizedBox(height: 15),
                   SizedBox(
                     child: TextButton.icon(
                       icon: const Icon(Icons.picture_as_pdf_sharp),
@@ -273,7 +311,44 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> with SingleTickerProv
                       style: TextButton.styleFrom(backgroundColor: isBtnVideoPressed ? Colors.greenAccent : Colors.orangeAccent ),
                       onPressed: () async{
                         setState(() => isBtnVideoPressed = !isBtnVideoPressed);
-                        await videoItem.videoMerger();
+                        String videoReport = 'video_report.mp4';
+                        var dir = await getExternalStorageDirectory();
+                        String videoPath = '${dir?.path}/$videoReport';
+                        // if(await File(videoPath).exists()){
+                        //   await File(videoPath).delete();
+                        // }
+
+                        // videoImageFile = await videoItem.videoMerger(videoPath);
+                        String imagePath = await ImageUtility.getImageDirPath();
+
+                        final FlutterFFmpeg _flutterFFmpeg = FlutterFFmpeg();
+
+                        setState(() => videoLoading = true);
+                        allItem.showCircularProgress(true);
+                        DialogCircularBuilder(context).showLoadingIndicator(value: allItem.circularIndicator, text: '');
+
+                        String commandToExecute = '-f image2 -framerate 1 -i $imagePath/%d.jpg -y $videoPath';
+                        await _flutterFFmpeg.execute(commandToExecute).then((rc) {
+                          print('FFmpeg process exited with rc video report : $rc');
+                          setState(() => videoLoading = false);
+                        });
+
+                        allItem.showCircularProgress(false);
+                        DialogCircularBuilder(context).hideOpenDialog();
+
+                        if(await File(videoPath).exists()){
+                          openVideo(context,File(videoPath));
+                        }else{
+                          Fluttertoast.showToast(
+                              msg: "Problem on create video",
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.CENTER,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.red,
+                              textColor: Colors.white,
+                              fontSize: 20.0
+                          );
+                        }
                       },
                     )
                   ),

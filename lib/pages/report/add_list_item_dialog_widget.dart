@@ -5,6 +5,7 @@ import 'dart:ui' as ui;
 
 import 'package:chat_app/models/defect.dart';
 import 'package:chat_app/models/list_item.dart';
+import 'package:chat_app/models/list_image_item.dart';
 import 'package:chat_app/provider/list_provider.dart';
 import 'package:chat_app/utils/circular_progress_dialog.dart';
 import 'package:chat_app/utils/image_full_screen_wrapper.dart';
@@ -143,31 +144,39 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
 
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      int counter =0;
-      for (int i = 0; i < images.length; i++) {
-        ++counter;
-        String? imageUri = images[i].identifier;
-        String? imageName = images[i].name;
-        String? itemName = "$ddItem\nNo-$counter";
-
-        String itemSuffix = "$ddItemValue\_$counter.jpg";
-        await ImageUtility.saveImage(imageUri!, imageName!, itemName, itemSuffix);
-      }
-      Fluttertoast.showToast(
-        msg: "Added Item",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.black,
-        textColor: Colors.white,
-        fontSize: 16.0
-      );
-
       if(images.isEmpty){
         Navigator.of(context).pop();
       }else {
+        int counter =0;
+        int addCounter = 0;
+        final ui.Image _logoImage = await ImageUtility.loadUiImage('assets/images/pqc.png');
+        for (int i = 0; i < images.length; i++) {
+          ++counter;
+          String? imageUri = images[i].identifier;
+          String? imageName = images[i].name;
+          String? itemName = "$ddItem\nNo-$counter";
+
+          Uri _imageUri = Uri.parse(imageUri!);
+          File _imageFile = await toFile(_imageUri);
+          String _newImageName = "$ddItemValue\_$counter.jpg";
+          int itemValue = int.parse(ddItemValue);
+
+          if(await ImageUtility.saveImage(_imageFile, imageName!, itemName, _newImageName, _logoImage, itemValue)){
+            ++addCounter;
+          }
+        }
+        Fluttertoast.showToast(
+            msg: "Added $addCounter Images",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.black,
+            textColor: Colors.white,
+            fontSize: 16.0
+        );
+
         final listItem = ListItem(
-          id: DateTime.now().toString(),
+          id: ddItemValue,
           itemValue: ddItemValue,
           item: ddItem,
           images: images,
@@ -175,9 +184,13 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
           //description: description,
           createdTime: DateTime.now(),
         );
-
         _defectProvider.addItem(listItem);
+
         DefectData.deleteDefectItem(ddItem);
+
+        // for (var element in DefectImageData.allListImagesItem) {
+        //   print("add element >>> ${element.oldImgName} & newImageName >>> ${element.newImgName} & proImageName >>> ${element.proImgName}");
+        // }
       }
     }
     _defectProvider.showCircularProgress(false);

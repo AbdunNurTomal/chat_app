@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
+import 'package:chat_app/models/defect.dart';
+import 'package:chat_app/models/list_image_item.dart';
 import 'package:chat_app/utils/painter.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
@@ -12,14 +14,12 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'image_util.dart';
 
 class ImageDialogOld extends StatefulWidget {
-  final String imageUri;
-  final String imageName;
   final String itemName;
   final ui.Image backgroundImage;
   final int imageIndex;
   final String editedName;
 
-  const ImageDialogOld({ Key? key, required this.backgroundImage, required this.imageUri, required this.imageName, required this.imageIndex, required this.itemName, required this.editedName}) : super(key: key);
+  const ImageDialogOld({ Key? key, required this.backgroundImage, required this.imageIndex, required this.itemName, required this.editedName}) : super(key: key);
 
   @override
   State<ImageDialogOld> createState() => _ImageDialogOldState();
@@ -275,7 +275,7 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
   }
 
   Future<void> renderAndDisplayImage() async{
-    String imageDir = await ImageUtility.getImageDirPath();
+    // String imageDir = await ImageUtility.getImageDirPath();
     if (backgroundImage == null) return;
 
     final backgroundImageSize = Size(
@@ -294,6 +294,14 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
         builder: (context) {
           return RenderedImageDialog(imageFuture: imageFuture);
         });
+
+    // print("widget.editedName ${DefectImageData.allListImagesItem[0].newImgName}");
+    String editedImgName = widget.editedName.split(' / ').last;
+    // final foundImg = DefectImageData.allListImagesItem.where((element) => ((element.oldImgName == editedImgName)||(element.newImgName == editedImgName)||(element.proImgName == editedImgName)));
+    // if(foundImg.isNotEmpty){
+      DefectImageData.updateImageItem(editedImgName);
+    // }
+
     Navigator.pop(context);
   }
 

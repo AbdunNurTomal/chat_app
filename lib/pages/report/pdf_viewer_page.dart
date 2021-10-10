@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
@@ -31,55 +30,55 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(name),
-        // actions: pages >= 2
-        // ? [
-        // Center(child: Text(text)),
-        // IconButton(
-        //   icon: const Icon(Icons.chevron_left, size: 32),
-        //   onPressed: () {
-        //     final page = indexPage == 0 ? pages : indexPage - 1;
-        //     controller.setPage(page);
-        //   },
-        // ),
-        // IconButton(
-        //   icon: const Icon(Icons.chevron_right, size: 32),
-        //   onPressed: () {
-        //     final page = indexPage == pages - 1 ? 0 : indexPage + 1;
-        //     controller.setPage(page);
-        //   },
-        // ),
-        // ]
-        // : null,
+        // title: const Text("Video Report Play",
+        //     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+        actions: [
+          IconButton(
+              onPressed: () async{
+                setState(() => isPressed = !isPressed);
+                final RenderBox box = context.findRenderObject() as RenderBox;
+                if(widget.file.path.isNotEmpty){
+                  fileAttach.add(widget.file.path);
+                  await Share.shareFiles(
+                      fileAttach,
+                      subject: 'PDF Report Share',
+                      text: 'Hello, check your share files!',
+                      sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size
+                  );
+                }
+              },
+              icon: const Icon(Icons.share)
+          )
+        ],
       ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.mail),
-        shape: RoundedRectangleBorder(
-            side: const BorderSide(
-                color: Colors.black26, width: 1.0, style: BorderStyle.solid),
-            borderRadius: BorderRadius.circular(10.0)),
-        // onPressed: () => showDialog(
-        //   context: context,
-        //   builder: (context) {
-        //     MailPDFReport();
-        //   },
-        //   barrierDismissible: false,
-        // ),
-        backgroundColor: isPressed ? Colors.green : Colors.blue,
-        onPressed: () async{
-          setState(() => isPressed = !isPressed);
-          final RenderBox box = context.findRenderObject() as RenderBox;
-          if(widget.file.path.isNotEmpty){
-            fileAttach.add(widget.file.path);
-            await Share.shareFiles(
-                fileAttach,
-                subject: 'URL File Share',
-                text: 'Hello, check your share files!',
-                sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size
-            );
-          }
-        },
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   child: const Icon(Icons.mail),
+      //   shape: RoundedRectangleBorder(
+      //       side: const BorderSide(
+      //           color: Colors.black26, width: 1.0, style: BorderStyle.solid),
+      //       borderRadius: BorderRadius.circular(10.0)),
+      //   // onPressed: () => showDialog(
+      //   //   context: context,
+      //   //   builder: (context) {
+      //   //     MailPDFReport();
+      //   //   },
+      //   //   barrierDismissible: false,
+      //   // ),
+      //   backgroundColor: isPressed ? Colors.green : Colors.blue,
+      //   onPressed: () async{
+      //     setState(() => isPressed = !isPressed);
+      //     final RenderBox box = context.findRenderObject() as RenderBox;
+      //     if(widget.file.path.isNotEmpty){
+      //       fileAttach.add(widget.file.path);
+      //       await Share.shareFiles(
+      //           fileAttach,
+      //           subject: 'URL File Share',
+      //           text: 'Hello, check your share files!',
+      //           sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size
+      //       );
+      //     }
+      //   },
+      // ),
       body: PDFView(
         filePath: widget.file.path,
         autoSpacing: false,

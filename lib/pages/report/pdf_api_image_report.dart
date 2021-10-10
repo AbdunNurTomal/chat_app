@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
+import 'package:chat_app/models/defect.dart';
 import 'package:chat_app/utils/image_util.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
@@ -37,29 +38,18 @@ class PdfApiImageReport{
   //   });
   // }
 
-  static Future<File> generateImage(List<FileSystemEntity> allImages) async {
+  static Future<File> generateImage(List<String> assetImage, String pdfReport) async {
     final pdf = pw.Document();
-    List<String> assetImage = [];
+    // List<String> assetImage = [];
     List<Uint8List> imagesUint8list = [];
     int counter =0;
 
-    // print("PDF >> ${allImages.length}");
-
-    for(var i=0;i<allImages.length;i++){
-      print(">>> ${allImages[i].path}");
-      assetImage.add(allImages[i].path);
-    }
-
-    //convert each image to Uint8List
     for (String image in assetImage) {
-      // await getImageBytes(image);
-
       final Uint8List byteList = File(image).readAsBytesSync();
-      if(counter ==0) {
+      if(counter == 0) {
         ui.Image _myBackgroundImage = await ImageUtility.loadImage(byteList);
       }
       imagesUint8list.add(byteList);
-      // print(imagesUint8list.length);
     }
 
     //create a list of images
@@ -93,7 +83,6 @@ class PdfApiImageReport{
       //   ignoreMargins: true,
       //   child: pw.Image(pw.MemoryImage(image), fit: pw.BoxFit.cover),
       // );
-
     }).toList();
 
     //create PDF
@@ -148,7 +137,7 @@ class PdfApiImageReport{
     //   ),
     // );
 
-    return saveDocument(name: 'my_example.pdf', pdf: pdf);
+    return saveDocument(name: pdfReport, pdf: pdf);
   }
   static Future<File> saveDocument({
     required String name,

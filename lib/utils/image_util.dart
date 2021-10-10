@@ -3,6 +3,8 @@ import 'dart:io';
 import 'dart:async';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
+import 'package:chat_app/models/defect.dart';
+import 'package:chat_app/models/list_image_item.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -24,6 +26,15 @@ class ImageUtility {
     final myImgDir = await Directory(myImagePath).create();
 
     return myImgDir;
+  }
+  static Future<List<FileSystemEntity>> dirContents(Directory dir) {
+    var files = <FileSystemEntity>[];
+    var completer = Completer<List<FileSystemEntity>>();
+    var lister = dir.list(recursive: false);
+    lister.listen((file) => files.add(file),
+        // should also register onError
+        onDone: () => completer.complete(files));
+    return completer.future;
   }
   static Future<String> getImageDirPath() async{
     final directory = await getExternalStorageDirectory();
@@ -78,21 +89,16 @@ class ImageUtility {
     return completer.future;
   }
 
-  static Future<bool> deleteFile(String? fileName, String itemSuffix) async {
-    // print("delete file : $itemSuffix");
+  static Future<bool> deleteFile(String imageNameSuffix) async {
     try {
       String imageDir = await getImageDirPath();
-      if((await File('$imageDir/$fileName').exists())||(await File('$imageDir/$itemSuffix').exists())){
+      if(await File('$imageDir/$imageNameSuffix').exists()){
         try{
-          await File('$imageDir/$fileName').delete();
+          await File('$imageDir/$imageNameSuffix').delete();
+          return true;
         }catch(e){
-          try{
-            await File('$imageDir/$itemSuffix').delete();
-          }catch(e){
-            print("delete check file : $e");
-          }
+          return false;
         }
-        return true;
       }else{
         return false;
       }
@@ -122,11 +128,18 @@ class ImageUtility {
         decodedBytes[17] = (dpi & 0xff);
 
         File('$imageDir/$newFileName').writeAsBytesSync(decodedBytes);
+
+        for (var element in DefectImageData.allListImagesItem) {
+          if(element.newImgName == fileName){
+            element.newImgName = newFileName;
+          }
+        }
       });
     }catch(e){
       print(e);
     }
   }
+
 
   static Future<void> createImage(String itemName, int fileName) async {
     try {
@@ -162,33 +175,36 @@ class ImageUtility {
     }
   }
 
-  static Future<bool> saveImage(String imageUri, String imageName, String itemName, String itemSuffix) async {
-    print("itemSuffix $itemSuffix");
+  static Future<bool> saveImage(File _imageFile, String imageName, String _itemName, String _newImageName, ui.Image _logoImage, int _itemValue) async {
     try {
       String imageDir = await getImageDirPath();
-      if((await File('$imageDir/$imageName').exists())||(await File('$imageDir/$itemSuffix').exists())){
-        print("Image exist");
-        return false;
-      }else{
-        print("New Image");
-        Uri _uri = Uri.parse(imageUri);
-        File _file = await toFile(_uri);
-
-        Uint8List decodedBytes = await compressFile(_file,1600,1200,0);
+      // if((await File('$imageDir/$imageName').exists())||(await File('$imageDir/$imageNameSuffix').exists())){
+      //   return false;
+      // }else{
+        Uint8List decodedBytes = await compressFile(_imageFile,1600,1200,0);
         ui.Image _imageBackground = await ImageUtility.loadImage(decodedBytes);
-        await writeLogoInsideImage('$imageDir/$imageName',_imageBackground, itemName);
+        await writeLogoInsideImage('$imageDir/$_newImageName', _imageBackground, _itemName, _logoImage);
+
+        final listImagesItem = ListImagesItem(
+            itemValue: _itemValue,
+            oldImgName: imageName,
+            oldImgUriFile: _imageFile,
+            newImgName: _newImageName,
+            newImgPath: '$imageDir/$_newImageName'
+        );
+        DefectImageData.addImageItem(listImagesItem);
 
         return true;
-      }
+      // }
     } catch (e) {
       print(e);
       return false;
     }
   }
 
-  static Future<void> writeLogoInsideImage(String imagePath,ui.Image backgroundImage, String itemName) async{
-    print("Write logo : $itemName");
-    final ui.PictureRecorder recorder = ui.PictureRecorder();
+  static Future<void> writeLogoInsideImage(String imagePath, ui.Image backgroundImage, String itemName, ui.Image _logoImage) async{
+    // print("Write logo : $itemName");
+    ui.PictureRecorder recorder = ui.PictureRecorder();
     Canvas c = Canvas(recorder);
 
     paintImage(
@@ -204,7 +220,7 @@ class ImageUtility {
       isAntiAlias: false,
     );
 
-    final ui.Image _logoImage = await ImageUtility.loadUiImage('assets/images/pqc.png');
+    // final ui.Image _logoImage = await ImageUtility.loadUiImage('assets/images/pqc.png');
     double positionX = (backgroundImage.width - _logoImage.width * 1.15).toDouble();
     double positionY = (backgroundImage.height - _logoImage.height * 1.15).toDouble();
     c.drawImage(_logoImage, Offset(positionX,positionY), Paint());
@@ -218,7 +234,7 @@ class ImageUtility {
     double testPositionY = (backgroundImage.height - (backgroundImage.height - 8)).toDouble();
     textPainter.paint(c, Offset(testPositionX, testPositionY));
 
-    final ui.Picture picture = recorder.endRecording();
+    ui.Picture picture = recorder.endRecording();
 
     final img = await picture.toImage(backgroundImage.width, backgroundImage.height);
 
