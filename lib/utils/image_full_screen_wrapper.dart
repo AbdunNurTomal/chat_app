@@ -14,14 +14,12 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'image_util.dart';
 
 class ImageDialogOld extends StatefulWidget {
-  final String imageUri;
-  final String imageName;
   final String itemName;
   final ui.Image backgroundImage;
   final int imageIndex;
   final String editedName;
 
-  const ImageDialogOld({ Key? key, required this.backgroundImage, required this.imageUri, required this.imageName, required this.imageIndex, required this.itemName, required this.editedName}) : super(key: key);
+  const ImageDialogOld({ Key? key, required this.backgroundImage, required this.imageIndex, required this.itemName, required this.editedName}) : super(key: key);
 
   @override
   State<ImageDialogOld> createState() => _ImageDialogOldState();
@@ -298,10 +296,11 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
         });
 
     // print("widget.editedName ${DefectImageData.allListImagesItem[0].newImgName}");
-    final indexData = DefectImageData.allListImagesItem.indexWhere((element) =>
-      element.newImgName == widget.editedName.split('/').last
-    );
-    DefectImageData.updateImageItem(widget.editedName.split('/').last);
+    String editedImgName = widget.editedName.split(' / ').last;
+    // final foundImg = DefectImageData.allListImagesItem.where((element) => ((element.oldImgName == editedImgName)||(element.newImgName == editedImgName)||(element.proImgName == editedImgName)));
+    // if(foundImg.isNotEmpty){
+      DefectImageData.updateImageItem(editedImgName);
+    // }
 
     Navigator.pop(context);
   }

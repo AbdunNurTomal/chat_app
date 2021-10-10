@@ -27,6 +27,15 @@ class ImageUtility {
 
     return myImgDir;
   }
+  static Future<List<FileSystemEntity>> dirContents(Directory dir) {
+    var files = <FileSystemEntity>[];
+    var completer = Completer<List<FileSystemEntity>>();
+    var lister = dir.list(recursive: false);
+    lister.listen((file) => files.add(file),
+        // should also register onError
+        onDone: () => completer.complete(files));
+    return completer.future;
+  }
   static Future<String> getImageDirPath() async{
     final directory = await getExternalStorageDirectory();
     final myImagePath = '${directory?.path}/images';
@@ -80,21 +89,16 @@ class ImageUtility {
     return completer.future;
   }
 
-  static Future<bool> deleteFile(String? fileName, String itemSuffix) async {
-    // print("delete file : $itemSuffix");
+  static Future<bool> deleteFile(String imageNameSuffix) async {
     try {
       String imageDir = await getImageDirPath();
-      if((await File('$imageDir/$fileName').exists())||(await File('$imageDir/$itemSuffix').exists())){
+      if(await File('$imageDir/$imageNameSuffix').exists()){
         try{
-          await File('$imageDir/$fileName').delete();
+          await File('$imageDir/$imageNameSuffix').delete();
+          return true;
         }catch(e){
-          try{
-            await File('$imageDir/$itemSuffix').delete();
-          }catch(e){
-            print("delete check file : $e");
-          }
+          return false;
         }
-        return true;
       }else{
         return false;
       }
@@ -136,6 +140,7 @@ class ImageUtility {
     }
   }
 
+
   static Future<void> createImage(String itemName, int fileName) async {
     try {
       String imageDir = await getImageDirPath();
@@ -170,7 +175,7 @@ class ImageUtility {
     }
   }
 
-  static Future<bool> saveImage(File _imageFile, String imageName, String itemName, String imageNameSuffix, ui.Image _logoImage, int _itemValue) async {
+  static Future<bool> saveImage(File _imageFile, String imageName, String _itemName, String _newImageName, ui.Image _logoImage, int _itemValue) async {
     try {
       String imageDir = await getImageDirPath();
       // if((await File('$imageDir/$imageName').exists())||(await File('$imageDir/$imageNameSuffix').exists())){
@@ -178,14 +183,14 @@ class ImageUtility {
       // }else{
         Uint8List decodedBytes = await compressFile(_imageFile,1600,1200,0);
         ui.Image _imageBackground = await ImageUtility.loadImage(decodedBytes);
-        await writeLogoInsideImage('$imageDir/$imageNameSuffix', _imageBackground, itemName, _logoImage);
+        await writeLogoInsideImage('$imageDir/$_newImageName', _imageBackground, _itemName, _logoImage);
 
         final listImagesItem = ListImagesItem(
             itemValue: _itemValue,
             oldImgName: imageName,
             oldImgUriFile: _imageFile,
-            newImgName: imageNameSuffix,
-            newImgPath: '$imageDir/$imageNameSuffix'
+            newImgName: _newImageName,
+            newImgPath: '$imageDir/$_newImageName'
         );
         DefectImageData.addImageItem(listImagesItem);
 

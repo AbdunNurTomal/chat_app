@@ -75,12 +75,12 @@ class DefectImageData{
 
   static void updateImageItem(String item) {
 
-    print("need to update >>>>> $item");
+    // print("need to update >>>>> $item");
     for (var element in allListImagesItem) {
       if(element.newImgName == item){
         element.isImgEdited = true;
       }
-      print(">>>>> ${element.newImgName}");
+      // print(">>>>> ${element.newImgName}");
     }
   }
 

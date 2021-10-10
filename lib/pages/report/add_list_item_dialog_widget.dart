@@ -186,8 +186,11 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
         );
         _defectProvider.addItem(listItem);
 
-
         DefectData.deleteDefectItem(ddItem);
+
+        // for (var element in DefectImageData.allListImagesItem) {
+        //   print("add element >>> ${element.oldImgName} & newImageName >>> ${element.newImgName} & proImageName >>> ${element.proImgName}");
+        // }
       }
     }
     _defectProvider.showCircularProgress(false);

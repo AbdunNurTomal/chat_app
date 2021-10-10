@@ -8,10 +8,8 @@ import 'package:path_provider/path_provider.dart';
 
 class VideoProvider with ChangeNotifier{
   bool loading = false;
-  String name = 'video.mp4';
 
-
-  Future<void> videoMerger() async {
+  Future<File> videoMerger(String videoPath) async {
     final dir = await getExternalStorageDirectory();
     String imagePath = await ImageUtility.getImageDirPath();
 
@@ -80,11 +78,12 @@ class VideoProvider with ChangeNotifier{
     // String commandToExecute = '-r 15 -f mp3 -i ${Constants.AUDIO_PATH}' -f image2 -i ${Constants.IMAGE_PATH} -y ${Constants.OUTPUT_PATH}';
     // String commandToExecute = '-r 15 -f mp3 -i ${dir?.path}/bird.mp3 -f image2 -i $imagePath -y ${dir?.path}/$name';
 
-    String commandToExecute = '-r 1 -f mp3 -i ${dir?.path}/bird.mp3 -f image2 -framerate 1 -i $imagePath/1_%d.jpg -s 640x480 -pix_fmt yuv420p ${dir?.path}/$name';
-
-    // String commandToExecute = '-f image2 -framerate 1 -i $_imageNamePath ${dir?.path}/video.gif';
+    // String commandToExecute = '-r 25 -f mp3 -i ${dir?.path}/bird.mp3 -f image2 -framerate 1 -i $imagePath/%d.jpg -y $videoPath';
+    String commandToExecute = '-f image2 -framerate 1 -i $imagePath/%d.jpg -y $videoPath';
     _flutterFFmpeg.execute(commandToExecute).then((rc) => print('FFmpeg process exited with rc: $rc'));
     loading = false;
     notifyListeners();
+
+    return File(videoPath);
   }
 }

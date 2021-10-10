@@ -114,25 +114,39 @@ class ItemWidget extends StatelessWidget {
           ElevatedButton(
             onPressed: () async {
               String imageDir = await ImageUtility.getImageDirPath();
-              int counter = 0;
 
               for(int i=0;i<listItem.images.length;i++) {
-                ++counter;
-                // if(await File('$imageDir/${listItem.images[i].name}').exists()){
-                //   await File('$imageDir/${listItem.images[i].name}').delete();
-                // }
+                var foundImgIndex = DefectImageData.allListImagesItem.indexWhere((element) => (element.oldImgName == '${listItem.images[i].name}'));
+                if(foundImgIndex>0){
+                  if(await File('$imageDir/${listItem.images[i].name}').exists()){
+                    await File('$imageDir/${listItem.images[i].name}').delete();
+                  }
 
-                String? itemSuffix = "${listItem.itemValue}\_$counter.jpg";
-                if(await File('$imageDir/$itemSuffix').exists()){
-                  await File('$imageDir/$itemSuffix').delete();
+                  if(await File('$imageDir/${DefectImageData.allListImagesItem[foundImgIndex].newImgName}').exists()){
+                    await File('$imageDir/${DefectImageData.allListImagesItem[foundImgIndex].newImgName}').delete();
+                  }
+
+                  if(await File('$imageDir/${DefectImageData.allListImagesItem[foundImgIndex].proImgName}').exists()){
+                    await File('$imageDir/${DefectImageData.allListImagesItem[foundImgIndex].proImgName}').delete();
+                  }
+
+                  DefectImageData.allListImagesItem.removeWhere((element) => (element.oldImgName == '${listItem.images[i].name}'));
+                  int proCounter =0;
+                  for(int i=0;i<DefectImageData.allListImagesItem.length;i++){
+                    ++proCounter;
+                    String proImgName = '$proCounter.jpg';
+                    String proImgPath = '$imageDir/$proImgName';
+
+                    if(await(File('${DefectImageData.allListImagesItem[i].proImgName}').exists())){
+                      File('${DefectImageData.allListImagesItem[i].proImgName}').renameSync(proImgPath);
+                      DefectImageData.allListImagesItem[i].proImgName = proImgName;
+                    }
+                  }
                 }
-
-                DefectImageData.allListImagesItem.removeWhere((element) => element.newImgName == itemSuffix);
-
               }
-              for (var element in DefectImageData.allListImagesItem) {
-                print("element >>> ${element.oldImgName} & newImageName >>> ${element.newImgName} & proImageName >>> ${element.proImgName}");
-              }
+              // for (var element in DefectImageData.allListImagesItem) {
+              //   print("element >>> ${element.oldImgName} & newImageName >>> ${element.newImgName} & proImageName >>> ${element.proImgName}");
+              // }
 
               provider.deleteItem(listItem);
               final deleteToAddItem = Defects(
