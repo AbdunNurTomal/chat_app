@@ -180,7 +180,7 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
           itemValue: ddItemValue,
           item: ddItem,
           images: images,
-          edited: editedImage,
+          // edited: editedImage,
           //description: description,
           createdTime: DateTime.now(),
         );

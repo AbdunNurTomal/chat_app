@@ -150,7 +150,7 @@ class ImageUtility {
       var rect = const Rect.fromLTWH(0.0, 0.0, 300.0, 300.0);
       c.clipRect(rect);
 
-      final textStyle = TextStyle(color: Colors.white, fontSize: 24);
+      final textStyle = const TextStyle(color: Colors.white, fontSize: 24);
       TextSpan textSpan = TextSpan(text: itemName,style: textStyle);
       TextPainter textPainter = TextPainter(text: textSpan,textDirection: TextDirection.ltr);
       textPainter.layout(minWidth: 0,maxWidth: 300);

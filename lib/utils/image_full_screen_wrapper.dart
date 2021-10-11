@@ -2,13 +2,9 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:chat_app/models/defect.dart';
-import 'package:chat_app/models/list_image_item.dart';
-import 'package:chat_app/utils/painter.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_painter/flutter_painter.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'image_util.dart';
@@ -295,12 +291,8 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
           return RenderedImageDialog(imageFuture: imageFuture);
         });
 
-    // print("widget.editedName ${DefectImageData.allListImagesItem[0].newImgName}");
     String editedImgName = widget.editedName.split(' / ').last;
-    // final foundImg = DefectImageData.allListImagesItem.where((element) => ((element.oldImgName == editedImgName)||(element.newImgName == editedImgName)||(element.proImgName == editedImgName)));
-    // if(foundImg.isNotEmpty){
-      DefectImageData.updateImageItem(editedImgName);
-    // }
+    DefectImageData.updateImageItem(editedImgName);
 
     Navigator.pop(context);
   }

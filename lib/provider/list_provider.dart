@@ -51,7 +51,7 @@ class ListProvider with ChangeNotifier {
       oldListItem.itemValue = newListItem.itemValue;
       oldListItem.item = newListItem.item;
       oldListItem.images = newListItem.images;
-      oldListItem.edited = newListItem.edited;
+      // oldListItem.edited = newListItem.edited;
       oldListItem.createdTime = newListItem.createdTime;
     }
     notifyListeners();

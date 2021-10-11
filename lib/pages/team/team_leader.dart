@@ -1,8 +1,5 @@
-import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 import 'dart:typed_data';
-import 'dart:ui' as ui;
 
 import 'package:chat_app/models/defect.dart';
 import 'package:chat_app/models/list_item.dart';
@@ -20,12 +17,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:image/image.dart' as IMG;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:step_progress_indicator/step_progress_indicator.dart';
-import 'package:chat_app/pages/report/process_image_report.dart';
-import 'package:uri_to_file/uri_to_file.dart';
 import 'package:chat_app/utils/image_util.dart';
 
 class TeameLeaderPage extends StatefulWidget {
@@ -35,18 +28,6 @@ class TeameLeaderPage extends StatefulWidget {
   _TeameLeaderPageState createState() => _TeameLeaderPageState();
 }
 
-class PopUpMenuConstants{
-  // static const String ProcessItem = 'Process';
-  static const String SecondItem = 'Create Report';
-  // static const String ThirdItem = 'Create Video Report';
-
-  static const List<String> choices = <String>[
-    // ProcessItem,
-    SecondItem,
-    // ThirdItem,
-  ];
-
-}
 class _TeameLeaderPageState extends State<TeameLeaderPage> with SingleTickerProviderStateMixin {
   int counter = 0;
 
@@ -59,9 +40,10 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> with SingleTickerProv
 
   int progressIndicator=0;
   late var pdfImageFile;
+  String pdfReport = 'pdf_report.pdf';
   List<String> allImagePath = [];
   late var videoImageFile;
-
+  String videoReport = 'video_report.mp4';
   bool videoLoading = false;
 
   @override
@@ -73,31 +55,15 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> with SingleTickerProv
     super.initState();
   }
 
-  // Future<void> processChangeFileName() async{
-  //   for(int i=0;i<allItem.allListItem.length;i++){
-  //     int countImage=0;
-  //     if(allItem.allListItem[i].images.isNotEmpty){
-  //       String? itemSuffix = allItem.allListItem[i].itemValue;
-  //       for(int j=0;j<allItem.allListItem[i].images.length;j++){
-  //         countImage++;
-  //         String? imageName = allItem.allListItem[i].images[j].name;
-  //         String newImageName = '$itemSuffix\_$countImage.jpg';
-  //         await ImageUtility.changeFileNameOnly(imageName!,newImageName,300);
-  //       }
-  //     }
-  //   }
-  // }
   Future<void> processChangeFileName() async{
-    int countImg = 1;
     String imageDir = await ImageUtility.getImageDirPath();
     DefectImageData.allListImagesItem.sort((a,b) => a.newImgName!.compareTo(b.newImgName!));
 
     for (var element in DefectImageData.allListImagesItem) {
       if(await(File('$imageDir/${element.proImgName}').exists())){
         File('$imageDir/${element.proImgName}').renameSync('$imageDir/${element.newImgName}');
+        element.proImgName = element.newImgName;
       }
-      element.proImgName = element.newImgName;
-      countImg++;
     }
 
     Directory imgDir = await ImageUtility.getImageDir();
@@ -106,6 +72,7 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> with SingleTickerProv
 
     int countNewImage=1;
     int count =0;
+    allImagePath = [];
     for (var f in fileList) {
       String proImgName = '$countNewImage.jpg';
       String proImgPath = '$imageDir/$proImgName';
@@ -131,128 +98,7 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> with SingleTickerProv
   void openVideo(BuildContext context, File file) => Navigator.of(context).push(
     MaterialPageRoute(builder: (context) => VideoViewerPage(file: file)),
   );
-  // void _showProcessDialog(context) {
-  //   // allItem.showCircularProgress(true);
-  //   // DialogCircularBuilder(context).showLoadingIndicator(value: allItem.circularIndicator, text: '');
-  //   // allItem = Provider.of<ListProvider>(context,listen: false);
-  //   //print("Item <<>> ${allItem.allListItem[0].images[0].identifier}");
-  //   // allItem.showBtnDownloadPDF(true);
-  //   // allItem.showCircularProgress(false);
-  //   // DialogCircularBuilder(context).hideOpenDialog();
-  //
-  //   showDialog(
-  //     barrierDismissible: false,
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         insetPadding: const EdgeInsets.all(8.0),
-  //         title: const Center(child: Text('Precess Report File')),
-  //         content: FutureBuilder(
-  //           future: processChangeFileName(),
-  //           builder: (context, snapshot) {
-  //             if (snapshot.connectionState != ConnectionState.done) {
-  //               return const SizedBox(
-  //                 height: 50,
-  //                 child: Center(child: CircularProgressIndicator.adaptive()),
-  //               );
-  //             }
-  //             return SizedBox(
-  //               width: MediaQuery
-  //                   .of(context)
-  //                   .size
-  //                   .width * 0.8,
-  //               height: 180,
-  //               child: Column(
-  //                 mainAxisAlignment: MainAxisAlignment.start,
-  //                 crossAxisAlignment: CrossAxisAlignment.stretch,
-  //                 children: <Widget>[
-  //                   Row(
-  //                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                     children: <Widget>[
-  //                       const Icon(Icons.picture_as_pdf_sharp),
-  //                       const Padding(
-  //                         padding: EdgeInsets.only(left: 8.0),
-  //                         child: Text(' Create a Pdf report'),
-  //                       ),
-  //                       SizedBox(
-  //                         child: AnimatedBuilder(
-  //                           animation: _downloadControllers[0],
-  //                           builder: (context, child) {
-  //                             return DownloadButton(
-  //                               status: _downloadControllers[0]
-  //                                   .downloadStatus,
-  //                               downloadProgress: _downloadControllers[0]
-  //                                   .progress,
-  //                               onDownload: _downloadControllers[0]
-  //                                   .startDownload,
-  //                               onCancel: _downloadControllers[0]
-  //                                   .stopDownload,
-  //                               onOpen: _downloadControllers[0].openDownload,
-  //                             );
-  //                           },
-  //                         ),
-  //                       ),
-  //                     ],
-  //                   ),
-  //                   const SizedBox(height: 20.0),
-  //                   Row(
-  //                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                     children: <Widget>[
-  //                       const Icon(Icons.video_collection_sharp),
-  //                       const Padding(
-  //                         padding: EdgeInsets.only(left: 8.0),
-  //                         child: Text(' Create a Video report'),
-  //                       ),
-  //                       SizedBox(
-  //                         width: 96.0,
-  //                         child: AnimatedBuilder(
-  //                           animation: _downloadControllers[1],
-  //                           builder: (context, child) {
-  //                             return DownloadButton(
-  //                               status: _downloadControllers[1]
-  //                                   .downloadStatus,
-  //                               downloadProgress: _downloadControllers[1]
-  //                                   .progress,
-  //                               onDownload: _downloadControllers[1]
-  //                                   .startDownload,
-  //                               onCancel: _downloadControllers[1]
-  //                                   .stopDownload,
-  //                               onOpen: _downloadControllers[1].openDownload,
-  //                             );
-  //                           },
-  //                         ),
-  //                       ),
-  //                     ],
-  //                   ),
-  //                   const SizedBox(height: 40.0),
-  //                   InkWell(
-  //                     child: Container(
-  //                       padding: const EdgeInsets.only(
-  //                           top: 10.0, bottom: 10.0),
-  //                       decoration: const BoxDecoration(
-  //                         color: Colors.blue,
-  //                         borderRadius: BorderRadius.all(Radius.circular(32)),
-  //                         // borderRadius: BorderRadius.only(
-  //                         //   bottomLeft: Radius.circular(32.0),
-  //                         //   bottomRight: Radius.circular(32.0)
-  //                         // ),
-  //                       ),
-  //                       child: const Text(
-  //                         "Done",
-  //                         style: TextStyle(color: Colors.white),
-  //                         textAlign: TextAlign.center,
-  //                       ),
-  //                     ),
-  //                   ),
-  //                 ],
-  //               ),
-  //             );
-  //           }
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
+
   void _showProcessDialog(context){
     showDialog(
       barrierDismissible: true,
@@ -288,18 +134,29 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> with SingleTickerProv
                       style: TextButton.styleFrom(backgroundColor: isBtnPDFPressed ? Colors.greenAccent : Colors.orangeAccent ),
                       onPressed: () async{
                         setState(() => isBtnPDFPressed = !isBtnPDFPressed);
-                        String pdfReport = 'pdf_report.pdf';
 
-                        var dir = await getExternalStorageDirectory();
-                        String pdfPath = '${dir?.path}/$pdfReport';
-                        if(await File(pdfPath).exists()){
-                          await File(pdfPath).delete();
-                        }
+                        allItem.showCircularProgress(true);
+                        DialogCircularBuilder(context).showLoadingIndicator(value: allItem.circularIndicator, text: '');
 
+                        await GlobalMethod.deleteFile(pdfReport);
                         pdfImageFile = await PdfApiImageReport.generateImage(allImagePath, pdfReport);
 
-                        if(pdfImageFile == null) return;
-                        openPDF(context,pdfImageFile);
+                        allItem.showCircularProgress(false);
+                        DialogCircularBuilder(context).hideOpenDialog();
+
+                        if(pdfImageFile == null) {
+                          Fluttertoast.showToast(
+                              msg: "Problem on create pdf",
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.CENTER,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.red,
+                              textColor: Colors.white,
+                              fontSize: 20.0
+                          );
+                        }else{
+                          openPDF(context,pdfImageFile);
+                        }
                       },
                     )
                   ),
@@ -311,9 +168,11 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> with SingleTickerProv
                       style: TextButton.styleFrom(backgroundColor: isBtnVideoPressed ? Colors.greenAccent : Colors.orangeAccent ),
                       onPressed: () async{
                         setState(() => isBtnVideoPressed = !isBtnVideoPressed);
-                        String videoReport = 'video_report.mp4';
+                        // String videoReport = 'video_report.mp4';
                         var dir = await getExternalStorageDirectory();
                         String videoPath = '${dir?.path}/$videoReport';
+
+                        // await GlobalMethod.deleteFile(videoReport);
                         // if(await File(videoPath).exists()){
                         //   await File(videoPath).delete();
                         // }
@@ -362,7 +221,6 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> with SingleTickerProv
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -381,69 +239,46 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> with SingleTickerProv
           title: Row(
             children: [
               SizedBox(
-                  width:20,
-                  child:Image.asset("images/pqc.png")
+                width:20,
+                child:Image.asset("images/pqc.png")
               ),
               const SizedBox(width:10),
               const Text('Pictures Report Form'),
             ],
           ),
-          actions: <Widget>[
-            PopupMenuButton<String>(
-              elevation: 20,
-              enabled: true,
-              onSelected: (value) async {
-                if(allItem.allListItem.isNotEmpty){
-                  switch(value){
-                    case 'Process':
-                      // _showProcessDialog(context);
-                      break;
-                    case 'Create Report':
-                      _showProcessDialog(context);
-                      break;
-                  }
-                }else{GlobalMethod.showAlertDialog(context,"Report Process Operation","No item found!!!");}
-              },
-              itemBuilder: (BuildContext context) {
-                return PopUpMenuConstants.choices.map((String choice) {
-                  return PopupMenuItem<String>(
-                    value: choice,
-                    child: Text(choice),
-                  );
-                }).toList();
-              },
+          actions: [
+            IconButton(
+              onPressed: () => _showProcessDialog(context),
+              icon: const Icon(Icons.settings)
             )
           ],
         ),
 
         floatingActionButton: FloatingActionButton(
-          child: const Text(
-            '+',
-            style: TextStyle(fontSize: 20.0),
-          ),
+          child: const Text('+',style: TextStyle(fontSize: 20.0)),
           shape: RoundedRectangleBorder(
               side: const BorderSide(
                   color: Colors.black26, width: 1.0, style: BorderStyle.solid),
-              borderRadius: BorderRadius.circular(10.0)),
+              borderRadius: BorderRadius.circular(10.0)
+            ),
             onPressed: () => showDialog(
               context: context,
               builder: (context) => AddListItemDialogWidget(),
               barrierDismissible: false,
             ),
         ),
-        body:  Container(
-            //margin: const EdgeInsets.all(6),
-            decoration: const BoxDecoration(
-                //border: Border.all(
-                //  color: Colors.black12,
-                //  width: 3,
-                //),
-                //borderRadius: BorderRadius.circular(5),
-              color: Colors.white,
-            ),
+        body: Container(
+          decoration: const BoxDecoration(
+            border: Border.symmetric(vertical: BorderSide(color: Colors.black, width: 1)),
+            color: Colors.black12
+          ),
 
-            // showAlertDialog(context),
-            child: ListItemWidget()
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          padding: const EdgeInsets.all(1.0),
+          child: LayoutBuilder(builder: (context, constraints) {
+            return ListItemWidget();
+          }),
         ),
     );
   }

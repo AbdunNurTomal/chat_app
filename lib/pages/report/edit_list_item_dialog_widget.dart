@@ -34,6 +34,7 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
   String ddItem = '';
   List<Asset> images = <Asset>[];
   List<int> editedImage = [];
+  bool deletedImage = false;
 
   late ListProvider _defectProvider;
   final TextEditingController _ddIemController = TextEditingController();
@@ -47,7 +48,7 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
     images = widget.listItem.images;
     ddItem = widget.listItem.item!;
     ddItemValue = widget.listItem.itemValue!;
-    editedImage = widget.listItem.edited;
+    // editedImage = widget.listItem.edited;
   }
 
   @override
@@ -141,29 +142,40 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
 
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
+      String imageDir = await ImageUtility.getImageDirPath();
       int counter = 0;
       int addCounter = 0;
       final ui.Image _logoImage = await ImageUtility.loadUiImage('assets/images/pqc.png');
 
       for (int i = 0; i < images.length; i++) {
         ++counter;
+        String _newImageName = "$ddItemValue\_$counter.jpg";
         String? imageUri = images[i].identifier;
         String? _imageName = images[i].name;
         String? _itemName = "$ddItem\nNo-$counter";
 
-        var foundName = DefectImageData.allListImagesItem.indexWhere((element) => (element.oldImgName == _imageName));
-        if(foundName<0){
+        if((DefectImageData.allListImagesItem.indexWhere((element) => (element.oldImgName == _imageName)))<0){
           Uri _imageUri = Uri.parse(imageUri!);
           File _imageFile = await toFile(_imageUri);
-          String _newImageName = "$ddItemValue\_$counter.jpg";
+
           int itemValue = int.parse(ddItemValue);
 
           if (await ImageUtility.saveImage(_imageFile, _imageName!, _itemName, _newImageName, _logoImage, itemValue)) {
             ++addCounter;
           }
+        }else if((DefectImageData.allListImagesItem.indexWhere((element) => (element.newImgName == _newImageName)))<0){
+          var _foundName = DefectImageData.allListImagesItem.indexWhere((element) => (element.oldImgName == _imageName));
+          if(_foundName>=0){
+            File('$imageDir/${DefectImageData.allListImagesItem[_foundName].proImgName}').renameSync('$imageDir/$_newImageName');
+            DefectImageData.allListImagesItem[_foundName].newImgName = _newImageName;
+            DefectImageData.allListImagesItem[_foundName].proImgName = _newImageName;
+          }
         }
       }
       DefectImageData.allListImagesItem.sort((a,b) => a.newImgName!.compareTo(b.newImgName!));
+      // for (var element in DefectImageData.allListImagesItem) {
+      //   print("edited add element >>> ${element.oldImgName} & newImageName >>> ${element.newImgName} & proImageName >>> ${element.proImgName}");
+      // }
 
       Fluttertoast.showToast(
           msg: (addCounter>0)?"Added $addCounter Item":"Updated Item",
@@ -180,7 +192,7 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
         itemValue: ddItemValue,
         item: ddItem,
         images: images,
-        edited: editedImage,
+        // edited: editedImage,
         createdTime: DateTime.now(),
       );
       _defectProvider.editItem(widget.listItem, updateListItem);
@@ -292,56 +304,46 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
                 itemCount: images.length,
                 itemBuilder: (context, index) {
                   Asset asset = images[index];
-                  //print("name ${asset.name}");
-                  //print("identifier ${asset.identifier}");
-                  // print("List edit item : $editedImage");
                   return Card(
-                    //clipBehavior: Clip.antiAlias,
                     elevation: 5.0,
                     child: Stack(
                       children: <Widget>[
                         InkWell(
                           onTap: ()async {
                             String? imageName = images[index].name;
-                            // String? imageUri = images[index].identifier;
-                            String imageNameSuffix = '$ddItemValue\_${index+1}.jpg';
+                            String imageNameSuffixPro='';
+                            String imageNameSuffix='';
 
-                            String? imageNameSuffixPro='';
-                            var foundProImgName = DefectImageData.allListImagesItem.where((element) => ((element.oldImgName == imageName)||(element.newImgName == imageName)));
-                            if(foundProImgName.isNotEmpty) {
-                              imageNameSuffixPro = foundProImgName.first.proImgName;
-                            }
+                            String imageDir = await ImageUtility.getImageDirPath();
+                            String editedFileName = '';
+                            Uint8List? _imageBytesList;
 
                             try{
-                              String imageDir = await ImageUtility.getImageDirPath();
-                              String editedFileName = '';
-                              Uint8List? _imageBytesList;
+                              var foundProImgName = DefectImageData.allListImagesItem.where((element) => (element.oldImgName == imageName));
+                              if(foundProImgName.isNotEmpty) {
+                                imageNameSuffix = '${foundProImgName.first.newImgName}';
+                                imageNameSuffixPro = '${foundProImgName.first.proImgName}';
 
-                              if(await File('$imageDir/$imageName').exists()){
-                                _imageBytesList = File('$imageDir/$imageName').readAsBytesSync();
-                                editedFileName = '$imageDir/$imageName';
-                              }else if(await File('$imageDir/$imageNameSuffix').exists()){
-                                _imageBytesList = File('$imageDir/$imageNameSuffix').readAsBytesSync();
-                                editedFileName = '$imageDir/$imageNameSuffix';
-                              }else if(await File('$imageDir/$imageNameSuffixPro').exists()){
-                                _imageBytesList = File('$imageDir/$imageNameSuffixPro').readAsBytesSync();
-                                editedFileName = '$imageDir/$imageNameSuffixPro';
-                              }
+                                if(await File('$imageDir/$imageNameSuffix').exists()){
+                                  _imageBytesList = File('$imageDir/$imageNameSuffix').readAsBytesSync();
+                                  editedFileName = '$imageDir/$imageNameSuffix';
+                                }else if(await File('$imageDir/$imageNameSuffixPro').exists()){
+                                  _imageBytesList = File('$imageDir/$imageNameSuffixPro').readAsBytesSync();
+                                  editedFileName = '$imageDir/$imageNameSuffixPro';
+                                }
 
-                              var foundName = DefectImageData.allListImagesItem.where((element) => ((element.oldImgName == imageName)||(element.newImgName == imageNameSuffix)||(element.proImgName == imageNameSuffixPro))).toList().length;
-                              if(foundName>0){
                                 Uint8List decodedBytes = await ImageUtility.compressImageList(_imageBytesList!,1200,1600,90);
                                 ui.Image _myBackgroundImage = await ImageUtility.loadImage(decodedBytes);
 
                                 final result = await Navigator.push(context,
-                                  MaterialPageRoute(builder: (context) => ImageDialogOld(
-                                    backgroundImage: _myBackgroundImage,
-                                    imageIndex: index,
-                                    itemName: _ddIemController.text,
-                                    editedName: editedFileName,
-                                  )));
+                                    MaterialPageRoute(builder: (context) => ImageDialogOld(
+                                      backgroundImage: _myBackgroundImage,
+                                      imageIndex: index,
+                                      itemName: _ddIemController.text,
+                                      editedName: editedFileName,
+                                    )));
                                 if(result!=null){
-                                  editedImage.add(result);
+                                  // editedImage.add(result);
                                   // print("editedImage $editedImage");
                                   setState((){
                                     editedImage = Set.of(editedImage).toList();
@@ -358,11 +360,6 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
                                     fontSize: 16.0
                                 );
                               }
-
-                              // for (var element in DefectImageData.allListImagesItem) {
-                              //   print("edit element >>> ${element.oldImgName} & newImageName >>> ${element.newImgName} & proImageName >>> ${element.proImgName}");
-                              // }
-
                             } catch (e) {
                               print(e);
                             }
@@ -402,53 +399,41 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
                               color: Colors.red,
                             ),
                             onTap: () async {
-                              int counter = index+1;
-                              bool deletedImage = false;
+                              String? imageName = images[index].name;
                               String imageDir = await ImageUtility.getImageDirPath();
-                              String imageNameSuffix = "$ddItemValue\_$counter.jpg";
 
-                              // for (var element in DefectImageData.allListImagesItem) {
-                              //   print("delete element >>> ${element.oldImgName} & newImageName >>> ${element.newImgName} & proImageName >>> ${element.proImgName}");
-                              // }
+                              String imageNameSuffix = '';
+                              String imageNameSuffixPro = '';
+                              var foundImgIndex = DefectImageData.allListImagesItem.indexWhere((element) => (element.oldImgName == imageName));
+                              if(foundImgIndex>=0){
+                                imageNameSuffix = '${DefectImageData.allListImagesItem[foundImgIndex].newImgName}';
+                                imageNameSuffixPro = '${DefectImageData.allListImagesItem[foundImgIndex].proImgName}';
 
-                              String imageNameSuffixPro='';
-                              var foundProImgName = DefectImageData.allListImagesItem.where((element) => (element.newImgName == imageNameSuffix));
-                              if(foundProImgName.isNotEmpty) {
-                                imageNameSuffixPro = '${foundProImgName.first.proImgName}';
-                              }
-                              // print("imageNameSuffixPro : $imageNameSuffixPro");
-                              if(imageNameSuffixPro!='null'){
-                                int proCounter = 0;
-                                deletedImage = await ImageUtility.deleteFile(imageNameSuffixPro);
-                                DefectImageData.allListImagesItem.removeWhere((element) => (element.proImgName == imageNameSuffixPro));
-                                for(int i=0;i<DefectImageData.allListImagesItem.length;i++){
-                                  ++proCounter;
-                                  String? proOldImgName = DefectImageData.allListImagesItem[i].proImgName;
-                                  String proImgName = '$proCounter.jpg';
+                                if(await File('$imageDir/$imageNameSuffix').exists()){
+                                  await File('$imageDir/$imageNameSuffix').delete();
+                                  DefectImageData.allListImagesItem.removeWhere((element) => (element.newImgName == imageNameSuffix));
+                                  setState(()=> deletedImage = true);
 
-                                  String newImgPath = '$imageDir/$proImgName';
-                                  await(File('$imageDir/$proOldImgName').exists()).then((_) {
-                                    File('$imageDir/$proOldImgName').renameSync(newImgPath);
-                                    DefectImageData.allListImagesItem[i].proImgName = proImgName;
-                                  });
-                                }
-                              }else{
-                                deletedImage = await ImageUtility.deleteFile(imageNameSuffix);
-                                DefectImageData.allListImagesItem.removeWhere((element) => (element.newImgName == imageNameSuffix));
-                                try {
-                                  Directory imageDir = await ImageUtility.getImageDir();
-                                  List<FileSystemEntity> entries = imageDir.listSync(recursive: false).toList();
-                                  int newCounter = 0;
-                                  for (var i = 0; i < entries.length; i++) {
-                                    var fileName = (entries[i].path.split('/').last);
-                                    if ((fileName.split('_').first) == ddItemValue) {
-                                      ++newCounter;
-                                      String newName = "$ddItemValue\_$newCounter.jpg";
-                                      await ImageUtility.changeFileNameOnly(fileName, newName, 300);
+                                  try {
+                                    Directory imageDir = await ImageUtility.getImageDir();
+                                    List<FileSystemEntity> entries = imageDir.listSync(recursive: false).toList();
+                                    int newCounter = 0;
+                                    for (var i = 0; i < entries.length; i++) {
+                                      var fileName = (entries[i].path.split('/').last);
+                                      if ((fileName.split('_').first) == ddItemValue) {
+                                        ++newCounter;
+                                        String newName = "$ddItemValue\_$newCounter.jpg";
+                                        File('$imageDir/$fileName').renameSync('$imageDir/$newName');
+                                      }
                                     }
-                                  }
-                                } catch (e) { print(e); }
+                                  } catch (e) { print(e); }
+                                }else if(await File('$imageDir/$imageNameSuffixPro').exists()){
+                                  await File('$imageDir/$imageNameSuffixPro').delete();
+                                  DefectImageData.allListImagesItem.removeWhere((element) => (element.proImgName == imageNameSuffixPro));
+                                  setState(()=> deletedImage = true);
+                                }
                               }
+
                               if (deletedImage == true) {
                                 Fluttertoast.showToast(
                                     msg: "Image Deleted",
@@ -471,11 +456,6 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
                                     fontSize: 16.0
                                 );
                               }
-
-                              // for (var element in DefectImageData.allListImagesItem) {
-                              //   print("delete element >>> ${element.oldImgName} & newImageName >>> ${element.newImgName} & proImageName >>> ${element.proImgName}");
-                              // }
-
                               setState(() {
                                 images.removeAt(index);
                               });
