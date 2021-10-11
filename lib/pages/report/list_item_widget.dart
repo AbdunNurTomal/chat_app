@@ -41,7 +41,7 @@ class _ListItemWidgetState extends State<ListItemWidget> {
               padding: const EdgeInsets.all(10),
               separatorBuilder: (context, index) => const Divider(
                 height: 6,
-                //color: Colors.black,
+                color: Colors.black,
               ),
               itemCount: listClass.length,
               itemBuilder: (context, index) {

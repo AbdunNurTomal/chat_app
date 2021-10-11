@@ -1,7 +1,8 @@
-import 'package:chat_app/auth/firebase_auth_service.dart';
-import 'package:chat_app/models/check_firestore_data.dart';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'custom_color.dart';
 
@@ -191,5 +192,17 @@ class GlobalMethod {
 
     var foundElements = list.where((e) => e == element);
     return foundElements.length;
+  }
+
+  /// delete file
+  static Future<bool> deleteFile(String fileName) async {
+    var dir = await getExternalStorageDirectory();
+    String _filePath = '${dir?.path}/$fileName';
+    if(await File(_filePath).exists()){
+      await File(_filePath).delete();
+      return true;
+    }else{
+      return false;
+    }
   }
 }

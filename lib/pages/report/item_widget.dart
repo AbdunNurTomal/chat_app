@@ -20,7 +20,7 @@ import 'edit_list_item_dialog_widget.dart';
 
 class ItemWidget extends StatelessWidget {
   final ListItem  listItem;
-  ItemWidget({Key? key, required this.listItem}) : super(key: key);
+  const ItemWidget({Key? key, required this.listItem}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => ClipRRect(
@@ -47,17 +47,18 @@ class ItemWidget extends StatelessWidget {
       child: buildItem(context),
     ),
   );
+
   Widget buildItem(BuildContext context) {
-    //print("List Item : ${listItem.item}");
     return GestureDetector(
       onTap: () => editItem(context, listItem),
       child: Container(
         decoration: BoxDecoration(
           border: Border.all(
-            color: Colors.black26,
+            color: Colors.black12,
             width: 3,
           ),
-          borderRadius: BorderRadius.circular(5)
+          borderRadius: BorderRadius.circular(5),
+          color: Colors.black26,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,7 +68,7 @@ class ItemWidget extends StatelessWidget {
                 height: 10,
                 child: DecoratedBox(
                   decoration: BoxDecoration(
-                    color: Colors.black54,
+                    color: Colors.black,
                     border: Border.all(
                       color: Colors.black12,
                       width: 2,
@@ -80,11 +81,11 @@ class ItemWidget extends StatelessWidget {
                     ),
                   ),
                   child: StepProgressIndicator(
-                    totalSteps: 20,
+                    totalSteps: 15,
                     currentStep: listItem.images.length,
                     size: 5,
                     selectedColor: Colors.orange,
-                    unselectedColor: Colors.white24,
+                    unselectedColor: Colors.white54,
                   )
                 ),
             ),
@@ -114,34 +115,23 @@ class ItemWidget extends StatelessWidget {
           ElevatedButton(
             onPressed: () async {
               String imageDir = await ImageUtility.getImageDirPath();
+              String imageNameSuffix = '';
+              String imageNameSuffixPro = '';
 
               for(int i=0;i<listItem.images.length;i++) {
                 var foundImgIndex = DefectImageData.allListImagesItem.indexWhere((element) => (element.oldImgName == '${listItem.images[i].name}'));
-                if(foundImgIndex>0){
-                  if(await File('$imageDir/${listItem.images[i].name}').exists()){
-                    await File('$imageDir/${listItem.images[i].name}').delete();
-                  }
+                if(foundImgIndex>=0){
+                  imageNameSuffix = '${DefectImageData.allListImagesItem[foundImgIndex].newImgName}';
+                  imageNameSuffixPro = '${DefectImageData.allListImagesItem[foundImgIndex].proImgName}';
 
-                  if(await File('$imageDir/${DefectImageData.allListImagesItem[foundImgIndex].newImgName}').exists()){
-                    await File('$imageDir/${DefectImageData.allListImagesItem[foundImgIndex].newImgName}').delete();
+                  if(await File('$imageDir/$imageNameSuffix}').exists()){
+                    await File('$imageDir/$imageNameSuffix').delete();
                   }
-
-                  if(await File('$imageDir/${DefectImageData.allListImagesItem[foundImgIndex].proImgName}').exists()){
-                    await File('$imageDir/${DefectImageData.allListImagesItem[foundImgIndex].proImgName}').delete();
+                  if(await File('$imageDir/$imageNameSuffixPro').exists()){
+                    await File('$imageDir/$imageNameSuffixPro').delete();
                   }
 
                   DefectImageData.allListImagesItem.removeWhere((element) => (element.oldImgName == '${listItem.images[i].name}'));
-                  int proCounter =0;
-                  for(int i=0;i<DefectImageData.allListImagesItem.length;i++){
-                    ++proCounter;
-                    String proImgName = '$proCounter.jpg';
-                    String proImgPath = '$imageDir/$proImgName';
-
-                    if(await(File('${DefectImageData.allListImagesItem[i].proImgName}').exists())){
-                      File('${DefectImageData.allListImagesItem[i].proImgName}').renameSync(proImgPath);
-                      DefectImageData.allListImagesItem[i].proImgName = proImgName;
-                    }
-                  }
                 }
               }
               // for (var element in DefectImageData.allListImagesItem) {

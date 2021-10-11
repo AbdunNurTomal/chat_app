@@ -7,14 +7,14 @@ class ListItem {
   String? item;
   DateTime? createdTime;
   List<Asset> images;
-  List<int> edited;
+  // List<int> edited;
 
   ListItem({
     this.id,
     required this.itemValue,
     required this.item,
     required this.images,
-    required this.edited,
+    // required this.edited,
     this.createdTime,
   });
 
