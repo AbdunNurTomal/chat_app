@@ -17,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:chat_app/utils/image_util.dart';
@@ -29,6 +30,15 @@ class TeameLeaderPage extends StatefulWidget {
 }
 
 class _TeameLeaderPageState extends State<TeameLeaderPage> with SingleTickerProviderStateMixin {
+
+  // static const List<Widget> pictureReportTabs = [
+  //   Center(child: Text('LAYOUT')),
+  //   Center(child: defectWidget()),
+  //   Center(child: Text('APPROVE')),
+  //   Center(child: Text('OTHER')),
+  // ];
+  late TabController? _tabController;
+
   int counter = 0;
 
   late ListProvider allItem;
@@ -48,11 +58,20 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> with SingleTickerProv
 
   @override
   void initState() {
+    super.initState();
+    _tabController = TabController(length: 4, vsync: this);
+    _tabController!.addListener(() {
+      print(_tabController!.index);
+    });
     DefectData.callDefect();
     allItem = Provider.of<ListProvider>(context,listen: false);
     videoItem = Provider.of<VideoProvider>(context,listen: false);
-    taskItems = allItem.allListItem;
-    super.initState();
+  }
+
+  @override
+  void dispose(){
+    super.dispose();
+    _tabController!.dispose();
   }
 
   Future<void> processChangeFileName() async{
@@ -223,6 +242,21 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> with SingleTickerProv
 
   @override
   Widget build(BuildContext context) {
+    var tabBar = TabBar(
+      controller: _tabController,
+      isScrollable: true,
+      indicatorColor: Colors.white,
+      labelColor: Colors.white,
+      tabs: const [
+        Tab(child: Text('LAYOUT',style: TextStyle(fontSize: 12))),
+        Tab(child: Text('DEFECT',style: TextStyle(fontSize: 12),)),
+        Tab(child: Text('APPROVE',style: TextStyle(fontSize: 12),)),
+        Tab(child: Text('OTHER',style: TextStyle(fontSize: 12),)),
+      ],
+      onTap: (index){
+        print(index);
+      },
+    );
     return Scaffold(
         appBar: AppBar(
           leading: Builder(
@@ -252,6 +286,16 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> with SingleTickerProv
               icon: const Icon(Icons.settings)
             )
           ],
+
+          bottom: PreferredSize(
+            child: Container(
+              alignment: Alignment.center,
+              width: double.infinity,
+              // color: Colors.blueAccent,
+              child: tabBar,
+            ),
+            preferredSize: Size(double.infinity, tabBar.preferredSize.height),
+          ),
         ),
 
         floatingActionButton: FloatingActionButton(
@@ -267,19 +311,45 @@ class _TeameLeaderPageState extends State<TeameLeaderPage> with SingleTickerProv
               barrierDismissible: false,
             ),
         ),
-        body: Container(
-          decoration: const BoxDecoration(
-            border: Border.symmetric(vertical: BorderSide(color: Colors.black, width: 1)),
-            color: Colors.black12
+        body: Center(
+          child: TabBarView(
+            controller: _tabController,
+            children: [
+              layoutWidget(context),
+              defectWidget(context),
+              approveWidget(context),
+              otherWidget(context)
+            ],
           ),
-
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-          padding: const EdgeInsets.all(1.0),
-          child: LayoutBuilder(builder: (context, constraints) {
-            return ListItemWidget();
-          }),
         ),
+
     );
+  }
+
+  Widget layoutWidget(BuildContext context){
+    return const Center(child: Text('LAYOUT WIDGET'));
+  }
+  Widget defectWidget(BuildContext context) {
+    taskItems = allItem.allListItem;
+
+    return Container(
+      decoration: const BoxDecoration(
+          border: Border.symmetric(vertical: BorderSide(color: Colors.black, width: 1)),
+          color: Colors.black12
+      ),
+
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height,
+      padding: const EdgeInsets.all(1.0),
+      child: LayoutBuilder(builder: (context, constraints) {
+        return ListItemWidget();
+      }),
+    );
+  }
+  Widget approveWidget(BuildContext context){
+    return const Center(child: Text('APPROVE WIDGET'));
+  }
+  Widget otherWidget(BuildContext context){
+    return const Center(child: Text('OTHER WIDGET'));
   }
 }

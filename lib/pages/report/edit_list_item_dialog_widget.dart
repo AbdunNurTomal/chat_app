@@ -4,7 +4,6 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:chat_app/models/defect.dart';
-import 'package:chat_app/models/list_image_item.dart';
 import 'package:chat_app/models/list_item.dart';
 import 'package:chat_app/provider/list_provider.dart';
 import 'package:chat_app/utils/circular_progress_dialog.dart';
@@ -33,7 +32,8 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
   String ddItemValue = '';
   String ddItem = '';
   List<Asset> images = <Asset>[];
-  List<int> editedImage = [];
+  List<bool> duplicateImg = [];
+  List<bool> editedImage = [];
   bool deletedImage = false;
 
   late ListProvider _defectProvider;
@@ -48,7 +48,10 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
     images = widget.listItem.images;
     ddItem = widget.listItem.item!;
     ddItemValue = widget.listItem.itemValue!;
-    // editedImage = widget.listItem.edited;
+
+    for (var element in DefectImageData.allListImagesItem) {
+      editedImage.add(element.isImgEdited);
+    }
   }
 
   @override
@@ -137,11 +140,50 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
 
   void _saveItem() async{
     _defectProvider.showCircularProgress(true);
-    DialogCircularBuilder(context).showLoadingIndicator(
-        value: _defectProvider.circularIndicator, text: '');
+    DialogCircularBuilder(context).showLoadingIndicator(value: _defectProvider.circularIndicator, text: '');
 
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
+
+      var duplicateImgMsgBuilder = StringBuffer();
+      duplicateImgMsgBuilder.write("Duplicate pictures found\n");
+
+      for (int i = 0; i < images.length; i++) {
+        var foundIndexImg = DefectImageData.allListImagesItem.indexWhere((element) => (element.oldImgName == images[i].name));
+        if(foundIndexImg>=0){
+          var categoryPosition = DefectImageData.allListImagesItem[foundIndexImg].newImgName!.split('.').first;
+
+          String _inCategory = categoryPosition.split('_').first;
+          var _inPosition = categoryPosition.split('_').last;
+
+          if(_inCategory != ddItemValue){
+            duplicateImgMsgBuilder.write("> added in category $_inCategory and position $_inPosition\n");
+            setState(() => duplicateImg[i] = true);
+          }else{
+            duplicateImg[i] = false;
+          }
+        }else{
+          duplicateImg[i] = false;
+        }
+      }
+      if(duplicateImg.contains(true)) {
+        _defectProvider.showCircularProgress(false);
+        DialogCircularBuilder(context).hideOpenDialog();
+
+        Fluttertoast.showToast(
+            msg: duplicateImgMsgBuilder.toString(),
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 5,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0
+        );
+
+        return;
+      }
+
+
       String imageDir = await ImageUtility.getImageDirPath();
       int counter = 0;
       int addCounter = 0;
@@ -277,7 +319,6 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
   }
 
   Widget buildGridView() {
-    ListProvider _listProvider;
     return Container(
       decoration: BoxDecoration(
         border: Border.all(
@@ -303,6 +344,8 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
                 ),
                 itemCount: images.length,
                 itemBuilder: (context, index) {
+                  duplicateImg.add(false);
+
                   Asset asset = images[index];
                   return Card(
                     elevation: 5.0,
@@ -318,50 +361,79 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
                             String editedFileName = '';
                             Uint8List? _imageBytesList;
 
-                            try{
-                              var foundProImgName = DefectImageData.allListImagesItem.where((element) => (element.oldImgName == imageName));
-                              if(foundProImgName.isNotEmpty) {
-                                imageNameSuffix = '${foundProImgName.first.newImgName}';
-                                imageNameSuffixPro = '${foundProImgName.first.proImgName}';
+                            print("duplicateImg[index] ${duplicateImg[index]}");
+                            if(!duplicateImg[index]) {
+                              try {
+                                var foundProImgName = DefectImageData
+                                    .allListImagesItem.where((element) =>
+                                (element.oldImgName == imageName));
+                                if (foundProImgName.isNotEmpty) {
+                                  imageNameSuffix =
+                                  '${foundProImgName.first.newImgName}';
+                                  imageNameSuffixPro =
+                                  '${foundProImgName.first.proImgName}';
 
-                                if(await File('$imageDir/$imageNameSuffix').exists()){
-                                  _imageBytesList = File('$imageDir/$imageNameSuffix').readAsBytesSync();
-                                  editedFileName = '$imageDir/$imageNameSuffix';
-                                }else if(await File('$imageDir/$imageNameSuffixPro').exists()){
-                                  _imageBytesList = File('$imageDir/$imageNameSuffixPro').readAsBytesSync();
-                                  editedFileName = '$imageDir/$imageNameSuffixPro';
+                                  if (await File('$imageDir/$imageNameSuffix')
+                                      .exists()) {
+                                    _imageBytesList =
+                                        File('$imageDir/$imageNameSuffix')
+                                            .readAsBytesSync();
+                                    editedFileName =
+                                    '$imageDir/$imageNameSuffix';
+                                  } else if (await File(
+                                      '$imageDir/$imageNameSuffixPro')
+                                      .exists()) {
+                                    _imageBytesList =
+                                        File('$imageDir/$imageNameSuffixPro')
+                                            .readAsBytesSync();
+                                    editedFileName =
+                                    '$imageDir/$imageNameSuffixPro';
+                                  }
+
+                                  Uint8List decodedBytes = await ImageUtility
+                                      .compressImageList(
+                                      _imageBytesList!, 1200, 1600, 90);
+                                  ui
+                                      .Image _myBackgroundImage = await ImageUtility
+                                      .loadImage(decodedBytes);
+
+                                  final result = await Navigator.push(context,
+                                      MaterialPageRoute(builder: (context) =>
+                                          ImageDialogOld(
+                                              backgroundImage: _myBackgroundImage,
+                                              imageIndex: index,
+                                              itemName: _ddIemController.text,
+                                              editedName: editedFileName,
+                                              oldName: '${foundProImgName.first
+                                                  .oldImgName}'
+                                          )));
+                                  if (result != null) {
+                                    setState(() => editedImage);
+                                  }
+                                } else {
+                                  Fluttertoast.showToast(
+                                      msg: "Please save image before paint",
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.BOTTOM,
+                                      timeInSecForIosWeb: 1,
+                                      backgroundColor: Colors.black,
+                                      textColor: Colors.white,
+                                      fontSize: 16.0
+                                  );
                                 }
-
-                                Uint8List decodedBytes = await ImageUtility.compressImageList(_imageBytesList!,1200,1600,90);
-                                ui.Image _myBackgroundImage = await ImageUtility.loadImage(decodedBytes);
-
-                                final result = await Navigator.push(context,
-                                    MaterialPageRoute(builder: (context) => ImageDialogOld(
-                                      backgroundImage: _myBackgroundImage,
-                                      imageIndex: index,
-                                      itemName: _ddIemController.text,
-                                      editedName: editedFileName,
-                                    )));
-                                if(result!=null){
-                                  // editedImage.add(result);
-                                  // print("editedImage $editedImage");
-                                  setState((){
-                                    editedImage = Set.of(editedImage).toList();
-                                  });
-                                }
-                              }else{
-                                Fluttertoast.showToast(
-                                    msg: "Please save image before paint",
-                                    toastLength: Toast.LENGTH_SHORT,
-                                    gravity: ToastGravity.BOTTOM,
-                                    timeInSecForIosWeb: 1,
-                                    backgroundColor: Colors.black,
-                                    textColor: Colors.white,
-                                    fontSize: 16.0
-                                );
+                              } catch (e) {
+                                print(e);
                               }
-                            } catch (e) {
-                              print(e);
+                            }else{
+                              Fluttertoast.showToast(
+                                  msg: "Duplicate picture cannot be edit!",
+                                  toastLength: Toast.LENGTH_SHORT,
+                                  gravity: ToastGravity.CENTER,
+                                  timeInSecForIosWeb: 5,
+                                  backgroundColor: Colors.red,
+                                  textColor: Colors.white,
+                                  fontSize: 16.0
+                              );
                             }
                           },
                           child: Container(
@@ -376,7 +448,7 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
                                   height: 300,
                                   quality: 75,
                                 ),
-                                (editedImage.contains(index))?
+                                (DefectImageData.allListImagesItem[index].isImgEdited &&(images[index].name == DefectImageData.allListImagesItem[index].oldImgName))?
                                 const DecoratedBox(
                                   decoration: BoxDecoration(
                                     color: Colors.black26,
@@ -384,6 +456,15 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
                                   child: Center(
                                     child: Text("Edited",style: TextStyle(backgroundColor: Colors.white))                            ,
                                   ),
+                                ):Container(),
+                                (duplicateImg[index])?
+                                const DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    color: Colors.black26,
+                                  ),
+                                  child: Align(
+                                      alignment: Alignment.bottomCenter,
+                                      child: Text(" Duplicate found ",style: TextStyle(backgroundColor: Colors.redAccent, color: Colors.white))),
                                 ):Container(),
                               ],
                             ),
@@ -404,34 +485,41 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
 
                               String imageNameSuffix = '';
                               String imageNameSuffixPro = '';
-                              var foundImgIndex = DefectImageData.allListImagesItem.indexWhere((element) => (element.oldImgName == imageName));
-                              if(foundImgIndex>=0){
-                                imageNameSuffix = '${DefectImageData.allListImagesItem[foundImgIndex].newImgName}';
-                                imageNameSuffixPro = '${DefectImageData.allListImagesItem[foundImgIndex].proImgName}';
 
-                                if(await File('$imageDir/$imageNameSuffix').exists()){
-                                  await File('$imageDir/$imageNameSuffix').delete();
-                                  DefectImageData.allListImagesItem.removeWhere((element) => (element.newImgName == imageNameSuffix));
-                                  setState(()=> deletedImage = true);
+                              if(!duplicateImg[index]) {
+                                var foundImgIndex = DefectImageData.allListImagesItem.indexWhere((element) => (element.oldImgName == imageName));
+                                if (foundImgIndex >= 0) {
+                                  imageNameSuffix = '${DefectImageData.allListImagesItem[foundImgIndex].newImgName}';
+                                  imageNameSuffixPro = '${DefectImageData.allListImagesItem[foundImgIndex].proImgName}';
 
-                                  try {
-                                    Directory imageDir = await ImageUtility.getImageDir();
-                                    List<FileSystemEntity> entries = imageDir.listSync(recursive: false).toList();
-                                    int newCounter = 0;
-                                    for (var i = 0; i < entries.length; i++) {
-                                      var fileName = (entries[i].path.split('/').last);
-                                      if ((fileName.split('_').first) == ddItemValue) {
-                                        ++newCounter;
-                                        String newName = "$ddItemValue\_$newCounter.jpg";
-                                        File('$imageDir/$fileName').renameSync('$imageDir/$newName');
+                                  if (await File('$imageDir/$imageNameSuffix').exists()) {
+                                    await File('$imageDir/$imageNameSuffix').delete();
+                                    DefectImageData.allListImagesItem.removeWhere((element) => (element.newImgName == imageNameSuffix));
+                                    setState(() => deletedImage = true);
+
+                                    try {
+                                      Directory imageDir = await ImageUtility.getImageDir();
+                                      List<FileSystemEntity> entries = imageDir.listSync(recursive: false).toList();
+                                      int newCounter = 0;
+                                      for (var i = 0; i < entries.length; i++) {
+                                        var fileName = (entries[i].path.split('/').last);
+                                        if ((fileName.split('_').first) == ddItemValue) {
+                                          ++newCounter;
+                                          String newName = "$ddItemValue\_$newCounter.jpg";
+                                          File('$imageDir/$fileName').renameSync('$imageDir/$newName');
+                                        }
                                       }
+                                    } catch (e) {
+                                      print(e);
                                     }
-                                  } catch (e) { print(e); }
-                                }else if(await File('$imageDir/$imageNameSuffixPro').exists()){
-                                  await File('$imageDir/$imageNameSuffixPro').delete();
-                                  DefectImageData.allListImagesItem.removeWhere((element) => (element.proImgName == imageNameSuffixPro));
-                                  setState(()=> deletedImage = true);
+                                  } else if (await File('$imageDir/$imageNameSuffixPro').exists()) {
+                                    await File('$imageDir/$imageNameSuffixPro').delete();
+                                    DefectImageData.allListImagesItem.removeWhere((element) => (element.proImgName == imageNameSuffixPro));
+                                    setState(() => deletedImage = true);
+                                  }
                                 }
+                              }else{
+                                setState(() => duplicateImg.removeAt(index));
                               }
 
                               if (deletedImage == true) {
@@ -444,18 +532,18 @@ class _EditListItemDialogWidgetState extends State<EditListItemDialogWidget> {
                                     textColor: Colors.white,
                                     fontSize: 16.0
                                 );
-                                editedImage.remove(index);
-                              } else {
-                                Fluttertoast.showToast(
-                                    msg: "Image can not Delete",
-                                    toastLength: Toast.LENGTH_SHORT,
-                                    gravity: ToastGravity.CENTER,
-                                    timeInSecForIosWeb: 1,
-                                    backgroundColor: Colors.red,
-                                    textColor: Colors.white,
-                                    fontSize: 16.0
-                                );
                               }
+                              // else {
+                              //   Fluttertoast.showToast(
+                              //       msg: "Image can not Delete",
+                              //       toastLength: Toast.LENGTH_SHORT,
+                              //       gravity: ToastGravity.CENTER,
+                              //       timeInSecForIosWeb: 1,
+                              //       backgroundColor: Colors.red,
+                              //       textColor: Colors.white,
+                              //       fontSize: 16.0
+                              //   );
+                              // }
                               setState(() {
                                 images.removeAt(index);
                               });

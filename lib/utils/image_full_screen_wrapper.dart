@@ -14,8 +14,9 @@ class ImageDialogOld extends StatefulWidget {
   final ui.Image backgroundImage;
   final int imageIndex;
   final String editedName;
+  final String oldName;
 
-  const ImageDialogOld({ Key? key, required this.backgroundImage, required this.imageIndex, required this.itemName, required this.editedName}) : super(key: key);
+  const ImageDialogOld({ Key? key, required this.backgroundImage, required this.imageIndex, required this.itemName, required this.editedName, required this.oldName}) : super(key: key);
 
   @override
   State<ImageDialogOld> createState() => _ImageDialogOldState();
@@ -291,8 +292,10 @@ class _ImageDialogOldState extends State<ImageDialogOld> {
           return RenderedImageDialog(imageFuture: imageFuture);
         });
 
-    String editedImgName = widget.editedName.split(' / ').last;
-    DefectImageData.updateImageItem(editedImgName);
+    var foundImgName = DefectImageData.allListImagesItem.where((element) => (element.oldImgName == widget.oldName));
+    if(foundImgName.isNotEmpty) {
+      foundImgName.first.isImgEdited = true;
+    }
 
     Navigator.pop(context);
   }

@@ -1,21 +1,16 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:chat_app/models/defect.dart';
 import 'package:chat_app/models/list_item.dart';
-import 'package:chat_app/models/list_image_item.dart';
 import 'package:chat_app/provider/list_provider.dart';
 import 'package:chat_app/utils/circular_progress_dialog.dart';
-import 'package:chat_app/utils/image_full_screen_wrapper.dart';
 import 'package:chat_app/utils/image_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:multi_image_picker2/multi_image_picker2.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:uri_to_file/uri_to_file.dart';
 
@@ -32,6 +27,7 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
   String _error = 'No Problem';
 
   List<Asset> images = <Asset>[];
+  List<bool> duplicateImg = [];
   List<int> editedImage = [];
 
   bool _imagePickButton = false;
@@ -144,6 +140,46 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
 
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
+
+      var duplicateImgMsgBuilder = StringBuffer();
+      duplicateImgMsgBuilder.write("Duplicate pictures found\n");
+
+      for (int i = 0; i < images.length; i++) {
+        var foundIndexImg = DefectImageData.allListImagesItem.indexWhere((element) => (element.oldImgName == images[i].name));
+        if(foundIndexImg>=0){
+          var categoryPosition = DefectImageData.allListImagesItem[foundIndexImg].newImgName!.split('.').first;
+
+          String _inCategory = categoryPosition.split('_').first;
+          var _inPosition = categoryPosition.split('_').last;
+
+          if(_inCategory != ddItemValue){
+            duplicateImgMsgBuilder.write("> added in category $_inCategory and position $_inPosition\n");
+            setState(() => duplicateImg[i] = true);
+          }else{
+            duplicateImg[i] = false;
+          }
+        }else{
+          duplicateImg[i] = false;
+        }
+      }
+      if(duplicateImg.contains(true)) {
+        _defectProvider.showCircularProgress(false);
+        DialogCircularBuilder(context).hideOpenDialog();
+
+        Fluttertoast.showToast(
+            msg: duplicateImgMsgBuilder.toString(),
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 5,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0
+        );
+
+        return;
+      }
+
+
       if(images.isEmpty){
         Navigator.of(context).pop();
       }else {
@@ -180,8 +216,6 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
           itemValue: ddItemValue,
           item: ddItem,
           images: images,
-          // edited: editedImage,
-          //description: description,
           createdTime: DateTime.now(),
         );
         _defectProvider.addItem(listItem);
@@ -285,6 +319,7 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
                 ),
                 itemCount: images.length,
                 itemBuilder: (context, index) {
+                  duplicateImg.add(false);
                   Asset asset = images[index];
                   return Card(
                     //clipBehavior: Clip.antiAlias,
@@ -312,6 +347,15 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
                                   child: Text("Edited",style: TextStyle(backgroundColor: Colors.white))                            ,
                                 ),
                               ):Container(),
+                              (duplicateImg[index])?
+                              const DecoratedBox(
+                                decoration: BoxDecoration(
+                                  color: Colors.black26,
+                                ),
+                                child: Align(
+                                    alignment: Alignment.bottomCenter,
+                                    child: Text("Duplicate found",style: TextStyle(backgroundColor: Colors.white))),
+                              ):Container(),
                             ],
                           ),
                         ),
@@ -325,6 +369,9 @@ class _AddListItemDialogWidgetState extends State<AddListItemDialogWidget> {
                               color: Colors.red,
                             ),
                             onTap: () {
+                              if(duplicateImg[index]) {
+                                setState(() => duplicateImg.removeAt(index));
+                              }
                               setState(() {
                                 //print("Remove");
                                 images.removeAt(index);

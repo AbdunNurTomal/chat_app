@@ -1,20 +1,15 @@
-import 'dart:typed_data';
 import 'dart:io';
-import 'dart:ui' as ui;
 
 import 'package:chat_app/models/defect.dart';
 import 'package:chat_app/models/list_item.dart';
 import 'package:chat_app/provider/list_provider.dart';
-import 'package:chat_app/utils/image_full_screen_wrapper.dart';
 import 'package:chat_app/utils/image_util.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:multi_image_picker2/multi_image_picker2.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:step_progress_indicator/step_progress_indicator.dart';
-import 'package:uri_to_file/uri_to_file.dart';
 
 import 'edit_list_item_dialog_widget.dart';
 
